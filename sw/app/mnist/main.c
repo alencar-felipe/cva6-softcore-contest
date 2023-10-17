@@ -42,9 +42,9 @@ int processInput(        UDATA_T* inputBuffer,
         ? nbValidPredictions : 0;
 }
 
+volatile int wait = 1;
 
 int main(int argc, char* argv[]) {
-
     // const N2D2::Network network{};
     size_t instret, cycles;
 
@@ -57,16 +57,18 @@ int main(int argc, char* argv[]) {
     Target_T expectedOutputBuffer[OUTPUTS_SIZE[0]];
     Target_T predictedOutputBuffer[OUTPUTS_SIZE[0]];
     UDATA_T output_value;
+    
+    //while(wait);
 
     readStimulus(inputBuffer, expectedOutputBuffer);
-    instret = -read_csr(minstret);
-    cycles = -read_csr(mcycle);
+//    instret = -read_csr(minstret);
+//    cycles = -read_csr(mcycle);
     const int success = processInput(inputBuffer, 
                                                         expectedOutputBuffer, 
                                                         predictedOutputBuffer,
 							&output_value);
-    instret += read_csr(minstret);
-    cycles += read_csr(mcycle);
+//    instret += read_csr(minstret);
+//    cycles += read_csr(mcycle);
     
     printf("Expected  = %d\n", expectedOutputBuffer[0]);
     printf("Predicted = %d\n", predictedOutputBuffer[0]);

@@ -8,6 +8,7 @@
 
 #define CHOOSE_INPUT_IMAGE 3
 
+
 #define NO_EXCEPT
 
 #if CHOOSE_INPUT_IMAGE == 3
