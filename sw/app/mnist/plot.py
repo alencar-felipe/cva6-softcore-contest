@@ -57,15 +57,16 @@ if __name__ == '__main__':
                 histogram[name] = value
 
     tuples = sorted(histogram.items(), key=lambda item: item[1], reverse=True)
+    tuples.reverse()
     labels, values = zip(*tuples)
 
     plt.title('mnist (-g -Og --fno-inline-small-functions)',
         fontname='Courier New', fontweight='bold')
-    plt.bar(range(len(labels)), values)
-    plt.xticks(range(len(labels)), labels, rotation=45,
-        fontname='Courier New', fontweight='bold')
-    plt.xlabel('Functions')
-    plt.ylabel('Executed Instructions')
-    plt.yscale('log')
-    plt.subplots_adjust(bottom=0.20)
+    plt.barh(range(len(labels)), values)
+    plt.yticks(range(len(labels)), labels)
+    plt.xlabel('Executed Instructions')
+    plt.xscale('log')
+    plt.ylabel('Functions')
+    #plt.tight_layout() 
+    plt.grid()
     plt.show()

@@ -70,12 +70,12 @@ int main(int argc, char* argv[]) {
 //    instret += read_csr(minstret);
 //    cycles += read_csr(mcycle);
     
-    printf("Expected  = %d\n", expectedOutputBuffer[0]);
-    printf("Predicted = %d\n", predictedOutputBuffer[0]);
-    printf("Result : %d/1\n", success);
-    printf("credence: %d\n", output_value);
-    printf("image %s: %d instructions\n", stringify(MNIST_INPUT_IMAGE), (int)(instret));
-    printf("image %s: %d cycles\n", stringify(MNIST_INPUT_IMAGE), (int)(cycles));
+    // printf("Expected  = %d\n", expectedOutputBuffer[0]);
+    // printf("Predicted = %d\n", predictedOutputBuffer[0]);
+    // printf("Result : %d/1\n", success);
+    // printf("credence: %d\n", output_value);
+    // printf("image %s: %d instructions\n", stringify(MNIST_INPUT_IMAGE), (int)(instret));
+    // printf("image %s: %d cycles\n", stringify(MNIST_INPUT_IMAGE), (int)(cycles));
 
 #ifdef OUTPUTFILE
     FILE *f = fopen("success_rate.txt", "w");
