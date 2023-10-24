@@ -44,6 +44,7 @@ int processInput(        UDATA_T* inputBuffer,
 
 
 int main(int argc, char* argv[]) {
+    printf("IM ALIVE\n");
 
     // const N2D2::Network network{};
     size_t instret, cycles;
@@ -59,14 +60,14 @@ int main(int argc, char* argv[]) {
     UDATA_T output_value;
 
     readStimulus(inputBuffer, expectedOutputBuffer);
-    instret = -read_csr(minstret);
-    cycles = -read_csr(mcycle);
+    // instret = -read_csr(minstret);
+    // cycles = -read_csr(mcycle);
     const int success = processInput(inputBuffer, 
                                                         expectedOutputBuffer, 
                                                         predictedOutputBuffer,
 							&output_value);
-    instret += read_csr(minstret);
-    cycles += read_csr(mcycle);
+    // instret += read_csr(minstret);
+    // cycles += read_csr(mcycle);
     
     printf("Expected  = %d\n", expectedOutputBuffer[0]);
     printf("Predicted = %d\n", predictedOutputBuffer[0]);
