@@ -138,7 +138,7 @@ static int feof_mnist_input() {
 void envRead(unsigned int size,
              unsigned int channelsHeight,
              unsigned int channelsWidth,
-             DATA_T* data,
+             int_t* data,
              unsigned int outputsSize,
              Target_T* outputTargets)
 {

@@ -36,7 +36,7 @@
 //--------------------------------------------------------------------------
 // matmul function
  
-extern void matmul(const size_t coreid, const size_t ncores, const size_t lda,  const data_t A[], const data_t B[], data_t C[] );
+extern void matmul(const size_t coreid, const size_t ncores, const size_t lda,  const int_t A[], const int_t B[], int_t C[] );
 
 
 //--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ extern void matmul(const size_t coreid, const size_t ncores, const size_t lda,  
   
 void thread_entry(int cid, int nc)
 {
-   static data_t results_data[ARRAY_SIZE];
+   static int_t results_data[ARRAY_SIZE];
 
    stats(matmul(cid, nc, DIM_SIZE, input1_data, input2_data, results_data); barrier(nc), DIM_SIZE/DIM_SIZE/DIM_SIZE);
  

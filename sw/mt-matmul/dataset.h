@@ -8,7 +8,7 @@
 #define DIM_SIZE 16 
 
 
-typedef int data_t;static data_t input1_data[ARRAY_SIZE] = 
+typedef int int_t;static int_t input1_data[ARRAY_SIZE] = 
 {
     0,   3,   2,   0,   3,   1,   0,   3,   2,   3,   2,   0,   3,   3,   1,   2,   3,   0,   0,   1, 
     1,   1,   2,   3,   1,   2,   3,   1,   1,   3,   2,   2,   0,   1,   3,   2,   2,   2,   0,   0, 
@@ -25,7 +25,7 @@ typedef int data_t;static data_t input1_data[ARRAY_SIZE] =
     3,   1,   1,   1,   2,   2,   1,   3,   0,   3,   3,   1,   0,   0,   3,   2
 };
 
-static data_t input2_data[ARRAY_SIZE] = 
+static int_t input2_data[ARRAY_SIZE] = 
 {
     1,   1,   0,   3,   1,   2,   0,   0,   0,   0,   0,   2,   1,   2,   3,   0,   0,   3,   3,   2, 
     2,   1,   2,   3,   3,   0,   2,   2,   1,   1,   2,   2,   0,   2,   2,   1,   2,   3,   2,   2, 
@@ -42,7 +42,7 @@ static data_t input2_data[ARRAY_SIZE] =
     2,   0,   3,   0,   3,   0,   3,   2,   2,   3,   3,   2,   1,   0,   2,   2
 };
 
-static data_t verify_data[ARRAY_SIZE] = 
+static int_t verify_data[ARRAY_SIZE] = 
 {
    36,  44,  57,  50,  54,  36,  38,  46,  55,  25,  38,  34,  51,  30,  40,  32,  37,  34,  38,  52, 
    51,  40,  28,  32,  41,  22,  26,  35,  49,  35,  42,  23,  26,  26,  33,  36,  52,  40,  45,  49, 

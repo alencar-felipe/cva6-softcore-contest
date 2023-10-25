@@ -49,7 +49,7 @@
 //#define IIRF_MMI                        0x03u
 #define IIRF_RX_DATA                    0x04u
 #define IIRF_RX_LINE_STATUS             0x06u
-#define IIRF_DATA_TIMEOUT               0x0Cu
+#define IIRF_int_tIMEOUT               0x0Cu
 
 
 uart_instance_t g_uart_0 = { .hw_reg = FPGA_UART_0_BASE };
@@ -701,7 +701,7 @@ uart_isr
         break;
 
         case IIRF_RX_DATA:      /* Received Data Available */
-        case IIRF_DATA_TIMEOUT: /* Received Data Timed-out */
+        case IIRF_int_tIMEOUT: /* Received Data Timed-out */
         {
             //ASSERT(NULL_HANDLER != this_uart->rx_handler);
             if (NULL_HANDLER != this_uart->rx_handler)

@@ -8,19 +8,19 @@
 #include "util.h"
 
 void readStimulus(
-                  UDATA_T* inputBuffer,
+                  uint_t* inputBuffer,
                   Target_T* expectedOutputBuffer)
 {
     envRead(ENV_SIZE_Y*ENV_SIZE_X*ENV_NB_OUTPUTS,
             ENV_SIZE_Y, ENV_SIZE_X,
-            (DATA_T*) inputBuffer, //TODO
+            (int_t*) inputBuffer, //TODO
             OUTPUTS_SIZE[0], expectedOutputBuffer);
 }
 
-int processInput(        UDATA_T* inputBuffer,
+int processInput(        uint_t* inputBuffer,
                             Target_T* expectedOutputBuffer,
                             Target_T* predictedOutputBuffer,
-			    UDATA_T* output_value)
+			    uint_t* output_value)
 {
     size_t nbPredictions = 0;
     size_t nbValidPredictions = 0;
@@ -50,14 +50,14 @@ int main(int argc, char* argv[]) {
     size_t instret, cycles;
 
 #if ENV_DATA_UNSIGNED
-    UDATA_T inputBuffer[ENV_SIZE_Y*ENV_SIZE_X*ENV_NB_OUTPUTS];
+    uint_t inputBuffer[ENV_SIZE_Y*ENV_SIZE_X*ENV_NB_OUTPUTS];
 #else
-    std::vector<DATA_T> inputBuffer(network.inputSize());
+    std::vector<int_t> inputBuffer(network.inputSize());
 #endif
 
     Target_T expectedOutputBuffer[OUTPUTS_SIZE[0]];
     Target_T predictedOutputBuffer[OUTPUTS_SIZE[0]];
-    UDATA_T output_value;
+    uint_t output_value;
 
     readStimulus(inputBuffer, expectedOutputBuffer);
     // instret = -read_csr(minstret);

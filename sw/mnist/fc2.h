@@ -21,12 +21,12 @@ static const int32_t FC2_SCALING_FACTOR_PER_OUTPUT[] = {0};
 #define FC2_OUTPUTS_SIZE (FC2_NB_OUTPUTS*FC2_OUTPUTS_WIDTH*FC2_OUTPUTS_HEIGHT)
 #define FC2_CHANNELS_SIZE (FC2_NB_CHANNELS*FC2_CHANNELS_WIDTH*FC2_CHANNELS_HEIGHT)
 
-static const BDATA_T fc2_biases[FC2_OUTPUTS_SIZE] = {0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, };
+static const long_t fc2_biases[FC2_OUTPUTS_SIZE] = {0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, 0 + 1024, };
 #define FC2_WEIGHTS_SIZE (FC2_OUTPUTS_SIZE*FC2_CHANNELS_SIZE)
 
 // Flatten weights with the order[OUTPUTS_SIZE][CHANNELS_SIZE]. 
 // If the previous cell was a 2D cell, CHANNELS_SIZE is flatten in the [CHANNELS_HEIGHT][CHANNELS_WIDTH][NB_CHANNELS] order.
-static const WDATA_T fc2_weights[FC2_WEIGHTS_SIZE] = {
+static const Wint_t fc2_weights[FC2_WEIGHTS_SIZE] = {
 -55, -5, -6, -28, -26, -38, 30, -29, -5, -28, -25, 44, -8, -19, -7, -23, -14, 29, -10, 28, 30, 33, -38, -39, -36, 16, -14, -19, -25, -12, 
 -3, 58, 6, -5, -43, 41, 27, -4, -23, 44, 28, -33, -2, 3, 40, -23, -7, 46, 38, -21, -19, -40, -9, -17, -21, -13, 34, -7, -4, -42, 
 47, 36, -10, -30, -21, -26, 28, -30, 50, 1, 20, 60, 44, 42, -10, -5, 30, -4, -8, -8, -6, -35, 40, -20, -20, -23, 18, -32, 12, -19, 

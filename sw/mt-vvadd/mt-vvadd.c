@@ -35,7 +35,7 @@
 //--------------------------------------------------------------------------
 // vvadd function
 
-extern void __attribute__((noinline)) vvadd(int coreid, int ncores, size_t n, const data_t* x, const data_t* y, data_t* z);
+extern void __attribute__((noinline)) vvadd(int coreid, int ncores, size_t n, const int_t* x, const int_t* y, int_t* z);
 
 
 //--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ extern void __attribute__((noinline)) vvadd(int coreid, int ncores, size_t n, co
 void thread_entry(int cid, int nc)
 {
    // static allocates data in the binary, which is visible to both threads
-   static data_t results_data[DATA_SIZE];
+   static int_t results_data[DATA_SIZE];
    
    // First do out-of-place vvadd
    barrier(nc);

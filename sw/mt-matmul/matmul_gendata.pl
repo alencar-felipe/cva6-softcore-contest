@@ -61,7 +61,7 @@ sub printArray
   my $numCols = 20;
   my $arrayLen = scalar(@{$arrayRef});
 
-  print "static data_t ".$arrayName."[ARRAY_SIZE] = \n";
+  print "static int_t ".$arrayName."[ARRAY_SIZE] = \n";
   print "{\n";
 
   if ( $arrayLen <= $numCols ) {
@@ -191,7 +191,7 @@ sub main()
   print "\n#define __DATASET_H";
   print "\n\#define ARRAY_SIZE ".($opts{"size"}*$opts{"size"})." \n\n";
   print "\n\#define DIM_SIZE ".$opts{"size"}." \n\n";
-  print "\ntypedef int data_t;";
+  print "\ntypedef int int_t;";
    
   printArray( "input1_data", \@values1 );
   printArray( "input2_data", \@values2 );

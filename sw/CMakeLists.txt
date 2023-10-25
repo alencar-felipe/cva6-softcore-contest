@@ -33,7 +33,6 @@ foreach(APP ${APPS})
     add_executable(${APP} ${COMMON_SRCS} ${APP_SRCS})
     target_include_directories(${APP} PRIVATE ${APP})
     
-    # If there are specific linking requirements, like a custom linker script, add them here
     # target_link_options(${APP} PRIVATE -T ${LDSCRIPT})
     
     # If you need the dump file
@@ -47,7 +46,7 @@ foreach(APP ${APPS})
         OUTPUT ${APP}_spike.phony
         COMMAND spike --isa=${ARCH} ${PK} $<TARGET_FILE:${APP}>
         DEPENDS ${APP}
-        COMMENT "Simulating ${APP} with Spike"
+        COMMENT "Launching ${APP} with Spike"
     )
     
 endforeach()

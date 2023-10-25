@@ -37,7 +37,7 @@ do { printf("%s\n", std::string(msg).c_str()); abort(); } while (false)
 void envRead(unsigned int size,
              unsigned int channelsHeight,
              unsigned int channelsWidth,
-             DATA_T* data,
+             int_t* data,
              unsigned int outputsSize,
              Target_T* outputTargets);
 

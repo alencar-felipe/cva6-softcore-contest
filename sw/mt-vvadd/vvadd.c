@@ -6,7 +6,7 @@
 //--------------------------------------------------------------------------
 // vvadd function
 
-void __attribute__((noinline)) vvadd(int coreid, int ncores, size_t n, const data_t* x, const data_t* y, data_t* z)
+void __attribute__((noinline)) vvadd(int coreid, int ncores, size_t n, const int_t* x, const int_t* y, int_t* z)
 {
    size_t i;
 
