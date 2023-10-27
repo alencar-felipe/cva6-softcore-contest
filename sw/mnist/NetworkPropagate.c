@@ -10,7 +10,7 @@
 #include "fc2.h"
 
 
-static int_t mem[MEMORY_SIZE];
+static int8_t mem[MEMORY_SIZE];
 
 static int max(int lhs, int rhs) {
         return (lhs >= rhs)?lhs:rhs;
@@ -28,9 +28,9 @@ static int clamp(int v, int lo, int hi) {
     }
 }
 
-static void macsOnRange(const uint_t* __restrict inputs,
-                        const Wint_t* __restrict weights,
-                        long_t* __restrict weightedSum,
+static void macsOnRange(const uint8_t* __restrict inputs,
+                        const int8_t* __restrict weights,
+                        int32_t* __restrict weightedSum,
                         int nb_iterations)
 {
     for (int iter = 0; iter < nb_iterations; ++iter) {
@@ -38,11 +38,11 @@ static void macsOnRange(const uint_t* __restrict inputs,
     }
 }
 
-static uint_t saturate(long_t value, uint32_t sat) {
-    return clamp(value, (long_t)(0), ((long_t)(1) << sat) - 1);
+static uint8_t saturate(int32_t value, uint32_t sat) {
+    return clamp(value, (int32_t)(0), ((int32_t)(1) << sat) - 1);
 }
 
-static uint_t sat(long_t weightedSum, int output,
+static uint8_t sat(int32_t weightedSum, int output,
                                            ActivationFunction_T func,
                                            /* const Rescaling_T& __restrict rescaling */
                                            int shift)
@@ -65,10 +65,10 @@ static uint_t sat(long_t weightedSum, int output,
 }
 
 static void convcellPropagate1(
-    const uint_t* __restrict inputs,
-    uint_t* __restrict outputs,
-    const long_t* __restrict biasses,
-    const Wint_t* __restrict weights,
+    const uint8_t* __restrict inputs,
+    uint8_t* __restrict outputs,
+    const int32_t* __restrict biasses,
+    const int8_t* __restrict weights,
     int rescaling,
     int NB_CHANNELS, 
     int CHANNELS_HEIGHT, int CHANNELS_WIDTH,
@@ -126,7 +126,7 @@ static void convcellPropagate1(
                 }
                 // <--
 
-                long_t weightedSum = biasses[output];
+                int32_t weightedSum = biasses[output];
 
                 for (int sy = 0; sy < KERNEL_HEIGHT; ++sy) {
                     if ((PADDING_Y != 0
@@ -207,11 +207,11 @@ static void convcellPropagate1(
     }
 }
 
-static void fccellPropagateuint_t(
-    const uint_t* __restrict inputs,
-    uint_t* __restrict outputs,
-    const long_t* __restrict biasses,
-    const Wint_t* __restrict weights,
+static void fccellPropagateuint8_t(
+    const uint8_t* __restrict inputs,
+    uint8_t* __restrict outputs,
+    const int32_t* __restrict biasses,
+    const int8_t* __restrict weights,
     const int rescaling,
     int NB_CHANNELS, 
     int CHANNELS_HEIGHT, int CHANNELS_WIDTH,
@@ -236,7 +236,7 @@ static void fccellPropagateuint_t(
     // static_assert(OUTPUT_MEM_WRAP_SIZE == 0, "Output wrapping not supported");
 
     for (int och = 0; och < NB_OUTPUTS; och++) {
-        long_t weightedSum = biasses[och];
+        int32_t weightedSum = biasses[och];
 
         for (int iy = 0; iy < CHANNELS_HEIGHT; ++iy) {
             const int iPos = (CHANNELS_WIDTH * iy);
@@ -291,11 +291,11 @@ static void fccellPropagateuint_t(
     }
 }
 
-static void fccellPropagateint_t(
-    const uint_t* __restrict inputs,
-    int_t* __restrict outputs,
-    const long_t* __restrict biasses,
-    const Wint_t* __restrict weights,
+static void fccellPropagateint8_t(
+    const uint8_t* __restrict inputs,
+    int8_t* __restrict outputs,
+    const int32_t* __restrict biasses,
+    const int8_t* __restrict weights,
     const int rescaling,
     int NB_CHANNELS, 
     int CHANNELS_HEIGHT, int CHANNELS_WIDTH,
@@ -320,7 +320,7 @@ static void fccellPropagateint_t(
     // static_assert(OUTPUT_MEM_WRAP_SIZE == 0, "Output wrapping not supported");
 
     for (int och = 0; och < NB_OUTPUTS; och++) {
-        long_t weightedSum = biasses[och];
+        int32_t weightedSum = biasses[och];
 
         for (int iy = 0; iy < CHANNELS_HEIGHT; ++iy) {
             const int iPos = (CHANNELS_WIDTH * iy);
@@ -376,9 +376,9 @@ static void fccellPropagateint_t(
 }
 
 static void maxPropagate1(
-    const int_t* __restrict inputs,
+    const int8_t* __restrict inputs,
     int32_t* __restrict outputs,
-    int_t* output_value,
+    int8_t* output_value,
     int NB_CHANNELS,
     int INPUTS_HEIGHT, int INPUTS_WIDTH,
     // Memory mapping: outputs
@@ -389,7 +389,7 @@ static void maxPropagate1(
     int INPUT_MEM_STRIDE)
 {
     int iMaxInput = 0;
-    int_t maxInput = SCHAR_MIN;
+    int8_t maxInput = SCHAR_MIN;
 
     for (int iy = 0; iy < INPUTS_HEIGHT; ++iy) {
         for (int ix = 0; ix < INPUTS_WIDTH; ++ix) {
@@ -420,19 +420,11 @@ static void maxPropagate1(
     }
 }
 
-void propagate(const uint_t* inputs, long_t* outputs, uint_t* maxPropagate_val)
+void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* maxPropagate_val)
 {
-#ifdef SAVE_OUTPUTS
-    FILE* env_stream = fopen("env_output.txt", "w");
-    saveOutputs(ENV_NB_OUTPUTS, ENV_SIZE_Y, ENV_SIZE_X, ENV_MEM_CONT_OFFSET, ENV_MEM_CONT_SIZE, ENV_MEM_WRAP_OFFSET, ENV_MEM_WRAP_SIZE, ENV_MEM_STRIDE, inputs, env_stream, Network::Format::CHW);
-    fclose(env_stream);
-#endif
-    // conv1
-    uint_t* conv1_output = (uint_t*) mem + CONV1_MEM_CONT_OFFSET;
 
-#ifdef BENCHMARK
-    const Tick_T start_conv1 = tick();
-#endif
+    // conv1
+    uint8_t* conv1_output = (uint8_t*) mem + CONV1_MEM_CONT_OFFSET;
 
     convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, 8,
     CONV1_NB_CHANNELS, CONV1_CHANNELS_HEIGHT, CONV1_CHANNELS_WIDTH, CONV1_NB_OUTPUTS, CONV1_OUTPUTS_HEIGHT, 
@@ -442,27 +434,8 @@ void propagate(const uint_t* inputs, long_t* outputs, uint_t* maxPropagate_val)
 
     //convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, CONV1_SCALING);
 
-#ifdef BENCHMARK
-    const Tick_T end_conv1 = tick();
-    static RunningMean_T conv1_timing = {0.0, 0};
-    benchmark("conv1", start_conv1, end_conv1, conv1_timing);
-#endif
-
-#ifdef SAVE_OUTPUTS
-    FILE* conv1_stream = fopen("conv1_output.txt", "w");
-    saveOutputs(CONV1_NB_OUTPUTS, CONV1_OUTPUTS_HEIGHT, CONV1_OUTPUTS_WIDTH, CONV1_MEM_CONT_OFFSET, CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, CONV1_MEM_STRIDE, conv1_output , conv1_stream, Network::Format::CHW);
-    fclose(conv1_stream);
-#endif
-
-
-
-
     // conv2
-    uint_t* conv2_output = (uint_t*) mem + CONV2_MEM_CONT_OFFSET;
-
-#ifdef BENCHMARK
-    const Tick_T start_conv2 = tick();
-#endif
+    uint8_t* conv2_output = (uint8_t*) mem + CONV2_MEM_CONT_OFFSET;
 
     convcellPropagate1(conv1_output , conv2_output, conv2_biases, conv2_weights, 8,
     CONV2_NB_CHANNELS, CONV2_CHANNELS_HEIGHT, CONV2_CHANNELS_WIDTH, 
@@ -475,29 +448,10 @@ void propagate(const uint_t* inputs, long_t* outputs, uint_t* maxPropagate_val)
 
     //convcellPropagate2(conv1_output , conv2_output, conv2_biases, conv2_weights, CONV2_SCALING);
 
-#ifdef BENCHMARK
-    const Tick_T end_conv2 = tick();
-    static RunningMean_T conv2_timing = {0.0, 0};
-    benchmark("conv2", start_conv2, end_conv2, conv2_timing);
-#endif
-
-#ifdef SAVE_OUTPUTS
-    FILE* conv2_stream = fopen("conv2_output.txt", "w");
-    saveOutputs(CONV2_NB_OUTPUTS, CONV2_OUTPUTS_HEIGHT, CONV2_OUTPUTS_WIDTH, CONV2_MEM_CONT_OFFSET, CONV2_MEM_CONT_SIZE, CONV2_MEM_WRAP_OFFSET, CONV2_MEM_WRAP_SIZE, CONV2_MEM_STRIDE, conv2_output , conv2_stream, Network::Format::CHW);
-    fclose(conv2_stream);
-#endif
-
-
-
-
     // fc1
-    uint_t* fc1_output = (uint_t*) mem + FC1_MEM_CONT_OFFSET;
+    uint8_t* fc1_output = (uint8_t*) mem + FC1_MEM_CONT_OFFSET;
 
-#ifdef BENCHMARK
-    const Tick_T start_fc1 = tick();
-#endif
-
-    fccellPropagateuint_t(conv2_output , fc1_output, fc1_biases, fc1_weights, 8,
+    fccellPropagateuint8_t(conv2_output , fc1_output, fc1_biases, fc1_weights, 8,
     FC1_NB_CHANNELS, FC1_CHANNELS_HEIGHT, 
     FC1_CHANNELS_WIDTH, FC1_NB_OUTPUTS, 
     FC1_OUTPUTS_HEIGHT, FC1_OUTPUTS_WIDTH, FC1_ACTIVATION, 
@@ -506,29 +460,10 @@ void propagate(const uint_t* inputs, long_t* outputs, uint_t* maxPropagate_val)
     CONV2_MEM_STRIDE, FC1_MEM_CONT_OFFSET, 
     FC1_MEM_CONT_SIZE, FC1_MEM_WRAP_OFFSET, FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE);
 
-#ifdef BENCHMARK
-    const Tick_T end_fc1 = tick();
-    static RunningMean_T fc1_timing = {0.0, 0};
-    benchmark("fc1", start_fc1, end_fc1, fc1_timing);
-#endif
-
-#ifdef SAVE_OUTPUTS
-    FILE* fc1_stream = fopen("fc1_output.txt", "w");
-    saveOutputs(FC1_NB_OUTPUTS, FC1_OUTPUTS_HEIGHT, FC1_OUTPUTS_WIDTH, FC1_MEM_CONT_OFFSET, FC1_MEM_CONT_SIZE, FC1_MEM_WRAP_OFFSET, FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE, fc1_output , fc1_stream, Network::Format::CHW);
-    fclose(fc1_stream);
-#endif
-
-
-
-
     // fc2
-    int_t* fc2_output = (int_t*) mem + FC2_MEM_CONT_OFFSET;
+    int8_t* fc2_output = (int8_t*) mem + FC2_MEM_CONT_OFFSET;
 
-#ifdef BENCHMARK
-    const Tick_T start_fc2 = tick();
-#endif
-
-    fccellPropagateint_t(fc1_output , fc2_output, fc2_biases, fc2_weights, 11,
+    fccellPropagateint8_t(fc1_output , fc2_output, fc2_biases, fc2_weights, 11,
     FC2_NB_CHANNELS, FC2_CHANNELS_HEIGHT, 
     FC2_CHANNELS_WIDTH, FC2_NB_OUTPUTS, 
     FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, 
@@ -538,36 +473,7 @@ void propagate(const uint_t* inputs, long_t* outputs, uint_t* maxPropagate_val)
     FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, 
     FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
 
-#ifdef BENCHMARK
-    const Tick_T end_fc2 = tick();
-    static RunningMean_T fc2_timing = {0.0, 0};
-    benchmark("fc2", start_fc2, end_fc2, fc2_timing);
-#endif
-
-#ifdef SAVE_OUTPUTS
-    FILE* fc2_stream = fopen("fc2_output.txt", "w");
-    saveOutputs(FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE, fc2_output , fc2_stream, Network::Format::CHW);
-    fclose(fc2_stream);
-#endif
-
     maxPropagate1(fc2_output, outputs, maxPropagate_val, FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
-
-#ifdef SAVE_OUTPUTS
-    FILE* max_stream = fopen("max_output.txt", "w");
-    saveOutputs(FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE, outputs, max_stream, Network::Format::CHW);
-    fclose(max_stream);
-#endif
-
 }
-
-/*template<>
-float Network::backpropagate(const int_t* input, const std::int32_t* labels){
-   const float loss = 0.0f;
-   return loss;
- }
-
-int Network::gradientCheck(){
-   return(0);
-}*/
 
 

@@ -12,7 +12,7 @@ set(LDSCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/link.ld")
 
 set(ARCH "rv32imc_zicsr_zifencei")
 add_compile_definitions(ARCH=${ARCH})
-add_compile_options(-march=${ARCH} -mabi=ilp32 -g -O2)
+add_compile_options(-march=${ARCH} -mabi=ilp32 -g -O2 -flto)
 
 include_directories(${COMMON_DIR})
 

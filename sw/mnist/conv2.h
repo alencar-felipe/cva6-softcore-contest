@@ -5,7 +5,7 @@
 #define N2D2_EXPORTC_CONV2_LAYER_H
 
 #include "typedefs.h"
-#include "utils.h"
+#include "mnist.h"
 #define CONV2_NB_OUTPUTS 24
 #define CONV2_NB_CHANNELS 16
 #define CONV2_OUTPUTS_WIDTH 4
@@ -31,12 +31,12 @@ static const int32_t CONV2_SCALING_FACTOR_PER_OUTPUT[] = {0};
 #define CONV2_OUTPUTS_SIZE (CONV2_NB_OUTPUTS*CONV2_OUTPUTS_WIDTH*CONV2_OUTPUTS_HEIGHT)
 #define CONV2_CHANNELS_SIZE (CONV2_NB_CHANNELS*CONV2_CHANNELS_WIDTH*CONV2_CHANNELS_HEIGHT)
 
-static const long_t conv2_biases[CONV2_NB_OUTPUTS] = {0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, };
+static const int32_t conv2_biases[CONV2_NB_OUTPUTS] = {0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, 0 + 128, };
 
 #define CONV2_WEIGHTS_SIZE (CONV2_NB_OUTPUTS*CONV2_KERNEL_WIDTH*CONV2_KERNEL_HEIGHT*CONV2_NB_CHANNELS)
 
 // Flatten weights with the order [NB_OUTPUTS][KERNEL_HEIGHT][KERNEL_WIDTH][NB_CHANNELS]
-static const Wint_t conv2_weights[CONV2_WEIGHTS_SIZE] = {5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 
+static const int8_t conv2_weights[CONV2_WEIGHTS_SIZE] = {5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, -4, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 2, -16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -33, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, -3, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
