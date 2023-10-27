@@ -89,7 +89,7 @@ typedef struct
     volatile uint32_t PRIORITY_THRESHOLD;
     volatile uint32_t CLAIM_COMPLETE;
     volatile uint32_t reserved[(0x1000/4)-2];
-} IRQ_Target_Type;
+} IRQ_long_type;
 
 typedef struct
 {
@@ -130,7 +130,7 @@ typedef struct
     volatile uint32_t RESERVED4[(0x200000-0x2000)/4 - PLIC_SET_UP_REGISTERS];
 
     /*--- Target Priority threshold and claim/complete---------*/
-    IRQ_Target_Type TARGET[NUM_CLAIM_REGS];
+    IRQ_long_type TARGET[NUM_CLAIM_REGS];
 
 
     

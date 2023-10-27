@@ -420,7 +420,7 @@ static void maxPropagate1(
     }
 }
 
-void propagate(const uint_t* inputs, Target_T* outputs, uint_t* maxPropagate_val)
+void propagate(const uint_t* inputs, long_t* outputs, uint_t* maxPropagate_val)
 {
 #ifdef SAVE_OUTPUTS
     FILE* env_stream = fopen("env_output.txt", "w");

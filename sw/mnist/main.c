@@ -1,25 +1,22 @@
+#include "mnist.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "cpp_utils.h"
 #include "env.h"
 #include "Network.h"
 #include "util.h"
 
-void readStimulus(
-                  uint_t* inputBuffer,
-                  Target_T* expectedOutputBuffer)
+static void decode_stimulus(uint8_t *raw, uint8_t **image, int32_t *label)
 {
-    envRead(ENV_SIZE_Y*ENV_SIZE_X*ENV_NB_OUTPUTS,
-            ENV_SIZE_Y, ENV_SIZE_X,
-            (int_t*) inputBuffer, //TODO
-            OUTPUTS_SIZE[0], expectedOutputBuffer);
+    *image = (int8_t *) (raw = raw + 13);
+    *label = *(int32_t *) (raw = raw + IMAGE_W*IMAGE_H);
 }
 
 int processInput(        uint_t* inputBuffer,
-                            Target_T* expectedOutputBuffer,
-                            Target_T* predictedOutputBuffer,
+                            long_t* expectedOutputBuffer,
+                            long_t* predictedOutputBuffer,
 			    uint_t* output_value)
 {
     size_t nbPredictions = 0;
@@ -49,17 +46,16 @@ int main(int argc, char* argv[]) {
     // const N2D2::Network network{};
     size_t instret, cycles;
 
-#if ENV_DATA_UNSIGNED
-    uint_t inputBuffer[ENV_SIZE_Y*ENV_SIZE_X*ENV_NB_OUTPUTS];
-#else
-    std::vector<int_t> inputBuffer(network.inputSize());
-#endif
+    uint8_t *inputBuffer;
 
-    Target_T expectedOutputBuffer[OUTPUTS_SIZE[0]];
-    Target_T predictedOutputBuffer[OUTPUTS_SIZE[0]];
+    long_t expectedOutputBuffer[OUTPUTS_SIZE[0]];
+    long_t predictedOutputBuffer[OUTPUTS_SIZE[0]];
     uint_t output_value;
 
-    readStimulus(inputBuffer, expectedOutputBuffer);
+    decode_stimulus(stimulus_0003, &inputBuffer, &expectedOutputBuffer[0]);
+
+    printf("%d\n", expectedOutputBuffer[0]);
+
     // instret = -read_csr(minstret);
     // cycles = -read_csr(mcycle);
     const int success = processInput(inputBuffer, 
@@ -75,14 +71,4 @@ int main(int argc, char* argv[]) {
     printf("credence: %d\n", output_value);
     printf("image %s: %d instructions\n", stringify(MNIST_INPUT_IMAGE), (int)(instret));
     printf("image %s: %d cycles\n", stringify(MNIST_INPUT_IMAGE), (int)(cycles));
-
-#ifdef OUTPUTFILE
-    FILE *f = fopen("success_rate.txt", "w");
-    if (f == NULL) {
-        N2D2_THROW_OR_ABORT(std::runtime_error,
-            "Could not create file:  success_rate.txt");
-    }
-    fprintf(f, "%f", successRate);
-    fclose(f);
-#endif
 }

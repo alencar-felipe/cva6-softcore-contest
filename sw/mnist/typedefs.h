@@ -1,5 +1,4 @@
-#ifndef TYPEDEFS_H
-#define TYPEDEFS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -8,6 +7,7 @@
 typedef uint8_t uint_t;
 typedef int8_t int_t;
 typedef int32_t long_t;
+typedef uint32_t ulong_t;
 
 typedef enum {
     Logistic,
@@ -87,4 +87,3 @@ typedef int_t Wint_t;
 #define uint_t_MIN 0LL
 #endif
 
-#endif // N2D2_EXPORTC_TYPEDEFS_H

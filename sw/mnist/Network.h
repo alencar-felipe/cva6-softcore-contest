@@ -4,6 +4,6 @@
 #include "typedefs.h"
 #include "env.h"
 
-void propagate(const uint_t* inputs, Target_T* outputs, uint_t* maxPropagate_val);
+void propagate(const uint_t* inputs, long_t* outputs, uint_t* maxPropagate_val);
 
 #endif
