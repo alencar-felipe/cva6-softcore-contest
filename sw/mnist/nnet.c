@@ -78,130 +78,91 @@ static void convcellPropagate1(
     int STRIDE_Y, int STRIDE_X,
     int KERNEL_HEIGHT, int KERNEL_WIDTH,
     ActivationFunction_T ACTIVATION,
-    // Memory mapping: inputs
     int INPUT_MEM_CONT_OFFSET,
     int INPUT_MEM_CONT_SIZE,
     int INPUT_MEM_WRAP_OFFSET,
     int INPUT_MEM_WRAP_SIZE,
     int INPUT_MEM_STRIDE,
-    // Memory mapping: outputs
     int OUTPUT_MEM_CONT_OFFSET,
     int OUTPUT_MEM_CONT_SIZE,
     int OUTPUT_MEM_WRAP_OFFSET,
     int OUTPUT_MEM_WRAP_SIZE,
     int OUTPUT_MEM_STRIDE)
 {
-    int OUTPUTS_HEIGHT_NOPAD
-        = (CHANNELS_HEIGHT - KERNEL_HEIGHT + STRIDE_Y) / STRIDE_Y;
-    int OUTPUTS_WIDTH_NOPAD
-        = (CHANNELS_WIDTH - KERNEL_WIDTH + STRIDE_X) / STRIDE_X;
+    // Compute output sizes without padding
+    int OUTPUTS_HEIGHT_NOPAD = (CHANNELS_HEIGHT - KERNEL_HEIGHT + STRIDE_Y) / STRIDE_Y;
+    int OUTPUTS_WIDTH_NOPAD = (CHANNELS_WIDTH - KERNEL_WIDTH + STRIDE_X) / STRIDE_X;
 
+    // Iterate over each output's height and width
     for (int oy = 0; oy < OUTPUTS_HEIGHT; ++oy) {
-        const int syMin = (PADDING_Y == 0) ? 0
-            : max(PADDING_Y - (oy * STRIDE_Y), 0);
-        const int syMax = (PADDING_Y == 0
-                && OUTPUTS_HEIGHT == OUTPUTS_HEIGHT_NOPAD) ? KERNEL_HEIGHT
-            : clamp(CHANNELS_HEIGHT + PADDING_Y - (oy * STRIDE_Y), 
-                    0, KERNEL_HEIGHT);
-        const int iy = (oy * STRIDE_Y) - PADDING_Y;
+        // Compute the y-start and y-end for the kernel
+        int syMin = (PADDING_Y == 0) ? 0 : max(PADDING_Y - (oy * STRIDE_Y), 0);
+        int syMax = (PADDING_Y == 0 && OUTPUTS_HEIGHT == OUTPUTS_HEIGHT_NOPAD) 
+            ? KERNEL_HEIGHT
+            : clamp(CHANNELS_HEIGHT + PADDING_Y - (oy * STRIDE_Y), 0, KERNEL_HEIGHT);
+        int iy = (oy * STRIDE_Y) - PADDING_Y;
 
         for (int ox = 0; ox < OUTPUTS_WIDTH; ++ox) {
+            int sxMin = (PADDING_X == 0) ? 0 : max(PADDING_X - (ox * STRIDE_X), 0);
+            int sxMax = (PADDING_X == 0 && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD) 
+                ? KERNEL_WIDTH
+                : clamp(CHANNELS_WIDTH + PADDING_X - (ox * STRIDE_X), 0, KERNEL_WIDTH);
+            int ix = (ox * STRIDE_X) - PADDING_X;
+
+            // Compute the output's memory offset
+            int oPos = (ox + OUTPUTS_WIDTH * oy);
+            int oOffset = OUTPUT_MEM_STRIDE * oPos;
+            if (OUTPUT_MEM_WRAP_SIZE > 0 && oOffset >= OUTPUT_MEM_CONT_SIZE) {
+                oOffset += OUTPUT_MEM_WRAP_OFFSET - OUTPUT_MEM_CONT_OFFSET - OUTPUT_MEM_CONT_SIZE;
+            }
+
+            // Iterate over each output channel
             for (int output = 0; output < NB_OUTPUTS; ++output) {
-                // moved to inner loop for collapsing -->
-                const int sxMin = (PADDING_X == 0) ? 0
-                    : max(PADDING_X - (ox * STRIDE_X), 0);
-                const int sxMax = (PADDING_X == 0
-                        && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD)
-                            ? KERNEL_WIDTH
-                    : clamp(CHANNELS_WIDTH + PADDING_X - (ox * STRIDE_X), 
-                            0, KERNEL_WIDTH);
-                const int ix = (ox * STRIDE_X) - PADDING_X;
-
-                const int oPos = (ox + OUTPUTS_WIDTH * oy);
-                int oOffset = OUTPUT_MEM_STRIDE * oPos;
-
-                if (OUTPUT_MEM_WRAP_SIZE > 0 && oOffset >= OUTPUT_MEM_CONT_SIZE) {
-                    oOffset += OUTPUT_MEM_WRAP_OFFSET - OUTPUT_MEM_CONT_OFFSET
-                                - OUTPUT_MEM_CONT_SIZE;
-                }
-                // <--
-
                 int32_t weightedSum = biasses[output];
 
+                // Iterate over the kernel's height
                 for (int sy = 0; sy < KERNEL_HEIGHT; ++sy) {
-                    if ((PADDING_Y != 0
-                            || OUTPUTS_HEIGHT != OUTPUTS_HEIGHT_NOPAD)
-                        && sy >= syMax - syMin)
-                    {
+                    if ((PADDING_Y != 0 || OUTPUTS_HEIGHT != OUTPUTS_HEIGHT_NOPAD) && sy >= syMax - syMin) {
                         break;
                     }
 
-                    const int iPos = ((sxMin + ix)
-                                        + CHANNELS_WIDTH * (iy + syMin + sy));
+                    // Compute the input's memory offset
+                    int iPos = ((sxMin + ix) + CHANNELS_WIDTH * (iy + syMin + sy));
                     int iOffset = INPUT_MEM_STRIDE * iPos;
-
-                    // Wrapping cannot occur in the middle of a line, except if
-                    // there is only one line (1D)!
                     bool wrapInRange = false;
 
-                    if (INPUT_MEM_WRAP_SIZE > 0
-                        && iOffset >= INPUT_MEM_CONT_SIZE)
-                    {
-                        iOffset += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET
-                                    - INPUT_MEM_CONT_SIZE;
-                    }
-                    else if (INPUT_MEM_WRAP_SIZE > 0 && KERNEL_WIDTH > 1
-                        && CHANNELS_HEIGHT == 1 // single line (1D)!
-                        && iOffset + KERNEL_WIDTH * NB_CHANNELS
-                            > INPUT_MEM_CONT_SIZE)
-                    {
+                    // Handle input memory wrapping
+                    if (INPUT_MEM_WRAP_SIZE > 0 && iOffset >= INPUT_MEM_CONT_SIZE) {
+                        iOffset += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET - INPUT_MEM_CONT_SIZE;
+                    } else if (INPUT_MEM_WRAP_SIZE > 0 && KERNEL_WIDTH > 1 && CHANNELS_HEIGHT == 1 && iOffset + KERNEL_WIDTH * NB_CHANNELS > INPUT_MEM_CONT_SIZE) {
                         wrapInRange = true;
                     }
 
-                    const int wOffset = NB_CHANNELS * (sxMin
-                        + KERNEL_WIDTH * (syMin + sy + KERNEL_HEIGHT * output));
+                    // Compute the weight's offset
+                    int wOffset = NB_CHANNELS * (sxMin + KERNEL_WIDTH * (syMin + sy + KERNEL_HEIGHT * output));
 
-                    if (!wrapInRange && (NB_CHANNELS == INPUT_MEM_STRIDE
-                        && ((PADDING_X == 0
-                            && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD)
-                                || sxMax - sxMin == KERNEL_WIDTH)))
-                    {
-                        macsOnRange(
-                            inputs + iOffset, 
-                            weights + wOffset, 
-                            &weightedSum,KERNEL_WIDTH * NB_CHANNELS);
-                    }
-                    else {
+                    // Apply the multiplication and accumulation (MAC) operations
+                    if (!wrapInRange && (NB_CHANNELS == INPUT_MEM_STRIDE && ((PADDING_X == 0 && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD) || sxMax - sxMin == KERNEL_WIDTH))) {
+                        macsOnRange(inputs + iOffset, weights + wOffset, &weightedSum, KERNEL_WIDTH * NB_CHANNELS);
+                    } else {
                         for (int sx = 0; sx < KERNEL_WIDTH; ++sx) {
-                            if ((PADDING_X != 0
-                                    || OUTPUTS_WIDTH != OUTPUTS_WIDTH_NOPAD)
-                                && sx >= sxMax - sxMin)
-                            {
+                            if ((PADDING_X != 0 || OUTPUTS_WIDTH != OUTPUTS_WIDTH_NOPAD) && sx >= sxMax - sxMin) {
                                 break;
                             }
 
-                            int iOffsetInRange = iOffset
-                                + sx * INPUT_MEM_STRIDE;
+                            int iOffsetInRange = iOffset + sx * INPUT_MEM_STRIDE;
 
-                            if (wrapInRange
-                                && iOffsetInRange >= INPUT_MEM_CONT_SIZE)
-                            {
-                                iOffsetInRange += INPUT_MEM_WRAP_OFFSET
-                                            - INPUT_MEM_CONT_OFFSET
-                                            - INPUT_MEM_CONT_SIZE;
+                            if (wrapInRange && iOffsetInRange >= INPUT_MEM_CONT_SIZE) {
+                                iOffsetInRange += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET - INPUT_MEM_CONT_SIZE;
                             }
 
-                            macsOnRange(
-                                // same input line so no wrapping can occur
-                                inputs + iOffsetInRange, 
-                                weights + wOffset + sx * NB_CHANNELS, 
-                                &weightedSum,NB_CHANNELS);
+                            macsOnRange(inputs + iOffsetInRange, weights + wOffset + sx * NB_CHANNELS, &weightedSum, NB_CHANNELS);
                         }
                     }
                 }
 
-                outputs[oOffset + output]
-                    = sat(weightedSum, output, ACTIVATION, rescaling);
+                // Store the final result after applying the activation function and saturation
+                outputs[oOffset + output] = sat(weightedSum, output, ACTIVATION, rescaling);
             }
         }
     }
@@ -474,7 +435,7 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* maxPropagate_va
         conv2_biases,
         conv2_weights,
         8,
-        
+
         CONV2_NB_CHANNELS,
         CONV2_CHANNELS_HEIGHT,
         CONV2_CHANNELS_WIDTH, 
