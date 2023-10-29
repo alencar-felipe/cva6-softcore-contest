@@ -24,7 +24,7 @@
 #define CONV1_PADDING_Y 0
 #define CONV1_NO_BIAS 1
 
-#define CONV1_ACTIVATION Rectifier
+#define CONV1_ACTIVATION ReLU
 #define CONV1_SHIFT 8
 static const int32_t CONV1_SCALING_FACTOR_PER_OUTPUT[] = {0};
 

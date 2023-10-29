@@ -52,7 +52,7 @@ static uint8_t sat(int32_t weightedSum, int output,
         case Saturation: {
             break;
         }
-        case Rectifier: {
+        case ReLU: {
             if(weightedSum <= 0) weightedSum = 0;
             break;
         }
@@ -426,39 +426,120 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* maxPropagate_va
     // conv1
     uint8_t* conv1_output = (uint8_t*) mem + CONV1_MEM_CONT_OFFSET;
 
-    convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, 8,
-    CONV1_NB_CHANNELS, CONV1_CHANNELS_HEIGHT, CONV1_CHANNELS_WIDTH, CONV1_NB_OUTPUTS, CONV1_OUTPUTS_HEIGHT, 
-    CONV1_OUTPUTS_WIDTH, CONV1_PADDING_Y, CONV1_PADDING_X, CONV1_STRIDE_Y, CONV1_STRIDE_X, CONV1_KERNEL_HEIGHT, 
-    CONV1_KERNEL_WIDTH, CONV1_ACTIVATION, ENV_MEM_CONT_OFFSET, ENV_MEM_CONT_SIZE, ENV_MEM_WRAP_OFFSET, 
-    ENV_MEM_WRAP_SIZE, ENV_MEM_STRIDE, CONV1_MEM_CONT_OFFSET, CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, CONV1_MEM_STRIDE);
+    convcellPropagate1(
+        inputs,
+        conv1_output,
+        conv1_biases,
+        conv1_weights,
+        8,
+        
+        CONV1_NB_CHANNELS,
+        CONV1_CHANNELS_HEIGHT,
+        CONV1_CHANNELS_WIDTH,
+        
+        CONV1_NB_OUTPUTS,
+        CONV1_OUTPUTS_HEIGHT, 
+        CONV1_OUTPUTS_WIDTH,
+        
+        CONV1_PADDING_Y,
+        CONV1_PADDING_X,
+        CONV1_STRIDE_Y,
+        CONV1_STRIDE_X,
+        CONV1_KERNEL_HEIGHT,
+        CONV1_KERNEL_WIDTH,
+
+        CONV1_ACTIVATION, // ReLU
+
+        ENV_MEM_CONT_OFFSET, // 0
+        ENV_MEM_CONT_SIZE,   // 576
+        ENV_MEM_WRAP_OFFSET, // 0
+        ENV_MEM_WRAP_SIZE,   // 0
+        ENV_MEM_STRIDE,      // 1
+        
+        CONV1_MEM_CONT_OFFSET, // 576
+        CONV1_MEM_CONT_SIZE,   // 1584
+        CONV1_MEM_WRAP_OFFSET, // 0
+        CONV1_MEM_WRAP_SIZE,   // 352
+        CONV1_MEM_STRIDE       // 16
+    );
 
     //convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, CONV1_SCALING);
 
     // conv2
     uint8_t* conv2_output = (uint8_t*) mem + CONV2_MEM_CONT_OFFSET;
 
-    convcellPropagate1(conv1_output , conv2_output, conv2_biases, conv2_weights, 8,
-    CONV2_NB_CHANNELS, CONV2_CHANNELS_HEIGHT, CONV2_CHANNELS_WIDTH, 
-    CONV2_NB_OUTPUTS, CONV2_OUTPUTS_HEIGHT, CONV2_OUTPUTS_WIDTH, 
-    CONV2_PADDING_Y, CONV2_PADDING_X, CONV2_STRIDE_Y, CONV2_STRIDE_X, 
-    CONV2_KERNEL_HEIGHT, CONV2_KERNEL_WIDTH, CONV2_ACTIVATION, CONV1_MEM_CONT_OFFSET, 
-    CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, 
-    CONV1_MEM_STRIDE, CONV2_MEM_CONT_OFFSET, CONV2_MEM_CONT_SIZE, CONV2_MEM_WRAP_OFFSET, 
-    CONV2_MEM_WRAP_SIZE, CONV2_MEM_STRIDE);
+    convcellPropagate1(
+        conv1_output,
+        conv2_output,
+        conv2_biases,
+        conv2_weights,
+        8,
+        
+        CONV2_NB_CHANNELS,
+        CONV2_CHANNELS_HEIGHT,
+        CONV2_CHANNELS_WIDTH, 
+        
+        CONV2_NB_OUTPUTS,
+        CONV2_OUTPUTS_HEIGHT,
+        CONV2_OUTPUTS_WIDTH, 
+        
+        CONV2_PADDING_Y,
+        CONV2_PADDING_X,
+        CONV2_STRIDE_Y,
+        CONV2_STRIDE_X,
+
+        CONV2_KERNEL_HEIGHT,
+        CONV2_KERNEL_WIDTH,
+
+        CONV2_ACTIVATION, // ReLU
+
+        CONV1_MEM_CONT_OFFSET, // 576
+        CONV1_MEM_CONT_SIZE,   // 1584
+        CONV1_MEM_WRAP_OFFSET, // 0
+        CONV1_MEM_WRAP_SIZE,   // 352
+        CONV1_MEM_STRIDE,      // 16
+        
+        CONV2_MEM_CONT_OFFSET, // 352
+        CONV2_MEM_CONT_SIZE,   // 384
+        CONV2_MEM_WRAP_OFFSET, // 0
+        CONV2_MEM_WRAP_SIZE,   // 0
+        CONV2_MEM_STRIDE       // 24
+    );
 
     //convcellPropagate2(conv1_output , conv2_output, conv2_biases, conv2_weights, CONV2_SCALING);
 
     // fc1
     uint8_t* fc1_output = (uint8_t*) mem + FC1_MEM_CONT_OFFSET;
 
-    fccellPropagateuint8_t(conv2_output , fc1_output, fc1_biases, fc1_weights, 8,
-    FC1_NB_CHANNELS, FC1_CHANNELS_HEIGHT, 
-    FC1_CHANNELS_WIDTH, FC1_NB_OUTPUTS, 
-    FC1_OUTPUTS_HEIGHT, FC1_OUTPUTS_WIDTH, FC1_ACTIVATION, 
-    CONV2_MEM_CONT_OFFSET, CONV2_MEM_CONT_SIZE, 
-    CONV2_MEM_WRAP_OFFSET, CONV2_MEM_WRAP_SIZE, 
-    CONV2_MEM_STRIDE, FC1_MEM_CONT_OFFSET, 
-    FC1_MEM_CONT_SIZE, FC1_MEM_WRAP_OFFSET, FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE);
+    fccellPropagateuint8_t(
+        conv2_output,
+        fc1_output,
+        fc1_biases,
+        fc1_weights,
+        8,
+        
+        FC1_NB_CHANNELS,
+        FC1_CHANNELS_HEIGHT, 
+        FC1_CHANNELS_WIDTH,
+        
+        FC1_NB_OUTPUTS, 
+        FC1_OUTPUTS_HEIGHT,
+        FC1_OUTPUTS_WIDTH,
+        
+        FC1_ACTIVATION, // ReLU
+        
+        CONV2_MEM_CONT_OFFSET, // 352
+        CONV2_MEM_CONT_SIZE,   // 384
+        CONV2_MEM_WRAP_OFFSET, // 0
+        CONV2_MEM_WRAP_SIZE,   // 0
+        CONV2_MEM_STRIDE,      // 24
+
+        FC1_MEM_CONT_OFFSET, // 736
+        FC1_MEM_CONT_SIZE,   // 150
+        FC1_MEM_WRAP_OFFSET, // 0
+        FC1_MEM_WRAP_SIZE,   // 0
+        FC1_MEM_STRIDE       //150
+    );
 
     // fc2
     int8_t* fc2_output = (int8_t*) mem + FC2_MEM_CONT_OFFSET;

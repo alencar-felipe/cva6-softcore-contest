@@ -11,7 +11,7 @@ typedef enum {
     Tanh,
     TanhLeCun,
     Saturation,
-    Rectifier,
+    ReLU,
     Linear,
     Softplus
 } ActivationFunction_T;

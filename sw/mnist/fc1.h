@@ -14,7 +14,7 @@
 #define FC1_CHANNELS_HEIGHT 4
 #define FC1_NO_BIAS 1
 
-#define FC1_ACTIVATION Rectifier
+#define FC1_ACTIVATION ReLU
 #define FC1_SHIFT 8
 static const int32_t FC1_SCALING_FACTOR_PER_OUTPUT[] = {0};
 
