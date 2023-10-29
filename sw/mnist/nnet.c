@@ -64,6 +64,11 @@ static uint8_t sat(int32_t weightedSum, int output,
     return saturate(weightedSum>>shift, NB_BITS);
 }
 
+static void computeKernelBounds(int outputPos, int padding, int stride, int channelSize, int kernelSize, int* minBound, int* maxBound) {
+    *minBound = (padding == 0) ? 0 : max(padding - (outputPos * stride), 0);
+    *maxBound = (padding == 0) ? kernelSize : clamp(channelSize + padding - (outputPos * stride), 0, kernelSize);
+}
+
 static void convcellPropagate1(
     const uint8_t* __restrict inputs,
     uint8_t* __restrict outputs,
@@ -96,17 +101,13 @@ static void convcellPropagate1(
     // Iterate over each output's height and width
     for (int oy = 0; oy < OUTPUTS_HEIGHT; ++oy) {
         // Compute the y-start and y-end for the kernel
-        int syMin = (PADDING_Y == 0) ? 0 : max(PADDING_Y - (oy * STRIDE_Y), 0);
-        int syMax = (PADDING_Y == 0 && OUTPUTS_HEIGHT == OUTPUTS_HEIGHT_NOPAD) 
-            ? KERNEL_HEIGHT
-            : clamp(CHANNELS_HEIGHT + PADDING_Y - (oy * STRIDE_Y), 0, KERNEL_HEIGHT);
+        int syMin, syMax;
+        computeKernelBounds(oy, PADDING_Y, STRIDE_Y, CHANNELS_HEIGHT, KERNEL_HEIGHT, &syMin, &syMax);
         int iy = (oy * STRIDE_Y) - PADDING_Y;
 
         for (int ox = 0; ox < OUTPUTS_WIDTH; ++ox) {
-            int sxMin = (PADDING_X == 0) ? 0 : max(PADDING_X - (ox * STRIDE_X), 0);
-            int sxMax = (PADDING_X == 0 && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD) 
-                ? KERNEL_WIDTH
-                : clamp(CHANNELS_WIDTH + PADDING_X - (ox * STRIDE_X), 0, KERNEL_WIDTH);
+            int sxMin, sxMax;
+            computeKernelBounds(ox, PADDING_X, STRIDE_X, CHANNELS_WIDTH, KERNEL_WIDTH, &sxMin, &sxMax);
             int ix = (ox * STRIDE_X) - PADDING_X;
 
             // Compute the output's memory offset
