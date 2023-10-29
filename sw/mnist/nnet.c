@@ -410,11 +410,11 @@ static void maxPropagate1(
                 }
 
                 outputs[oPos] = (int32_t)(iMaxInput);
-		*output_value = maxInput;
+		        *output_value = maxInput;
             }
             else {
                 outputs[oPos] = (inputs[iOffset] > 0);
-		output_value = inputs[iOffset];
+		        *output_value = inputs[iOffset];
             }
         }
     }

@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "env.h"
-#include "Network.h"
+#include "nnet.h"
 #include "util.h"
 
 static void decode_stimulus(
