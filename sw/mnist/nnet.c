@@ -42,7 +42,7 @@ static uint8_t saturate(int32_t value, uint32_t sat) {
     return clamp(value, (int32_t)(0), ((int32_t)(1) << sat) - 1);
 }
 
-static uint8_t sat(int32_t weightedSum, int output,
+static uint8_t sat(int32_t weightedSum,
                                            ActivationFunction_T func,
                                            /* const Rescaling_T& __restrict rescaling */
                                            int shift)
@@ -70,14 +70,14 @@ static void computeKernelBounds(int outputPos, int padding, int stride, int chan
 }
 
 static void convcellPropagate1(
-    const uint8_t* __restrict inputs,
-    uint8_t* __restrict outputs,
+    const uint8_t *input,
+    uint8_t *outputs,
     const int32_t* __restrict biasses,
     const int8_t* __restrict weights,
     int rescaling,
-    int NB_CHANNELS, 
-    int CHANNELS_HEIGHT, int CHANNELS_WIDTH,
-    int NB_OUTPUTS,
+    int input_len, 
+    int input_height, int input_width,
+    int output_len,
     int OUTPUTS_HEIGHT, int OUTPUTS_WIDTH,
     int PADDING_Y, int PADDING_X,
     int STRIDE_Y, int STRIDE_X,
@@ -95,19 +95,17 @@ static void convcellPropagate1(
     int OUTPUT_MEM_STRIDE)
 {
     // Compute output sizes without padding
-    int OUTPUTS_HEIGHT_NOPAD = (CHANNELS_HEIGHT - KERNEL_HEIGHT + STRIDE_Y) / STRIDE_Y;
-    int OUTPUTS_WIDTH_NOPAD = (CHANNELS_WIDTH - KERNEL_WIDTH + STRIDE_X) / STRIDE_X;
+    int OUTPUTS_HEIGHT_NOPAD = (input_height - KERNEL_HEIGHT + STRIDE_Y) / STRIDE_Y;
+    int OUTPUTS_WIDTH_NOPAD = (input_width - KERNEL_WIDTH + STRIDE_X) / STRIDE_X;
 
-    // Iterate over each output's height and width
-    for (int oy = 0; oy < OUTPUTS_HEIGHT; ++oy) {
-        // Compute the y-start and y-end for the kernel
-        int syMin, syMax;
-        computeKernelBounds(oy, PADDING_Y, STRIDE_Y, CHANNELS_HEIGHT, KERNEL_HEIGHT, &syMin, &syMax);
+    for (int oy = 0; oy < OUTPUTS_HEIGHT; oy++) {
+        int kyMin, kyMax;
+        computeKernelBounds(oy, PADDING_Y, STRIDE_Y, input_height, KERNEL_HEIGHT, &kyMin, &kyMax);
         int iy = (oy * STRIDE_Y) - PADDING_Y;
 
-        for (int ox = 0; ox < OUTPUTS_WIDTH; ++ox) {
-            int sxMin, sxMax;
-            computeKernelBounds(ox, PADDING_X, STRIDE_X, CHANNELS_WIDTH, KERNEL_WIDTH, &sxMin, &sxMax);
+        for (int ox = 0; ox < OUTPUTS_WIDTH; ox++) {
+            int kxMin, kxMax;
+            computeKernelBounds(ox, PADDING_X, STRIDE_X, input_width, KERNEL_WIDTH, &kxMin, &kxMax);
             int ix = (ox * STRIDE_X) - PADDING_X;
 
             // Compute the output's memory offset
@@ -117,55 +115,60 @@ static void convcellPropagate1(
                 oOffset += OUTPUT_MEM_WRAP_OFFSET - OUTPUT_MEM_CONT_OFFSET - OUTPUT_MEM_CONT_SIZE;
             }
 
+            //printf("[%02d %02d %04d] ", ix, iy, oOffset);
+
             // Iterate over each output channel
-            for (int output = 0; output < NB_OUTPUTS; ++output) {
-                int32_t weightedSum = biasses[output];
+            for (int output = 0; output < output_len; ++output) {
+                int32_t sum = biasses[output];
 
                 // Iterate over the kernel's height
-                for (int sy = 0; sy < KERNEL_HEIGHT; ++sy) {
-                    if ((PADDING_Y != 0 || OUTPUTS_HEIGHT != OUTPUTS_HEIGHT_NOPAD) && sy >= syMax - syMin) {
+                for (int ky = 0; ky < KERNEL_HEIGHT; ky++) {
+                    if ((PADDING_Y != 0 || OUTPUTS_HEIGHT != OUTPUTS_HEIGHT_NOPAD) && ky >= kyMax - kyMin) {
                         break;
                     }
 
                     // Compute the input's memory offset
-                    int iPos = ((sxMin + ix) + CHANNELS_WIDTH * (iy + syMin + sy));
+                    int iPos = ((kxMin + ix) + input_width * (iy + kyMin + ky));
                     int iOffset = INPUT_MEM_STRIDE * iPos;
                     bool wrapInRange = false;
 
                     // Handle input memory wrapping
                     if (INPUT_MEM_WRAP_SIZE > 0 && iOffset >= INPUT_MEM_CONT_SIZE) {
                         iOffset += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET - INPUT_MEM_CONT_SIZE;
-                    } else if (INPUT_MEM_WRAP_SIZE > 0 && KERNEL_WIDTH > 1 && CHANNELS_HEIGHT == 1 && iOffset + KERNEL_WIDTH * NB_CHANNELS > INPUT_MEM_CONT_SIZE) {
+                    } else if (INPUT_MEM_WRAP_SIZE > 0 && KERNEL_WIDTH > 1 && input_height == 1 && iOffset + KERNEL_WIDTH * input_len > INPUT_MEM_CONT_SIZE) {
                         wrapInRange = true;
                     }
 
                     // Compute the weight's offset
-                    int wOffset = NB_CHANNELS * (sxMin + KERNEL_WIDTH * (syMin + sy + KERNEL_HEIGHT * output));
+                    int wOffset = input_len * (kxMin + KERNEL_WIDTH * (kyMin + ky + KERNEL_HEIGHT * output));
 
                     // Apply the multiplication and accumulation (MAC) operations
-                    if (!wrapInRange && (NB_CHANNELS == INPUT_MEM_STRIDE && ((PADDING_X == 0 && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD) || sxMax - sxMin == KERNEL_WIDTH))) {
-                        macsOnRange(inputs + iOffset, weights + wOffset, &weightedSum, KERNEL_WIDTH * NB_CHANNELS);
+                    if (!wrapInRange && (input_len == INPUT_MEM_STRIDE && ((PADDING_X == 0 && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD) || kxMax - kxMin == KERNEL_WIDTH))) {
+                        macsOnRange(input + iOffset, weights + wOffset, &sum, KERNEL_WIDTH * input_len);
                     } else {
-                        for (int sx = 0; sx < KERNEL_WIDTH; ++sx) {
-                            if ((PADDING_X != 0 || OUTPUTS_WIDTH != OUTPUTS_WIDTH_NOPAD) && sx >= sxMax - sxMin) {
+                        for (int kx = 0; kx < KERNEL_WIDTH; kx++) {
+                            if ((PADDING_X != 0 || OUTPUTS_WIDTH != OUTPUTS_WIDTH_NOPAD) && kx >= kxMax - kxMin) {
                                 break;
                             }
 
-                            int iOffsetInRange = iOffset + sx * INPUT_MEM_STRIDE;
+                            int iOffsetInRange = iOffset + kx * INPUT_MEM_STRIDE;
 
                             if (wrapInRange && iOffsetInRange >= INPUT_MEM_CONT_SIZE) {
                                 iOffsetInRange += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET - INPUT_MEM_CONT_SIZE;
                             }
 
-                            macsOnRange(inputs + iOffsetInRange, weights + wOffset + sx * NB_CHANNELS, &weightedSum, NB_CHANNELS);
+                            macsOnRange(input + iOffsetInRange, weights + wOffset + kx * input_len, &sum, input_len);
                         }
                     }
                 }
 
+                //printf("0x%08x %04d\n", &outputs[oOffset + output], oOffset);
                 // Store the final result after applying the activation function and saturation
-                outputs[oOffset + output] = sat(weightedSum, output, ACTIVATION, rescaling);
+                outputs[oOffset + output] = sat(sum, ACTIVATION, rescaling);
             }
         }
+
+        //printf("\n");
     }
 }
 
@@ -249,7 +252,7 @@ static void fccellPropagateuint8_t(
             }
         }
 
-        outputs[och] = sat(weightedSum, och, ACTIVATION, rescaling);
+        outputs[och] = sat(weightedSum, ACTIVATION, rescaling);
     }
 }
 
@@ -333,60 +336,35 @@ static void fccellPropagateint8_t(
             }
         }
 
-        outputs[och] = sat(weightedSum, och, ACTIVATION, rescaling);
+        outputs[och] = sat(weightedSum, ACTIVATION, rescaling);
     }
 }
 
-static void maxPropagate1(
-    const int8_t* __restrict inputs,
-    int32_t* __restrict outputs,
-    int8_t* output_value,
-    int NB_CHANNELS,
-    int INPUTS_HEIGHT, int INPUTS_WIDTH,
-    // Memory mapping: outputs
-    int INPUT_MEM_CONT_OFFSET,
-    int INPUT_MEM_CONT_SIZE,
-    int INPUT_MEM_WRAP_OFFSET,
-    int INPUT_MEM_WRAP_SIZE,
-    int INPUT_MEM_STRIDE)
+static void nnet_argmax(
+    const int8_t *input,
+    const uint32_t input_len,
+    uint32_t *arg,
+    int8_t *max
+) 
 {
-    int iMaxInput = 0;
-    int8_t maxInput = SCHAR_MIN;
+    *arg = 0;
+    *max = input[*arg];
 
-    for (int iy = 0; iy < INPUTS_HEIGHT; ++iy) {
-        for (int ix = 0; ix < INPUTS_WIDTH; ++ix) {
-            const int oPos = (ix + INPUTS_WIDTH * iy);
-            int iOffset = INPUT_MEM_STRIDE * oPos;
-
-            if (INPUT_MEM_WRAP_SIZE > 0 && iOffset >= INPUT_MEM_CONT_SIZE) {
-                iOffset += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET
-                            - INPUT_MEM_CONT_SIZE;
-            }
-
-            if (NB_CHANNELS > 1) {
-                for (int ch = 0; ch < NB_CHANNELS; ++ch) {
-                    if (inputs[iOffset + ch] > maxInput) {
-                        iMaxInput = ch;
-                        maxInput = inputs[iOffset + ch];
-                    }
-                }
-
-                outputs[oPos] = (int32_t)(iMaxInput);
-		        *output_value = maxInput;
-            }
-            else {
-                outputs[oPos] = (inputs[iOffset] > 0);
-		        *output_value = inputs[iOffset];
-            }
+    for(uint32_t i = 1; i < input_len; i++) {
+        if(input[i] > *max) {
+            *arg = i;
+            *max = input[i];
         }
     }
 }
 
 void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* maxPropagate_val)
 {
-
     // conv1
     uint8_t* conv1_output = (uint8_t*) mem + CONV1_MEM_CONT_OFFSET;
+    
+    //printf("-1 => %d\n", conv1_output[0]);
+    //exit(-1);
 
     convcellPropagate1(
         inputs,
@@ -425,7 +403,10 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* maxPropagate_va
         CONV1_MEM_STRIDE       // 16
     );
 
-    //convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, CONV1_SCALING);
+    //printf("-1 => %d\n", conv1_output[0]);
+
+    //printf("mem : 0x%08x\n", conv1_output);
+    //exit(-1);
 
     // conv2
     uint8_t* conv2_output = (uint8_t*) mem + CONV2_MEM_CONT_OFFSET;
@@ -516,7 +497,7 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* maxPropagate_va
     FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, 
     FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
 
-    maxPropagate1(fc2_output, outputs, maxPropagate_val, FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
+    nnet_argmax(fc2_output, 10, outputs, maxPropagate_val);
 }
 
 
