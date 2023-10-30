@@ -27,7 +27,7 @@ static int clamp(int v, int lo, int hi) {
     }
 }
 
-static void nnet_mac(const uint8_t* __restrict inputs,
+static void mac(const uint8_t* __restrict inputs,
                         const int8_t* __restrict weights,
                         int32_t* __restrict weightedSum,
                         int nb_iterations)
@@ -141,9 +141,9 @@ static void convcellPropagate1(
                     // Compute the weight's offset
                     int wOffset = input_len * (kxMin + KERNEL_WIDTH * (kyMin + ky + KERNEL_HEIGHT * output));
 
-                    // Apply the multiplication and accumulation (nnet_mac) operations
+                    // Apply the multiplication and accumulation (mac) operations
                     if (!wrapInRange && (input_len == INPUT_MEM_STRIDE && ((PADDING_X == 0 && OUTPUTS_WIDTH == OUTPUTS_WIDTH_NOPAD) || kxMax - kxMin == KERNEL_WIDTH))) {
-                        nnet_mac(input + iOffset, weights + wOffset, &sum, KERNEL_WIDTH * input_len);
+                        mac(input + iOffset, weights + wOffset, &sum, KERNEL_WIDTH * input_len);
                     } else {
                         for (int kx = 0; kx < KERNEL_WIDTH; kx++) {
                             if ((PADDING_X != 0 || OUTPUTS_WIDTH != OUTPUTS_WIDTH_NOPAD) && kx >= kxMax - kxMin) {
@@ -156,7 +156,7 @@ static void convcellPropagate1(
                                 iOffsetInRange += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET - INPUT_MEM_CONT_SIZE;
                             }
 
-                            nnet_mac(input + iOffsetInRange, weights + wOffset + kx * input_len, &sum, input_len);
+                            mac(input + iOffsetInRange, weights + wOffset + kx * input_len, &sum, input_len);
                         }
                     }
                 }
@@ -171,10 +171,10 @@ static void convcellPropagate1(
     }
 }
 
-static void fccellPropagateuint8_t(
+static void fc1(
     const uint8_t* __restrict inputs,
     uint8_t* __restrict outputs,
-    const int32_t* __restrict biasses,
+    const int32_t* __restrict bias,
     const int8_t* __restrict weights,
     const int rescaling,
     int NB_CHANNELS, 
@@ -187,109 +187,60 @@ static void fccellPropagateuint8_t(
     int INPUT_MEM_CONT_SIZE,
     int INPUT_MEM_WRAP_OFFSET,
     int INPUT_MEM_WRAP_SIZE,
-    int INPUT_MEM_STRIDE,
-    // Memory mapping: outputs
-    int OUTPUT_MEM_CONT_OFFSET,
-    int OUTPUT_MEM_CONT_SIZE,
-    int OUTPUT_MEM_WRAP_OFFSET,
-    int OUTPUT_MEM_WRAP_SIZE,
-    int OUTPUT_MEM_STRIDE)
+    int INPUT_MEM_STRIDE)
 {
-    // static_assert(OUTPUTS_HEIGHT == 1, "Outputs height should be 1");
-    // static_assert(OUTPUTS_WIDTH == 1, "Outputs width should be 1");
-    // static_assert(OUTPUT_MEM_WRAP_SIZE == 0, "Output wrapping not supported");
-
     for (int och = 0; och < NB_OUTPUTS; och++) {
-        int32_t weightedSum = biasses[och];
+        int32_t sum = bias[och];
 
         for (int iy = 0; iy < CHANNELS_HEIGHT; ++iy) {
-            const int iPos = (CHANNELS_WIDTH * iy);
-            int iOffset = INPUT_MEM_STRIDE * iPos;
+            int iPos = CHANNELS_WIDTH * iy;
+            int iBaseOffset = INPUT_MEM_STRIDE * iPos;
+            int wBaseOffset = NB_CHANNELS * CHANNELS_WIDTH * (iy + CHANNELS_HEIGHT * och);
 
-            // Wrapping cannot occur in the middle of a line, except if
-            // there is only one line (1D)!
-            bool wrapInRange = false;
+            for (int ix = 0; ix < CHANNELS_WIDTH; ++ix) {
+                int iOffset = iBaseOffset + ix * INPUT_MEM_STRIDE;
+                int wOffset = wBaseOffset + ix * NB_CHANNELS;
 
-            if (INPUT_MEM_WRAP_SIZE > 0 && iOffset >= INPUT_MEM_CONT_SIZE) {
-                iOffset += INPUT_MEM_WRAP_OFFSET - INPUT_MEM_CONT_OFFSET
-                            - INPUT_MEM_CONT_SIZE;
+                printf("[%5d %5d %5d] ", iOffset, wOffset, NB_CHANNELS);
+                mac(inputs + iOffset, weights + wOffset, &sum, NB_CHANNELS);
             }
-            else if (INPUT_MEM_WRAP_SIZE > 0 && CHANNELS_WIDTH > 1
-                && CHANNELS_HEIGHT == 1 // single line (1D)!
-                && iOffset + CHANNELS_WIDTH * NB_CHANNELS
-                    > INPUT_MEM_CONT_SIZE)
-            {
-                wrapInRange = true;
-            }
-
-            const int wOffset = NB_CHANNELS * CHANNELS_WIDTH
-                                    * (iy + CHANNELS_HEIGHT * och);
-
-            if (!wrapInRange && INPUT_MEM_STRIDE == NB_CHANNELS) {
-                nnet_mac(
-                    inputs + iOffset, 
-                    weights + wOffset, 
-                    &weightedSum, NB_CHANNELS * CHANNELS_WIDTH);
-            }
-            else {
-                for (int ix = 0; ix < CHANNELS_WIDTH; ++ix) {
-                    int iOffsetInRange = iOffset + ix * INPUT_MEM_STRIDE;
-
-                    if (wrapInRange
-                        && iOffsetInRange >= INPUT_MEM_CONT_SIZE)
-                    {
-                        iOffsetInRange += INPUT_MEM_WRAP_OFFSET
-                                    - INPUT_MEM_CONT_OFFSET
-                                    - INPUT_MEM_CONT_SIZE;
-                    }
-
-                    nnet_mac(
-                        inputs + iOffsetInRange, 
-                        weights + wOffset + ix * NB_CHANNELS, 
-                        &weightedSum, NB_CHANNELS);
-                }
-            }
+            printf("\n");
         }
 
-        outputs[och] = sat(weightedSum, ACTIVATION, rescaling);
+        outputs[och] = sat(sum, ACTIVATION, rescaling);
     }
 }
 
-static void nnet_fc_i8(
+static void fc2(
+    const uint32_t input_len,
+    const uint32_t output_len,
     const uint8_t *input,
     const int32_t *bias,
     const int8_t *weight,
     int8_t *output,
     const int rescaling,
-    int NB_CHANNELS,     // 150
-    int NB_OUTPUTS,      // 10
     ActivationFunction_T ACTIVATION // Linear
 )
 {
-    for (int och = 0; och < NB_OUTPUTS; och++) {
-        int32_t sum = bias[och];
-
-        const int wOffset = NB_CHANNELS * och;
-
-        nnet_mac(input, weight + wOffset, &sum, NB_CHANNELS);
-
-        output[och] = sat(sum, ACTIVATION, rescaling);
+    for (uint32_t i = 0; i < output_len; i++) {
+        int32_t sum = bias[i];
+        mac(input, weight, &sum, input_len);
+        output[i] = sat(sum, ACTIVATION, rescaling);
+        weight += input_len;
     }
 }
 
-static void nnet_argmax(
-    const int8_t *input,
+static void argmax(
     const uint32_t input_len,
+    const int8_t *input,
     uint32_t *arg,
     int8_t *max
 ) 
 {
-    uint32_t i;
-
     *arg = 0;
     *max = input[*arg];
 
-    for(i = 1; i < input_len; i++) {
+    for(uint32_t i = 1; i < input_len; i++) {
         if(input[i] > *max) {
             *arg = i;
             *max = input[i];
@@ -393,7 +344,7 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* credence)
     // fc1
     uint8_t* fc1_output = (uint8_t*) mem + FC1_MEM_CONT_OFFSET;
 
-    fccellPropagateuint8_t(
+    fc1(
         conv2_output,
         fc1_output,
         fc1_biases,
@@ -414,31 +365,24 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* credence)
         CONV2_MEM_CONT_SIZE,   // 384
         CONV2_MEM_WRAP_OFFSET, // 0
         CONV2_MEM_WRAP_SIZE,   // 0
-        CONV2_MEM_STRIDE,      // 24
-
-        FC1_MEM_CONT_OFFSET, // 736
-        FC1_MEM_CONT_SIZE,   // 150
-        FC1_MEM_WRAP_OFFSET, // 0
-        FC1_MEM_WRAP_SIZE,   // 0
-        FC1_MEM_STRIDE       // 150
+        CONV2_MEM_STRIDE       // 24
     );
 
     // fc2
     int8_t* fc2_output = (int8_t*) mem + FC2_MEM_CONT_OFFSET;
 
-    nnet_fc_i8(
+    fc2(
+        FC2_NB_CHANNELS, 
+        FC2_NB_OUTPUTS, 
         fc1_output,
         fc2_biases,
         fc2_weights,
         fc2_output,
         11,
-        FC2_NB_CHANNELS, 
-        FC2_NB_OUTPUTS, 
-        
         FC2_ACTIVATION // Linear
     );
 
-    nnet_argmax(fc2_output, 10, outputs, credence);
+    argmax(10, fc2_output, outputs, credence);
 }
 
 
