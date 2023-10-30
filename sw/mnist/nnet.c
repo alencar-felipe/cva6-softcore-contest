@@ -172,42 +172,24 @@ static void convcellPropagate1(
 }
 
 static void fc1(
-    const uint8_t* __restrict inputs,
-    uint8_t* __restrict outputs,
-    const int32_t* __restrict bias,
-    const int8_t* __restrict weights,
+    const uint8_t *inputs,
+    uint8_t *outputs,
+    const int32_t *bias,
+    const int8_t *weights,
     const int rescaling,
     int NB_CHANNELS, 
     int CHANNELS_HEIGHT, int CHANNELS_WIDTH,
     int NB_OUTPUTS,
-    int OUTPUTS_HEIGHT, int OUTPUTS_WIDTH,
-    ActivationFunction_T ACTIVATION,
-    // Memory mapping: inputs
-    int INPUT_MEM_CONT_OFFSET,
-    int INPUT_MEM_CONT_SIZE,
-    int INPUT_MEM_WRAP_OFFSET,
-    int INPUT_MEM_WRAP_SIZE,
-    int INPUT_MEM_STRIDE)
+    ActivationFunction_T ACTIVATION
+)
 {
-    for (int och = 0; och < NB_OUTPUTS; och++) {
-        int32_t sum = bias[och];
-
-        for (int iy = 0; iy < CHANNELS_HEIGHT; ++iy) {
-            int iPos = CHANNELS_WIDTH * iy;
-            int iBaseOffset = INPUT_MEM_STRIDE * iPos;
-            int wBaseOffset = NB_CHANNELS * CHANNELS_WIDTH * (iy + CHANNELS_HEIGHT * och);
-
-            for (int ix = 0; ix < CHANNELS_WIDTH; ++ix) {
-                int iOffset = iBaseOffset + ix * INPUT_MEM_STRIDE;
-                int wOffset = wBaseOffset + ix * NB_CHANNELS;
-
-                printf("[%5d %5d %5d] ", iOffset, wOffset, NB_CHANNELS);
-                mac(inputs + iOffset, weights + wOffset, &sum, NB_CHANNELS);
-            }
-            printf("\n");
-        }
-
-        outputs[och] = sat(sum, ACTIVATION, rescaling);
+    uint32_t K = CHANNELS_WIDTH*CHANNELS_HEIGHT*NB_CHANNELS;
+    uint32_t offset = 0;
+    for (int i = 0; i < NB_OUTPUTS; i++) {
+        int32_t sum = bias[i];
+        mac(inputs, weights + offset, &sum, K);
+        outputs[i] = sat(sum, ACTIVATION, rescaling);
+        offset += K;
     }
 }
 
@@ -231,19 +213,19 @@ static void fc2(
 }
 
 static void argmax(
-    const uint32_t input_len,
-    const int8_t *input,
+    const uint32_t n,
+    const int8_t *arr,
     uint32_t *arg,
     int8_t *max
 ) 
 {
     *arg = 0;
-    *max = input[*arg];
+    *max = arr[*arg];
 
-    for(uint32_t i = 1; i < input_len; i++) {
-        if(input[i] > *max) {
+    for(uint32_t i = 1; i < n; i++) {
+        if(arr[i] > *max) {
             *arg = i;
-            *max = input[i];
+            *max = arr[i];
         }
     }
 }
@@ -356,16 +338,8 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* credence)
         FC1_CHANNELS_WIDTH,
         
         FC1_NB_OUTPUTS, 
-        FC1_OUTPUTS_HEIGHT,
-        FC1_OUTPUTS_WIDTH,
         
-        FC1_ACTIVATION, // ReLU
-        
-        CONV2_MEM_CONT_OFFSET, // 352
-        CONV2_MEM_CONT_SIZE,   // 384
-        CONV2_MEM_WRAP_OFFSET, // 0
-        CONV2_MEM_WRAP_SIZE,   // 0
-        CONV2_MEM_STRIDE       // 24
+        FC1_ACTIVATION // ReLU
     );
 
     // fc2
