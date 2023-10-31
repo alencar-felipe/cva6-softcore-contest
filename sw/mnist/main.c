@@ -17,6 +17,8 @@ static void decode_stimulus(
     *label = *(int32_t *) (raw += IMAGE_W*IMAGE_H);
 }
 
+#include "fc1.h"
+
 int main() {
     size_t instret, cycles;
 

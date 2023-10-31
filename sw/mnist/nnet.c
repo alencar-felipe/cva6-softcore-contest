@@ -171,37 +171,17 @@ static void convcellPropagate1(
     }
 }
 
-static void fc1(
-    const uint8_t *inputs,
-    uint8_t *outputs,
-    const int32_t *bias,
-    const int8_t *weights,
-    const int rescaling,
-    int NB_CHANNELS, 
-    int CHANNELS_HEIGHT, int CHANNELS_WIDTH,
-    int NB_OUTPUTS,
-    ActivationFunction_T ACTIVATION
-)
-{
-    uint32_t K = CHANNELS_WIDTH*CHANNELS_HEIGHT*NB_CHANNELS;
-    uint32_t offset = 0;
-    for (int i = 0; i < NB_OUTPUTS; i++) {
-        int32_t sum = bias[i];
-        mac(inputs, weights + offset, &sum, K);
-        outputs[i] = sat(sum, ACTIVATION, rescaling);
-        offset += K;
-    }
-}
+//TODO: Do we need int8_t for the output of fc2?
 
-static void fc2(
+static void fully_connected(
     const uint32_t input_len,
     const uint32_t output_len,
     const uint8_t *input,
     const int32_t *bias,
     const int8_t *weight,
-    int8_t *output,
+    uint8_t *output,
     const int rescaling,
-    ActivationFunction_T ACTIVATION // Linear
+    ActivationFunction_T ACTIVATION 
 )
 {
     for (uint32_t i = 0; i < output_len; i++) {
@@ -321,31 +301,25 @@ void propagate(const uint8_t* inputs, int32_t* outputs, uint8_t* credence)
         CONV2_MEM_STRIDE       // 24
     );
 
-    //convcellPropagate2(conv1_output , conv2_output, conv2_biases, conv2_weights, CONV2_SCALING);
-
     // fc1
     uint8_t* fc1_output = (uint8_t*) mem + FC1_MEM_CONT_OFFSET;
 
-    fc1(
+    fully_connected(
+        FC1_CHANNELS_WIDTH*FC1_CHANNELS_HEIGHT*FC1_NB_CHANNELS, 
+        FC1_NB_OUTPUTS, 
         conv2_output,
-        fc1_output,
         fc1_biases,
         fc1_weights,
+        fc1_output,
         8,
-        
-        FC1_NB_CHANNELS,   
-        FC1_CHANNELS_HEIGHT, 
-        FC1_CHANNELS_WIDTH,
-        
-        FC1_NB_OUTPUTS, 
-        
-        FC1_ACTIVATION // ReLU
+        FC1_ACTIVATION // Linear
     );
+
 
     // fc2
     int8_t* fc2_output = (int8_t*) mem + FC2_MEM_CONT_OFFSET;
 
-    fc2(
+    fully_connected(
         FC2_NB_CHANNELS, 
         FC2_NB_OUTPUTS, 
         fc1_output,
