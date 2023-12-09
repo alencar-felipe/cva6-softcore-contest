@@ -11,15 +11,11 @@
 
 static int8_t mem[MEMORY_SIZE];
 
-static inline int clamp(int v, int hi)
-{
-    // int mask = v >> (sizeof(int) * 8 - 1);
-    /*
-        Do the displacement(Right Shift) in v
-        And logic v and not v(shifted)
-        Or logic between the two parts
-    */
-    return (v & ~(v >> 31)) | (hi & (v >> 31));
+static int clamp(int v, int lo, int hi) {
+    int mask_lo = v - lo >> (sizeof(int) * CHAR_BIT - 1);
+    int mask_hi = hi - v >> (sizeof(int) * CHAR_BIT - 1);
+
+    return (lo & mask_lo) | (hi & mask_hi) | (v & ~(mask_lo | mask_hi));
 }
 
 static void mac(const uint8_t *__restrict inputs,
@@ -34,30 +30,30 @@ static void mac(const uint8_t *__restrict inputs,
 }
 
 static inline void convcellPropagate1(const uint8_t *input, uint8_t *outputs, const int32_t *__restrict biasses, const int8_t *__restrict weights, ActivationFunction_T ACTIVATION){
-    for (int oy = 0; oy < 11; oy++){
+    for (int oy = 0; oy < 11; oy++){        //OUTPUTS_HEIGHT 
         int iy = oy << 1;
-        for (int ox = 0; ox < 11; ox++){
+        for (int ox = 0; ox < 11; ox++){   // OUTPUTS_WIDTH
             int ix = ox << 1;
             int oOffset = ox + 11 * oy << 4;
-            oOffset += (oOffset >= 1584) ? -2160 : 0;
+            oOffset += (oOffset >= 1584) ? -2160 : 0;       // 1584 = OUTPUT_MEM_CONT_SIZE    _|&&|_  2160 = UTPUT_MEM_WRAP_OFFSET - OUTPUT_MEM_CONT_OFFSET - OUTPUT_MEM_CONT_SIZE;
             for (int output = 0; output < 16; ++output){
                 int32_t sum = biasses[output];
                 for (int ky = 0; ky < 4; ky++){
                     int iPos = ix + (24 * (iy + ky));
                     int wOffset = ((ky + (output << 2)) << 2);
-                    sum += (((input + iPos)[0]) * ((weights + wOffset)[0]));
-                    sum += (((input + iPos)[1]) * ((weights + wOffset)[1]));
-                    sum += (((input + iPos)[2]) * ((weights + wOffset)[2]));
-                    sum += (((input + iPos)[3]) * ((weights + wOffset)[3]));
+                    for (int i=0; i<4 ; i++){
+                        sum += (((input + iPos)[i]) * ((weights + wOffset)[i]));
+                    }
                 }
-                outputs[oOffset + output] = (ACTIVATION == ReLU && sum <= 0) ? clamp(0, 8) : clamp(sum >> 8, 8);
+                //outputs[oOffset + output] = (ACTIVATION == ReLU && sum <= 0) ? clamp(0, 0,8) : clamp(sum >> 8,0, 8);
+                outputs[oOffset + output] = clamp(sum >> 8, 0, 255);
             }
         }
     }
 }
 
-static void convcellPropagate2(const uint8_t *input, uint8_t *outputs, const int32_t *__restrict biasses, const int8_t *__restrict weights, ActivationFunction_T ACTIVATION){
-    for (int oy = 0; oy < 4; oy++){
+static inline void convcellPropagate2(const uint8_t *input, uint8_t *outputs, const int32_t *__restrict biasses, const int8_t *__restrict weights, ActivationFunction_T ACTIVATION){
+    for (int oy = 0; oy < 4; oy++){ 
         int iy = oy << 1;
         for (int ox = 0; ox < 4; ox++){
             int ix = ox << 1;
@@ -68,14 +64,15 @@ static void convcellPropagate2(const uint8_t *input, uint8_t *outputs, const int
                 int32_t sum = biasses[output];
                 for (int ky = 0; ky < 5; ky++){
                     int iOffset = ((ix) + 11 * (iy + ky)) << 4;
-                    iOffset += (iOffset >= 1584) ? -2160 : 0;
+                    iOffset += (iOffset >= 1584) ? -2160 : 0;       // 1584 = OUTPUT_MEM_CONT_SIZE    _|&&|_  2160 = UTPUT_MEM_WRAP_OFFSET - OUTPUT_MEM_CONT_OFFSET - OUTPUT_MEM_CONT_SIZE;
                     int wOffset = (5 * (ky + 5 * output)) << 4;
                     for (int kx = 0; kx < 5; kx++){
                         int iOffsetInRange = iOffset + (kx << 4);
                         mac(input + iOffsetInRange, weights + wOffset + kx * 16, &sum, 16);
                     }
                 }
-                outputs[oOffset + output] = (ACTIVATION == ReLU && sum <= 0) ? clamp(0, 8) : clamp(sum >> 8, 8);
+                //outputs[oOffset + output] = (ACTIVATION == ReLU && sum <= 0) ? clamp(0, 0,8) : clamp(sum >> 8, 0,8);
+                outputs[oOffset + output] = clamp(sum >> 8, 0, 255);
             }
         }
     }
@@ -96,7 +93,7 @@ static void fully_connected(
     {
         int32_t sum = bias[i];
         mac(input, weight, &sum, input_len);
-        output[i] = (ACTIVATION == ReLU && sum <= 0) ? clamp(0, 8) : clamp(sum >> rescaling, 8);
+        output[i] = (ACTIVATION == ReLU && sum <= 0) ? 0 : clamp(sum >> rescaling, 0, 255);
         weight += input_len;
     }
 }
