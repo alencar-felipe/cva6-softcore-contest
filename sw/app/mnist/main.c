@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef NUM_MPHMCOUNTERS
+#define NUM_MHPMCOUNTERS 31
+#endif
+
 #include "cpp_utils.h"
 #include "env.h"
 #include "Network.h"
@@ -22,16 +26,16 @@ inline int xadac_max(int rs1, int rs2)
 
 void experiments(void)
 {
-    printf("experiments begin\n");
+    //printf("experiments begin\n");
 
     for (int a = 0; a <= 5; a++) {
         for (int b = 0; b <= 5; b++) {
             int res = xadac_max(a, b);
-            printf("xadac_max(%d, %d) -> %d\n", a, b, res);
+            //printf("xadac_max(%d, %d) -> %d\n", a, b, res);
         }
     }
 
-    printf("experiments end\n");
+   // printf("experiments end\n");
 }
 void readStimulus(
                   UDATA_T* inputBuffer,
@@ -68,6 +72,17 @@ int processInput(        UDATA_T* inputBuffer,
         ? nbValidPredictions : 0;
 }
 
+static int chck(unsigned int is, unsigned int should)
+{
+  int err;
+  err = is == should ? 0 : 1;
+  if (err)
+    printf("fail %d %d\n", is, should);
+  else
+    printf("pass\n");
+  return err;
+}
+
 
 int main(int argc, char* argv[]) {
 
@@ -96,13 +111,13 @@ int main(int argc, char* argv[]) {
     
     experiments();
 
-    printf("Expected  = %d\n", expectedOutputBuffer[0]);
-    printf("Predicted = %d\n", predictedOutputBuffer[0]);
-    printf("Result : %d/1\n", success);
-    printf("credence: %d\n", output_value);
-    printf("image %s: %d instructions\n", stringify(MNIST_INPUT_IMAGE), (int)(instret));
-    printf("image %s: %d cycles\n", stringify(MNIST_INPUT_IMAGE), (int)(cycles));
-
+    //printf("Expected  = %d\n", expectedOutputBuffer[0]);
+    //printf("Predicted = %d\n", predictedOutputBuffer[0]);
+    //printf("Result : %d/1\n", success);
+    //printf("credence: %d\n", output_value);
+    //printf("image %s: %d instructions\n", stringify(MNIST_INPUT_IMAGE), (int)(instret));
+    //printf("image %s: %d cycles\n", stringify(MNIST_INPUT_IMAGE), (int)(cycles));
+    printf("%d\n",(int)(cycles));
 #ifdef OUTPUTFILE
     FILE *f = fopen("success_rate.txt", "w");
     if (f == NULL) {
