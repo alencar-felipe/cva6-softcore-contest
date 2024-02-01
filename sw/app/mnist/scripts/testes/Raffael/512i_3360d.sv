@@ -34,10 +34,10 @@ package cva6_config_pkg;
   localparam CVA6ConfigDataUserEn = 0;
   localparam CVA6ConfigDataUserWidth = CVA6ConfigXlen;
 
-  localparam CVA6ConfigIcacheByteSize = 1378;
+  localparam CVA6ConfigIcacheByteSize = 512;
   localparam CVA6ConfigIcacheSetAssoc = 2;
   localparam CVA6ConfigIcacheLineWidth = 128;
-  localparam CVA6ConfigDcacheByteSize = 1521; 
+  localparam CVA6ConfigDcacheByteSize = 3360; 
   localparam CVA6ConfigDcacheSetAssoc = 2;
   localparam CVA6ConfigDcacheLineWidth = 128;
 

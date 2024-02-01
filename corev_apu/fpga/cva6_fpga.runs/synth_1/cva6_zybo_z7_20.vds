@@ -3,16 +3,16 @@
 # SW Build 4029153 on Fri Oct 13 20:13:54 MDT 2023
 # IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
 # SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
-# Start of session at: Tue Jan 23 13:21:17 2024
-# Process ID: 500542
+# Start of session at: Thu Feb  1 16:13:21 2024
+# Process ID: 136729
 # Current directory: /home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1
 # Command line: vivado -log cva6_zybo_z7_20.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source cva6_zybo_z7_20.tcl
 # Log file: /home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/cva6_zybo_z7_20.vds
 # Journal file: /home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/vivado.jou
-# Running On: raffael, OS: Linux, CPU Frequency: 3400.848 MHz, CPU Physical cores: 4, Host memory: 20704 MB
+# Running On: raffael, OS: Linux, CPU Frequency: 3803.363 MHz, CPU Physical cores: 4, Host memory: 20704 MB
 #-----------------------------------------------------------
 source cva6_zybo_z7_20.tcl -notrace
-create_project: Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 1382.141 ; gain = 45.836 ; free physical = 7157 ; free virtual = 42602
+create_project: Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 1382.020 ; gain = 33.836 ; free physical = 10085 ; free virtual = 44108
 Command: synth_design -top cva6_zybo_z7_20 -part xc7z020clg400-1 -global_retiming on
 Starting synth_design
 Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
@@ -20,9 +20,9 @@ INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020
 INFO: [Device 21-403] Loading part xc7z020clg400-1
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 500792
+INFO: [Synth 8-7075] Helper process launched with PID 136981
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 2156.230 ; gain = 403.715 ; free physical = 6118 ; free virtual = 41563
+Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 2156.109 ; gain = 403.715 ; free physical = 9023 ; free virtual = 43048
 ---------------------------------------------------------------------------------
 WARNING: [Synth 8-9535] ignoring re-definition of command line macro 'BRAM' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/src/zybo-z7-20.svh:18]
 WARNING: [Synth 8-11067] parameter 'NbInstr' declared inside package 'cvxif_instr_pkg' shall be treated as localparam [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core/cvxif_example/include/cvxif_instr_pkg.sv:19]
@@ -101,8 +101,8 @@ INFO: [Synth 8-6157] synthesizing module 'AXI_BUS' [/home/raffael/Desktop/Projec
 	Parameter AXI_ID_WIDTH bound to: 5 - type: integer 
 	Parameter AXI_USER_WIDTH bound to: 32 - type: integer 
 INFO: [Synth 8-6155] done synthesizing module 'AXI_BUS' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/tb/axi_intf.sv:19]
-INFO: [Synth 8-6157] synthesizing module 'xlnx_axi_dwidth_converter_dm_slave' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-500542-raffael/realtime/xlnx_axi_dwidth_converter_dm_slave_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'xlnx_axi_dwidth_converter_dm_slave' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-500542-raffael/realtime/xlnx_axi_dwidth_converter_dm_slave_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'xlnx_axi_dwidth_converter_dm_slave' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-136729-raffael/realtime/xlnx_axi_dwidth_converter_dm_slave_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'xlnx_axi_dwidth_converter_dm_slave' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-136729-raffael/realtime/xlnx_axi_dwidth_converter_dm_slave_stub.v:6]
 INFO: [Synth 8-6157] synthesizing module 'AXI_BUS' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/tb/axi_intf.sv:19]
 	Parameter AXI_ADDR_WIDTH bound to: 64 - type: integer 
 	Parameter AXI_DATA_WIDTH bound to: 64 - type: integer 
@@ -115,8 +115,8 @@ INFO: [Synth 8-6157] synthesizing module 'AXI_BUS' [/home/raffael/Desktop/Projec
 	Parameter AXI_ID_WIDTH bound to: 4 - type: integer 
 	Parameter AXI_USER_WIDTH bound to: 32 - type: integer 
 INFO: [Synth 8-6155] done synthesizing module 'AXI_BUS' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/tb/axi_intf.sv:19]
-INFO: [Synth 8-6157] synthesizing module 'xlnx_axi_dwidth_converter_dm_master' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-500542-raffael/realtime/xlnx_axi_dwidth_converter_dm_master_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'xlnx_axi_dwidth_converter_dm_master' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-500542-raffael/realtime/xlnx_axi_dwidth_converter_dm_master_stub.v:6]
+INFO: [Synth 8-6157] synthesizing module 'xlnx_axi_dwidth_converter_dm_master' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-136729-raffael/realtime/xlnx_axi_dwidth_converter_dm_master_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'xlnx_axi_dwidth_converter_dm_master' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/.Xil/Vivado-136729-raffael/realtime/xlnx_axi_dwidth_converter_dm_master_stub.v:6]
 INFO: [Synth 8-6157] synthesizing module 'bootrom_32' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/src/bootrom/bootrom_32.sv:17]
 INFO: [Synth 8-6155] done synthesizing module 'bootrom_32' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/src/bootrom/bootrom_32.sv:17]
 INFO: [Synth 8-6157] synthesizing module 'rstgen' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/vendor/pulp-platform/common_cells/src/rstgen.sv:13]
@@ -1320,17 +1320,17 @@ INFO: [Synth 8-6155] done synthesizing module 'perf_counters' (0#1) [/home/raffa
 	Parameter CVA6Cfg[CachedRegionLength][0] bound to: 64'b0000000000000000000000000000000001000000000000000000000000000000 
 	Parameter CVA6Cfg[MaxOutstandingStores] bound to: 32'b00000000000000000000000000000111 
 	Parameter RdTxId bound to: 2'b00 
-	Parameter DATA_WIDTH bound to: 23 - type: integer 
-	Parameter NUM_WORDS bound to: 256 - type: integer 
-	Parameter NumWords bound to: 256 - type: integer 
+	Parameter DATA_WIDTH bound to: 25 - type: integer 
+	Parameter NUM_WORDS bound to: 64 - type: integer 
+	Parameter NumWords bound to: 64 - type: integer 
 	Parameter DataWidth bound to: 32'b00000000000000000000000001000000 
 	Parameter ByteWidth bound to: 8 - type: integer 
 	Parameter NumPorts bound to: 1 - type: integer 
 	Parameter Latency bound to: 1 - type: integer 
 	Parameter SimInit bound to: none - type: string 
 	Parameter PrintSimCfg bound to: 1'b0 
-	Parameter ADDR_WIDTH bound to: 8 - type: integer 
-	Parameter DATA_DEPTH bound to: 256 - type: integer 
+	Parameter ADDR_WIDTH bound to: 6 - type: integer 
+	Parameter DATA_DEPTH bound to: 64 - type: integer 
 	Parameter OUT_REGS bound to: 0 - type: integer 
 	Parameter SIM_INIT bound to: 1 - type: integer 
 INFO: [Synth 8-6155] done synthesizing module 'SyncSpRamBeNx64' (0#1) [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/vendor/pulp-platform/fpga-support/rtl/SyncSpRamBeNx64.sv:28]
@@ -1339,7 +1339,7 @@ INFO: [Common 17-14] Message 'Synth 8-6155' appears 100 times and further instan
 	Parameter DATA_WIDTH bound to: 128 - type: integer 
 	Parameter USER_WIDTH bound to: 128 - type: integer 
 	Parameter USER_EN bound to: 0 - type: integer 
-	Parameter NUM_WORDS bound to: 256 - type: integer 
+	Parameter NUM_WORDS bound to: 64 - type: integer 
 INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core/cache_subsystem/cva6_icache.sv:208]
 	Parameter LfsrWidth bound to: 32'b00000000000000000000000000001000 
 	Parameter OutWidth bound to: 32'b00000000000000000000000000000001 
@@ -2060,7 +2060,7 @@ INFO: [Synth 8-294] found qualifier unique on case statement: implementing as pa
 	Parameter DATA_WIDTH bound to: 64 - type: integer 
 	Parameter USER_WIDTH bound to: 64 - type: integer 
 	Parameter USER_EN bound to: 0 - type: integer 
-	Parameter NUM_WORDS bound to: 256 - type: integer 
+	Parameter NUM_WORDS bound to: 64 - type: integer 
 	Parameter NumIn bound to: 32'b00000000000000000000000000000100 
 	Parameter DataWidth bound to: 32'b00000000000000000000000000000001 
 	Parameter CVA6Cfg[NrCommitPorts] bound to: 32'b00000000000000000000000000000001 
@@ -5900,17 +5900,6 @@ INFO: [Synth 8-294] found qualifier unique on case statement: implementing as pa
 	Parameter ASID_WIDTH bound to: 32'sb00000000000000000000000000000001 
 	Parameter DATA_WIDTH bound to: 30 - type: integer 
 	Parameter NUM_WORDS bound to: 64 - type: integer 
-	Parameter NumWords bound to: 64 - type: integer 
-	Parameter DataWidth bound to: 32'b00000000000000000000000001000000 
-	Parameter ByteWidth bound to: 8 - type: integer 
-	Parameter NumPorts bound to: 1 - type: integer 
-	Parameter Latency bound to: 1 - type: integer 
-	Parameter SimInit bound to: none - type: string 
-	Parameter PrintSimCfg bound to: 1'b0 
-	Parameter ADDR_WIDTH bound to: 6 - type: integer 
-	Parameter DATA_DEPTH bound to: 64 - type: integer 
-	Parameter OUT_REGS bound to: 0 - type: integer 
-	Parameter SIM_INIT bound to: 1 - type: integer 
 	Parameter DATA_WIDTH bound to: 32 - type: integer 
 	Parameter NUM_WORDS bound to: 64 - type: integer 
 	Parameter CVA6Cfg[NrCommitPorts] bound to: 32'b00000000000000000000000000000001 
@@ -7838,18 +7827,18 @@ WARNING: [Synth 8-7129] Port gpio\.r_data[58] in module ariane_peripherals is ei
 WARNING: [Synth 8-7129] Port gpio\.r_data[57] in module ariane_peripherals is either unconnected or has no load
 INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:14 ; elapsed = 00:00:14 . Memory (MB): peak = 2566.449 ; gain = 813.934 ; free physical = 5677 ; free virtual = 41130
+Finished RTL Elaboration : Time (s): cpu = 00:00:14 ; elapsed = 00:00:14 . Memory (MB): peak = 2565.328 ; gain = 812.934 ; free physical = 8581 ; free virtual = 42618
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2578.324 ; gain = 825.809 ; free physical = 5674 ; free virtual = 41127
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2580.172 ; gain = 827.777 ; free physical = 8581 ; free virtual = 42617
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2578.324 ; gain = 825.809 ; free physical = 5674 ; free virtual = 41127
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2580.172 ; gain = 827.777 ; free physical = 8581 ; free virtual = 42617
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00.85 ; elapsed = 00:00:00.84 . Memory (MB): peak = 2578.324 ; gain = 0.000 ; free physical = 5651 ; free virtual = 41112
+Netlist sorting complete. Time (s): cpu = 00:00:00.89 ; elapsed = 00:00:00.89 . Memory (MB): peak = 2580.172 ; gain = 0.000 ; free physical = 8582 ; free virtual = 42619
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
@@ -7877,22 +7866,22 @@ Parsing XDC File [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core
 Finished Parsing XDC File [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/dont_touch.xdc]
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2775.012 ; gain = 0.000 ; free physical = 5590 ; free virtual = 41051
+Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 2773.891 ; gain = 0.000 ; free physical = 8504 ; free virtual = 42540
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00.19 ; elapsed = 00:00:00.18 . Memory (MB): peak = 2775.047 ; gain = 0.000 ; free physical = 5588 ; free virtual = 41051
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.25 ; elapsed = 00:00:00.26 . Memory (MB): peak = 2773.926 ; gain = 0.000 ; free physical = 8510 ; free virtual = 42538
 WARNING: [Timing 38-316] Clock period '100.000' specified during out-of-context synthesis of instance 'i_axi_dwidth_converter_dm_master' at clock pin 's_axi_aclk' is different from the actual clock period '20.000', this can lead to different synthesis results.
 WARNING: [Timing 38-316] Clock period '100.000' specified during out-of-context synthesis of instance 'i_axi_dwidth_converter_dm_slave' at clock pin 's_axi_aclk' is different from the actual clock period '20.000', this can lead to different synthesis results.
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:33 ; elapsed = 00:00:31 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 5571 ; free virtual = 41034
+Finished Constraint Validation : Time (s): cpu = 00:00:33 ; elapsed = 00:00:30 . Memory (MB): peak = 2785.797 ; gain = 1033.402 ; free physical = 8488 ; free virtual = 42521
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z020clg400-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:33 ; elapsed = 00:00:31 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 5571 ; free virtual = 41034
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:33 ; elapsed = 00:00:30 . Memory (MB): peak = 2785.797 ; gain = 1033.402 ; free physical = 8488 ; free virtual = 42521
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
@@ -7904,7 +7893,7 @@ Applied set_property KEEP_HIERARCHY = SOFT for i_axi_dwidth_converter_dm_slave. 
 Applied set_property KEEP_HIERARCHY = SOFT for i_xlnx_blk_mem_gen. (constraint file  auto generated constraint).
 Applied set_property KEEP_HIERARCHY = SOFT for i_xlnx_clk_gen. (constraint file  auto generated constraint).
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:33 ; elapsed = 00:00:31 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 5571 ; free virtual = 41034
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:33 ; elapsed = 00:00:31 . Memory (MB): peak = 2785.797 ; gain = 1033.402 ; free physical = 8488 ; free virtual = 42521
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-802] inferred FSM for state register 'r_state_q_reg' in module 'axi_atop_filter'
 INFO: [Synth 8-802] inferred FSM for state register 'w_state_q_reg' in module 'axi_atop_filter'
@@ -8238,7 +8227,7 @@ INFO: [Synth 8-3354] encoded FSM with state register 'w_state_q_reg' using encod
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'r_state_q_reg' using encoding 'sequential' in module 'axi_riscv_lrsc'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:01:03 ; elapsed = 00:01:01 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 2262 ; free virtual = 37731
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:01:10 ; elapsed = 00:01:08 . Memory (MB): peak = 2785.797 ; gain = 1033.402 ; free physical = 4404 ; free virtual = 38442
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -8256,10 +8245,10 @@ Detailed RTL Component Info :
 	   2 Input   12 Bit       Adders := 1     
 	   3 Input    9 Bit       Adders := 2     
 	   2 Input    9 Bit       Adders := 11    
-	   2 Input    8 Bit       Adders := 6     
+	   2 Input    8 Bit       Adders := 4     
 	   3 Input    7 Bit       Adders := 1     
 	   2 Input    7 Bit       Adders := 5     
-	   2 Input    6 Bit       Adders := 3     
+	   2 Input    6 Bit       Adders := 5     
 	   3 Input    5 Bit       Adders := 1     
 	   2 Input    5 Bit       Adders := 2     
 	   2 Input    4 Bit       Adders := 4     
@@ -8290,18 +8279,18 @@ Detailed RTL Component Info :
 	               32 Bit    Registers := 273   
 	               30 Bit    Registers := 5     
 	               27 Bit    Registers := 1     
-	               24 Bit    Registers := 1     
-	               22 Bit    Registers := 11    
+	               24 Bit    Registers := 6     
+	               22 Bit    Registers := 6     
 	               20 Bit    Registers := 2     
 	               16 Bit    Registers := 6     
 	               14 Bit    Registers := 1     
-	               12 Bit    Registers := 4     
+	               12 Bit    Registers := 3     
 	               11 Bit    Registers := 70    
-	               10 Bit    Registers := 14    
+	               10 Bit    Registers := 15    
 	                9 Bit    Registers := 15    
-	                8 Bit    Registers := 176   
+	                8 Bit    Registers := 169   
 	                7 Bit    Registers := 10    
-	                6 Bit    Registers := 30    
+	                6 Bit    Registers := 37    
 	                5 Bit    Registers := 116   
 	                4 Bit    Registers := 300   
 	                3 Bit    Registers := 169   
@@ -8310,8 +8299,7 @@ Detailed RTL Component Info :
 +---Multipliers : 
 	              33x33  Multipliers := 1     
 +---RAMs : 
-	              16K Bit	(256 X 64 bit)          RAMs := 12    
-	               4K Bit	(64 X 64 bit)          RAMs := 4     
+	               4K Bit	(64 X 64 bit)          RAMs := 16    
 	             1024 Bit	(32 X 32 bit)          RAMs := 1     
 	               1K Bit	(32 X 33 bit)          RAMs := 1     
 +---ROMs : 
@@ -8359,9 +8347,9 @@ Detailed RTL Component Info :
 	  41 Input   31 Bit        Muxes := 1     
 	   2 Input   30 Bit        Muxes := 2     
 	   2 Input   27 Bit        Muxes := 1     
-	   2 Input   24 Bit        Muxes := 1     
-	   2 Input   22 Bit        Muxes := 31    
-	   4 Input   22 Bit        Muxes := 1     
+	   2 Input   24 Bit        Muxes := 13    
+	   4 Input   24 Bit        Muxes := 1     
+	   2 Input   22 Bit        Muxes := 19    
 	   2 Input   21 Bit        Muxes := 3     
 	   2 Input   20 Bit        Muxes := 12    
 	   2 Input   16 Bit        Muxes := 24    
@@ -8370,25 +8358,25 @@ Detailed RTL Component Info :
 	   2 Input   14 Bit        Muxes := 2     
 	  13 Input   13 Bit        Muxes := 1     
 	   2 Input   13 Bit        Muxes := 11    
-	   2 Input   12 Bit        Muxes := 7     
-	   4 Input   12 Bit        Muxes := 1     
+	   2 Input   12 Bit        Muxes := 3     
 	   2 Input   11 Bit        Muxes := 60    
-	   2 Input   10 Bit        Muxes := 7     
+	   2 Input   10 Bit        Muxes := 11    
+	   4 Input   10 Bit        Muxes := 1     
 	   2 Input    9 Bit        Muxes := 9     
 	   4 Input    9 Bit        Muxes := 6     
-	   2 Input    8 Bit        Muxes := 189   
+	   2 Input    8 Bit        Muxes := 160   
 	   3 Input    8 Bit        Muxes := 2     
-	   4 Input    8 Bit        Muxes := 6     
+	   4 Input    8 Bit        Muxes := 5     
 	  12 Input    8 Bit        Muxes := 1     
 	   5 Input    8 Bit        Muxes := 2     
 	   9 Input    8 Bit        Muxes := 2     
 	  20 Input    7 Bit        Muxes := 1     
 	   2 Input    7 Bit        Muxes := 7     
-	   2 Input    6 Bit        Muxes := 46    
+	   2 Input    6 Bit        Muxes := 75    
+	   4 Input    6 Bit        Muxes := 2     
 	  17 Input    6 Bit        Muxes := 1     
 	  63 Input    6 Bit        Muxes := 1     
 	   8 Input    6 Bit        Muxes := 2     
-	   4 Input    6 Bit        Muxes := 1     
 	  13 Input    6 Bit        Muxes := 1     
 	   6 Input    6 Bit        Muxes := 1     
 	   2 Input    5 Bit        Muxes := 209   
@@ -8466,1559 +8454,11 @@ Finished Part Resource Summary
 ---------------------------------------------------------------------------------
 Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-5544] ROM "i_atop_filter/" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
-INFO: [Synth 8-5544] ROM "i_atop_filter/" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
-INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_slv_port_demux[1].i_axi_err_slv /\i_atop_filter/r_resp_cmd/i_fifo/i_fifo_v3/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_slv_port_demux[0].i_axi_err_slv /\i_atop_filter/r_resp_cmd/i_fifo/i_fifo_v3/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_slv_port_demux[1].i_axi_demux /\gen_demux.i_w_fifo /\write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[9].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[8].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[7].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[6].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[5].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[4].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[3].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[2].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[1].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_mst_port_mux[0].i_axi_mux /\gen_mux.i_w_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gen_slv_port_demux[0].i_axi_demux /\gen_demux.i_w_fifo /\write_pointer_q_reg[0] )
-INFO: [Synth 8-5845] Not enough pipeline registers after wide multiplier. Recommended levels of pipeline registers is 4 [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core/multiplier.sv:107]
-DSP Report: Generating DSP i_multiplier/mult_result_d, operation Mode is: A*B.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-DSP Report: Generating DSP i_multiplier/mult_result_d, operation Mode is: (PCIN>>17)+A*B.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-DSP Report: Generating DSP i_multiplier/mult_result_d, operation Mode is: A*B.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-DSP Report: Generating DSP i_multiplier/mult_result_d, operation Mode is: (PCIN>>17)+A*B.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-DSP Report: operator i_multiplier/mult_result_d is absorbed into DSP i_multiplier/mult_result_d.
-INFO: [Synth 8-5587] ROM size for "amo_op_d" is below threshold of ROM address width. It will be mapped to LUTs
-INFO: [Synth 8-5546] ROM "extract_transfer_size0" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5587] ROM size for "amo_op_d" is below threshold of ROM address width. It will be mapped to LUTs
-INFO: [Synth 8-5546] ROM "extract_transfer_size0" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "extract_transfer_size1" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "extract_transfer_size1" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "extract_transfer_size" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "extract_transfer_size" won't be mapped to RAM because it is too sparse
-INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (ex_stage_i/lsu_i/\i_store_unit/i_amo_buffer/i_amo_fifo/write_pointer_q_reg[0] )
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][3]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][4]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][5]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][6]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][7]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][8]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][9]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][10]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][11]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][12]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][13]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][14]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][15]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][16]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][17]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][18]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][19]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][20]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][21]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][22]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][23]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][24]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][25]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][26]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][27]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][28]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][29]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][30]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]'
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /\misaligned_ex_q_reg[cause][31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (ex_stage_i/lsu_i/\lsu_bypass_i/mem_q_reg[1][overflow] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (ex_stage_i/lsu_i/\lsu_bypass_i/mem_q_reg[0][overflow] )
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_ptw/ptw_pptr_q_reg[0]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_ptw/ptw_pptr_q_reg[1]'
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_ptw/\ptw_pptr_q_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\issue_stage_i/i_scoreboard /\mem_q_reg[0][is_rd_fpr_flag] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\issue_stage_i/i_scoreboard /\mem_q_reg[1][is_rd_fpr_flag] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\issue_stage_i/i_scoreboard /\mem_q_reg[2][is_rd_fpr_flag] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\issue_stage_i/i_scoreboard /\mem_q_reg[3][is_rd_fpr_flag] )
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][31]' (FDC) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/misaligned_ex_q_reg[cause][0]'
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /\misaligned_ex_q_reg[cause][0] )
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[37]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[38]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[38]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[39]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[39]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[40]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[40]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[41]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[41]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[42]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[42]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[43]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[43]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[44]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[44]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[45]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[45]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[46]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[46]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[47]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[47]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[48]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[48]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[49]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[49]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[50]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[50]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[51]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[51]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[52]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[52]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[53]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[53]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[54]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[54]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[55]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[55]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[56]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[56]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[57]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[57]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[58]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[58]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[59]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[59]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[60]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[60]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[61]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[61]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[62]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[62]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[63]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[63]' (FDC) to 'ex_stage_i/lsu_i/i_pipe_reg_load/gen_register.d_o_reg[64]'
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (ex_stage_i/lsu_i/\i_pipe_reg_load/gen_register.d_o_reg[64] )
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[47]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[46]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[45]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[44]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[43]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[42]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[41]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[40]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[39]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[38]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[37]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[36]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[35]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[34]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[33]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[32]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[31]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[30]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[29]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[28]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[27]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[26]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[25]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[24]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[23]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[22]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[21]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[20]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[19]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[18]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[17]) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[47]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[46]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[45]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[44]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[43]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[42]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[41]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[40]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[39]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[38]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[37]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[36]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[35]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[34]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[33]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[32]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[31]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[30]__0) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[47]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[46]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[45]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[44]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[43]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[42]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[41]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[40]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[39]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[38]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[37]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[36]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[35]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[34]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[33]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[32]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[31]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[30]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[29]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[28]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[27]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[26]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[25]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[24]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[23]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[22]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[21]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[20]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[19]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[18]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[17]__1) is unused and will be removed from module mult.
-WARNING: [Synth 8-3332] Sequential element (i_multiplier/mult_result_q_reg[47]__2) is unused and will be removed from module mult.
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[12]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[0]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[13]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[1]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[14]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[2]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[15]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[3]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[16]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[4]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[17]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[5]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[18]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[6]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[19]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[7]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[20]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[8]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[21]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn0_q_reg[9]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[22]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[0]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[23]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[1]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[24]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[2]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[25]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[3]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[26]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[4]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[27]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[5]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[28]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[6]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[29]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[7]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[30]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[8]'
-INFO: [Synth 8-3886] merging instance 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/shared_tlb_vaddr_q_reg[31]' (FDCE) to 'ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/vpn1_q_reg[9]'
-INFO: [Synth 8-4471] merging register 'id_stage_i/issue_q_reg[sbe][ex][valid]' into 'id_stage_i/issue_q_reg[sbe][valid]' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core/id_stage.sv:135]
-INFO: [Synth 8-4471] merging register 'id_stage_i/issue_q_reg[sbe][vfp]' into 'id_stage_i/issue_q_reg[sbe][is_compressed]' [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core/id_stage.sv:135]
-INFO: [Synth 8-5546] ROM "id_stage_i/decoder_i/instruction_o" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "id_stage_i/decoder_i/instruction_o" won't be mapped to RAM because it is too sparse
-WARNING: [Synth 8-3917] design cva6__GB2 has port we_fpr_o[0] driven by constant 0
-WARNING: [Synth 8-3917] design cva6__GB2 has port csr_write_fflags_commit_cs driven by constant 0
-WARNING: [Synth 8-6014] Unused sequential element btb_gen.i_btb/gen_fpga_btb.gen_btb_ram[0].i_btb_ram/Mem_DP_reg was removed. 
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_frontend/\i_instr_realign/unaligned_address_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\controller_i/flush_dcache_o_reg )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\controller_i/fence_active_q_reg )
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][0]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][1]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][1]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][2]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][2]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][3]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][3]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][4]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][4]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][5]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][5]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][6]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][6]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][7]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][7]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][8]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][8]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][9]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][9]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][10]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][10]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][11]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][11]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][12]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][12]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][13]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][13]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][14]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][14]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][15]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][15]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][16]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][16]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][17]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][17]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][18]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][18]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][19]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][19]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][20]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][20]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][21]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][21]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][22]'
-INFO: [Synth 8-3886] merging instance 'id_stage_i/issue_q_reg[sbe][lsu_wdata][22]' (FDCE) to 'id_stage_i/issue_q_reg[sbe][lsu_wdata][23]'
-INFO: [Common 17-14] Message 'Synth 8-3886' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Common 17-14] Message 'Synth 8-3886' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\id_stage_i/issue_q_reg[sbe][trans_id][1] )
-INFO: [Common 17-14] Message 'Synth 8-3886' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\i_wt_dcache/i_wt_dcache_wbuffer /\wbuffer_q_reg[1][user][7] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\i_wt_dcache/i_wt_dcache_wbuffer /\wbuffer_q_reg[1][user][15] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\i_wt_dcache/i_wt_dcache_wbuffer /\wbuffer_q_reg[1][user][23] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\i_wt_dcache/i_wt_dcache_wbuffer /\wbuffer_q_reg[1][user][31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\dcache_rd_shift_user_q_reg[3][31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (\i_wt_dcache/i_wt_dcache_wbuffer /\rd_tag_q_reg[20] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\dcache_rtrn_type_q_reg[2] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\icache_rd_shift_user_q_reg[3][7] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_cva6_icache/\cl_offset_q_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_cva6_icache/inv_q_reg)
-INFO: [Synth 8-7067] Removed DRAM instance i_adapter/i_dcache_data_fifo/i_2/gen_fpga_queue.fifo_ram/mem_reg_0_1_30_35 from module fifo_v3__parameterized9 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_adapter/i_dcache_data_fifo/i_2/gen_fpga_queue.fifo_ram/mem_reg_0_1_24_29 from module fifo_v3__parameterized9 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_adapter/i_dcache_data_fifo/i_2/gen_fpga_queue.fifo_ram/mem_reg_0_1_18_23 from module fifo_v3__parameterized9 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_adapter/i_dcache_data_fifo/i_2/gen_fpga_queue.fifo_ram/mem_reg_0_1_12_17 from module fifo_v3__parameterized9 due to constant propagation
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\dcache_rd_shift_user_q_reg[2][0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\icache_rd_shift_user_q_reg[3][7] )
-INFO: [Synth 8-7067] Removed DRAM instance i_adapter/i_dcache_data_fifo/i_2/gen_fpga_queue.fifo_ram/mem_reg_0_1_24_29 from module fifo_v3__parameterized9 due to constant propagation
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\dcache_rd_shift_user_q_reg[1][31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\icache_rd_shift_user_q_reg[3][7] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\dcache_rd_shift_user_q_reg[0][31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_adapter/\icache_rd_shift_user_q_reg[0][31] )
-WARNING: [Synth 8-3332] Sequential element (FSM_sequential_wr_state_q_reg[1]) is unused and will be removed from module axi_shim.
-INFO: [Synth 8-5544] ROM "state_d" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
-INFO: [Synth 8-5544] ROM "axi_fsm.result" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
-INFO: [Synth 8-5544] ROM "axi_fsm.result" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
-INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_dm_top/i_dm_csrs/\abstractauto_q_reg[autoexecprogbuf][24] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_dm_axi_master/\amo_q_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_dm_top/i_dm_csrs/\sbcs_q_reg[sbaccess][19] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_axi_riscv_atomics/\i_atomics/i_amos /\r_user_q_reg[31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_axi_riscv_atomics/\i_atomics/i_lrsc/i_non_excl_acc_arb/i_arb/gen_rr_arb.i_arbiter/gen_arbiter.gen_int_rr.gen_lock.lock_q_reg )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_axi_riscv_atomics/\i_atomics/i_lrsc/i_non_excl_acc_arb/i_arb/gen_rr_arb.i_arbiter/gen_arbiter.gen_int_rr.rr_q_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_axi_riscv_atomics/\i_atomics/i_lrsc/i_non_excl_acc_arb/i_arb/gen_rr_arb.i_arbiter/gen_arbiter.gen_int_rr.gen_lock.req_q_reg[1] )
-INFO: [Synth 8-5546] ROM "resp_o" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "ip_re_o" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "resp_o" won't be mapped to RAM because it is too sparse
-INFO: [Synth 8-5546] ROM "ip_re_o" won't be mapped to RAM because it is too sparse
-INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/\gen_uart.i_apb_uart /\UART_RX/RX_MVF/iCounter_reg[4] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/\gen_uart.i_apb_uart /\UART_IS_DCD/iD_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/i_plic/\i_rv_plic_gateway/src_d_reg[29] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/i_axi2apb_64_32_uart/\RDATA_Q_0_reg[28] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/i_axi2apb_64_32_uart/\RDATA_Q_1_reg[31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/i_axi2apb_64_32_plic/\RDATA_Q_0_reg[31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/i_axi2apb_64_32_plic/\RDATA_Q_1_reg[31] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/\gen_uart.i_apb_uart /\UART_IS_DCD/iD_reg[0] )
-INFO: [Synth 8-7067] Removed DRAM instance i_ariane_peripherals/i_axi2apb_64_32_uart/slave_r_buffer_i//slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg_0_1_60_65 from module axi2apb_64_32 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_ariane_peripherals/i_axi2apb_64_32_uart/slave_r_buffer_i//slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg_0_1_54_59 from module axi2apb_64_32 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_ariane_peripherals/i_axi2apb_64_32_uart/slave_r_buffer_i//slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg_0_1_48_53 from module axi2apb_64_32 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_ariane_peripherals/i_axi2apb_64_32_uart/slave_r_buffer_i//slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg_0_1_24_29 from module axi2apb_64_32 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_ariane_peripherals/i_axi2apb_64_32_uart/slave_r_buffer_i//slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg_0_1_18_23 from module axi2apb_64_32 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_ariane_peripherals/i_axi2apb_64_32_uart/slave_r_buffer_i//slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg_0_1_12_17 from module axi2apb_64_32 due to constant propagation
-INFO: [Synth 8-7067] Removed DRAM instance i_ariane_peripherals/i_axi2apb_64_32_uart/slave_r_buffer_i//slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg_0_1_54_59 from module axi2apb_64_32 due to constant propagation
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_ariane_peripherals/i_plic/\gen_target[0].i_target/gen_sequential.irq_id_reg[4] )
-WARNING: [Synth 8-3332] Sequential element (ip_re_o_reg[0]) is unused and will be removed from module plic_regs.
----------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:02:29 ; elapsed = 00:02:54 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 330 ; free virtual = 35099
----------------------------------------------------------------------------------
- Sort Area is cva6__GB0 i_multiplier/mult_result_d_0 : 0 0 : 2701 5011 : Used 1 time 0
- Sort Area is cva6__GB0 i_multiplier/mult_result_d_0 : 0 1 : 2310 5011 : Used 1 time 0
- Sort Area is cva6__GB0 i_multiplier/mult_result_d_3 : 0 0 : 2304 4387 : Used 1 time 0
- Sort Area is cva6__GB0 i_multiplier/mult_result_d_3 : 0 1 : 2083 4387 : Used 1 time 0
----------------------------------------------------------------------------------
-Start ROM, RAM, DSP, Shift Register and Retiming Reporting
----------------------------------------------------------------------------------
-
-ROM: Preliminary Mapping Report
-+------------+------------+---------------+----------------+
-|Module Name | RTL Object | Depth x Width | Implemented As | 
-+------------+------------+---------------+----------------+
-|debug_rom   | mem        | 32x55         | LUT            | 
-+------------+------------+---------------+----------------+
-
-
-Block RAM: Preliminary Mapping Report (see note below)
-+--------------------------------------------------------------+--------------------------------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
-|Module Name                                                   | RTL Object                                                         | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
-+--------------------------------------------------------------+--------------------------------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
-|i_cva6_icache/\gen_sram[0].tag_sram                           | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[0].data_sram                          | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[0].data_sram                          | gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[1].tag_sram                           | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[1].data_sram                          | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[1].data_sram                          | gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[0].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[1].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[2].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[3].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_tag_srams[0].i_tag_sram    | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_tag_srams[1].i_tag_sram    | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[0].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[0].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[1].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[1].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|i_frontend                                                    | btb_gen.i_btb/gen_fpga_btb.gen_btb_ram[0].i_btb_ram/Mem_DP_reg     | 32 x 33(READ_FIRST)    | W |   | 32 x 33(WRITE_FIRST)   |   | R | Port A and B     | 1      | 0      | 
-+--------------------------------------------------------------+--------------------------------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
-
-Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
-
-Distributed RAM: Preliminary Mapping Report (see note below)
-+-------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+-----------+----------------------+----------------+
-|Module Name                                            | RTL Object                                                                                                    | Inference | Size (Depth x Width) | Primitives     | 
-+-------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+-----------+----------------------+----------------+
-|\gen_slv_port_demux[0].i_axi_err_slv                   | i_w_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[0].i_axi_err_slv                   | i_b_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 2 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[0].i_axi_err_slv                   | i_r_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 12               | RAM32M x 2     | 
-|\gen_slv_port_demux[1].i_axi_err_slv                   | i_w_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[1].i_axi_err_slv                   | i_b_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 2 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[1].i_axi_err_slv                   | i_r_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 12               | RAM32M x 2     | 
-|\i_ariane/gen_example_coprocessor.i_cvxif_coprocessor  | fifo_commit_i/gen_fpga_queue.fifo_ram/mem_reg                                                                 | Implied   | 8 x 108              | RAM32M x 18    | 
-|\i_wt_dcache/i_wt_dcache_wbuffer                       | i_rtrn_id_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                | Implied   | 4 x 2                | RAM16X1D x 2   | 
-|i_adapter/i_icache_data_fifo                           | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 2 x 38               | RAM32M x 7     | 
-|i_adapter/i_dcache_data_fifo                           | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 2 x 111              | RAM32M x 19    | 
-|i_adapter/i_rd_dcache_id                               | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 4 x 2                | RAM16X1D x 2   | 
-|i_adapter/i_wr_dcache_id                               | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 4 x 2                | RAM16X1D x 2   | 
-|i_adapter/i_b_fifo                                     | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 4 x 5                | RAM32M x 1     | 
-|cva6__GB0                                              | issue_stage_i/i_issue_read_operands/gen_fpga_regfile.i_ariane_regfile_fpga/regfile_ram_block[0].mem_reg[0][0] | Implied   | 32 x 32              | RAM32M x 12    | 
-|i_frontend                                             | bht_gen.i_bht/gen_fpga_bht.gen_bht_ram[0].i_bht_ram/mem_reg                                                   | Implied   | 128 x 3              | RAM128X1D x 3  | 
-|i_frontend                                             | i_instr_queue/gen_instr_fifo[0].i_fifo_instr_data/gen_fpga_queue.fifo_ram/mem_reg                             | Implied   | 4 x 69               | RAM32M x 12    | 
-|i_frontend                                             | i_instr_queue/i_fifo_address/gen_fpga_queue.fifo_ram/mem_reg                                                  | Implied   | 4 x 32               | RAM32M x 6     | 
-|i_dm_top/i_dm_csrs                                     | i_fifo/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                                                              | Implied   | 2 x 32               | RAM32M x 6     | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_aw_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_ar_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_w_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 73               | RAM32M x 13    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 104              | RAM32M x 18    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_b_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 39               | RAM32M x 7     | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_aw_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_ar_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_w_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 73               | RAM32M x 13    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 104              | RAM32M x 18    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_b_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 39               | RAM32M x 7     | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_aw_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_ar_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_w_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 73               | RAM32M x 13    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 104              | RAM32M x 18    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_b_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 39               | RAM32M x 7     | 
-+-------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+-----------+----------------------+----------------+
-
-Note: The table above is a preliminary report that shows the Distributed RAMs at the current stage of the synthesis flow. Some Distributed RAMs may be reimplemented as non Distributed RAM primitives later in the synthesis flow. Multiple instantiated RAMs are reported only once.
-
-DSP: Preliminary Mapping Report (see note below. The ' indicates corresponding REG is set)
-+------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
-|Module Name | DSP Mapping    | A Size | B Size | C Size | D Size | P Size | AREG | BREG | CREG | DREG | ADREG | MREG | PREG | 
-+------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
-|mult        | A*B            | 18     | 16     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
-|mult        | (PCIN>>17)+A*B | 16     | 16     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
-|mult        | A*B            | 18     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
-|mult        | (PCIN>>17)+A*B | 18     | 16     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
-+------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
-
-Note: The table above is a preliminary report that shows the DSPs inferred at the current stage of the synthesis flow. Some DSP may be reimplemented as non DSP primitives later in the synthesis flow. Multiple instantiated DSPs are reported only once.
----------------------------------------------------------------------------------
-Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Applying XDC Timing Constraints
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:02:36 ; elapsed = 00:03:01 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 375 ; free virtual = 35085
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Timing Optimization
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:03:31 ; elapsed = 00:03:57 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 414 ; free virtual = 35126
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start ROM, RAM, DSP, Shift Register and Retiming Reporting
----------------------------------------------------------------------------------
-
-Block RAM: Final Mapping Report
-+--------------------------------------------------------------+--------------------------------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
-|Module Name                                                   | RTL Object                                                         | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
-+--------------------------------------------------------------+--------------------------------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
-|i_cva6_icache/\gen_sram[0].tag_sram                           | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[0].data_sram                          | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[0].data_sram                          | gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[1].tag_sram                           | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[1].data_sram                          | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|i_cva6_icache/\gen_sram[1].data_sram                          | gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[0].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[1].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[2].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_data_banks[3].i_data_sram  | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_tag_srams[0].i_tag_sram    | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|\i_wt_dcache/i_wt_dcache_mem /\gen_tag_srams[1].i_tag_sram    | gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg                      | 256 x 64(READ_FIRST)   | W |   | 256 x 64(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[0].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[0].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[1].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|ex_stage_i/lsu_i/\gen_mmu_sv32.i_cva6_mmu /i_shared_tlb       | gen_sram[1].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg | 64 x 64(READ_FIRST)    | W |   | 64 x 64(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
-|i_frontend                                                    | btb_gen.i_btb/gen_fpga_btb.gen_btb_ram[0].i_btb_ram/Mem_DP_reg     | 32 x 33(READ_FIRST)    | W |   | 32 x 33(WRITE_FIRST)   |   | R | Port A and B     | 1      | 0      | 
-+--------------------------------------------------------------+--------------------------------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
-
-
-Distributed RAM: Final Mapping Report
-+-------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+-----------+----------------------+----------------+
-|Module Name                                            | RTL Object                                                                                                    | Inference | Size (Depth x Width) | Primitives     | 
-+-------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+-----------+----------------------+----------------+
-|\gen_slv_port_demux[0].i_axi_err_slv                   | i_w_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[0].i_axi_err_slv                   | i_b_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 2 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[0].i_axi_err_slv                   | i_r_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 12               | RAM32M x 2     | 
-|\gen_slv_port_demux[1].i_axi_err_slv                   | i_w_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[1].i_axi_err_slv                   | i_b_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 2 x 4                | RAM32M x 1     | 
-|\gen_slv_port_demux[1].i_axi_err_slv                   | i_r_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                      | Implied   | 4 x 12               | RAM32M x 2     | 
-|\i_ariane/gen_example_coprocessor.i_cvxif_coprocessor  | fifo_commit_i/gen_fpga_queue.fifo_ram/mem_reg                                                                 | Implied   | 8 x 108              | RAM32M x 18    | 
-|\i_wt_dcache/i_wt_dcache_wbuffer                       | i_rtrn_id_fifo/gen_fpga_queue.fifo_ram/mem_reg                                                                | Implied   | 4 x 2                | RAM16X1D x 2   | 
-|i_adapter/i_icache_data_fifo                           | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 2 x 38               | RAM32M x 7     | 
-|i_adapter/i_dcache_data_fifo                           | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 2 x 111              | RAM32M x 19    | 
-|i_adapter/i_rd_dcache_id                               | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 4 x 2                | RAM16X1D x 2   | 
-|i_adapter/i_wr_dcache_id                               | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 4 x 2                | RAM16X1D x 2   | 
-|i_adapter/i_b_fifo                                     | gen_fpga_queue.fifo_ram/mem_reg                                                                               | Implied   | 4 x 5                | RAM32M x 1     | 
-|i_frontend                                             | bht_gen.i_bht/gen_fpga_bht.gen_bht_ram[0].i_bht_ram/mem_reg                                                   | Implied   | 128 x 3              | RAM128X1D x 3  | 
-|i_frontend                                             | i_instr_queue/gen_instr_fifo[0].i_fifo_instr_data/gen_fpga_queue.fifo_ram/mem_reg                             | Implied   | 4 x 69               | RAM32M x 12    | 
-|i_frontend                                             | i_instr_queue/i_fifo_address/gen_fpga_queue.fifo_ram/mem_reg                                                  | Implied   | 4 x 32               | RAM32M x 6     | 
-|cva6__GB0                                              | issue_stage_i/i_issue_read_operands/gen_fpga_regfile.i_ariane_regfile_fpga/regfile_ram_block[0].mem_reg[0][0] | Implied   | 32 x 32              | RAM32M x 12    | 
-|i_dm_top/i_dm_csrs                                     | i_fifo/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                                                              | Implied   | 2 x 32               | RAM32M x 6     | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_aw_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_ar_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_w_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 73               | RAM32M x 13    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 104              | RAM32M x 18    | 
-|i_ariane_peripherals/\gen_timer.i_axi2apb_64_32_timer  | slave_b_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 39               | RAM32M x 7     | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_aw_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_ar_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_w_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 73               | RAM32M x 13    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 104              | RAM32M x 18    | 
-|i_ariane_peripherals/i_axi2apb_64_32_plic              | slave_b_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 39               | RAM32M x 7     | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_aw_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_ar_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                    | Implied   | 2 x 120              | RAM32M x 20    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_w_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 73               | RAM32M x 13    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_r_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 104              | RAM32M x 18    | 
-|i_ariane_peripherals/i_axi2apb_64_32_uart              | slave_b_buffer_i/i_axi_single_slice/i_fifo/impl/i_fifo_v3/gen_fpga_queue.fifo_ram/mem_reg                     | Implied   | 2 x 39               | RAM32M x 7     | 
-+-------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+-----------+----------------------+----------------+
-
----------------------------------------------------------------------------------
-Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Technology Mapping
----------------------------------------------------------------------------------
-INFO: [Synth 8-5816] Retiming module `addr_decode`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `addr_decode' done
-
-
-INFO: [Synth 8-5816] Retiming module `addr_decode__1`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `addr_decode__1' done
-
-
-INFO: [Synth 8-5816] Retiming module `cvxif_example_coprocessor`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cvxif_example_coprocessor' done
-
-
-INFO: [Synth 8-5816] Retiming module `wt_cache_subsystem`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `wt_cache_subsystem' done
-
-
-INFO: [Synth 8-5816] Retiming module `csr_regfile`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `csr_regfile' done
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20' done
-
-
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[0].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram/gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[1].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram/gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[0].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[1].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[2].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[3].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_tag_srams[0].i_tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_tag_srams[1].i_tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-5816] Retiming module `axi_xbar__GC0_tempName`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `axi_xbar__GC0_tempName' done
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20' done
-
-
-Combination loop (list two pins only) .:cva6_zybo_z7_20/i_0:cva6_zybo_z7_20__GCB0_tempName/i_xlnx_clk_gen/clk_out1  .:cva6_zybo_z7_20/i_0:cva6_zybo_z7_20__GCB0_tempName/i_rstgen_main/i_rstgen_bypass/synch_regs_q_reg[3]/C
-The design has combinational loop or hierarchical design, no retiming 
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20__GCB0_tempName`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20__GCB0_tempName' done
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20' done
-
-
-INFO: [Synth 8-7052] The timing for the instance i_0/i_bootrom/addr_q_reg_rep_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_0/i_bootrom/addr_q_reg_rep_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20__GCB1_tempName`
-	Numbers of forward move = 5, and backward move = 205
-
-	Retimed registers names:
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__10
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__11
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__12
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__13
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__14
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__15
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__16
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__3
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__4
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__5
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__6
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__7
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__8
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[0]_bret_bret__9
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[1]_bret__0
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[1]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[1]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[1]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[1]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[1]_bret_bret__3
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[1]_bret_bret__4
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[2]_bret
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[2]_bret__0
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_id_reg[2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_reg_bret
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_reg_bret__0
-		i_1/i_ariane_peripherals/i_plic/gen_target[0].i_target/gen_sequential.irq_reg_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__0_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__0_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__0_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__0_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__0_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__0_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__2_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__2_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__2_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__2_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__2_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__2_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__0_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__0_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__0_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__0_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__0_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__0_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__2_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__2_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__2_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__2_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__2_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__2_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[3]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__0_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__0_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__0_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__0_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__0_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__0_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__2_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__2_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__2_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__2_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__2_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__2_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[4]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__0_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__0_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__0_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__0_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__0_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__0_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__2_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__2_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__2_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__2_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__2_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__2_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[5]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__0_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__0_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__0_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__0_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__0_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__0_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__1_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__1_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__1_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__1_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__1_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__1_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__2_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__2_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__2_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__2_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__2_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__2_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__3_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__3_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__3_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__3_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__3_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ia_reg[6]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[0]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[0]_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[3]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[3]_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[3]_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[3]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[4]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[4]_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[4]_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[4]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[5]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[5]_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[5]_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[5]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__10
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__3
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__4
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__5
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__6
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__7
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__8
-		i_1/i_ariane_peripherals/i_plic/i_rv_plic_gateway/ip_reg[6]_bret_bret__9
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][0]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][0]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][10]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][10]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][10]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][11]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][11]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][11]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][12]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][12]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][12]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][13]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][13]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][13]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][14]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][14]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][14]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][15]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][15]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][15]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][16]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][16]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][16]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][17]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][17]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][17]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][18]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][18]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][18]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][19]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][19]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][19]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][1]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][1]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][20]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][20]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][20]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][21]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][21]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][21]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][22]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][22]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][22]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][23]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][23]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][23]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][24]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][24]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][24]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][25]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][25]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][25]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][26]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][26]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][26]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][27]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][27]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][27]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][28]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][28]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][28]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][29]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][29]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][29]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][29]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][29]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][29]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][29]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][2]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][2]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][3]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][3]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][3]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][4]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][4]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][4]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][5]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][5]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][5]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][6]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][6]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][6]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][7]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][7]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][7]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][8]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][8]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][8]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][9]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][9]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[0][9]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][0]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][0]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][10]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][10]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][10]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][11]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][11]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][11]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][12]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][12]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][12]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][13]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][13]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][13]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][14]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][14]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][14]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][15]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][15]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][15]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][16]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][16]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][16]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][17]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][17]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][17]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][18]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][18]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][18]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][19]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][19]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][19]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][1]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][1]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][20]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][20]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][20]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][21]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][21]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][21]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][22]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][22]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][22]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][23]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][23]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][23]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][24]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][24]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][24]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][25]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][25]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][25]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][26]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][26]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][26]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][27]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][27]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][27]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][28]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][28]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][28]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][29]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][29]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][29]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][29]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][29]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][29]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][29]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][2]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][2]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][3]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][3]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][3]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][4]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][4]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][4]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][5]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][5]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][5]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][6]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][6]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][6]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][7]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][7]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][7]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][8]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][8]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][8]_bret__1
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][9]_bret
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][9]_bret__0
-		i_1/i_ariane_peripherals/i_plic/ie_q_reg[1][9]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][2]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][2]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[0][2]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[10][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[11][2]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[12][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[13][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[14][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[15][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][0]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][1]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][2]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[16][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[17][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[18][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[19][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[1][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][0]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][1]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][2]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[20][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[21][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][2]_bret__2_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][2]_bret__2_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][2]_bret__2_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[22][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[23][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[24][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[25][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][2]_bret__0_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][2]_bret__0_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[26][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[27][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][0]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][1]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][2]_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][2]_bret__1_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][2]_bret__1_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[28][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__0_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__0_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__0_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__3_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__3_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__3_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[29][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][2]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][2]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][2]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[2][2]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[3][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][2]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][2]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[4][2]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[5][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[6][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[7][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][2]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][2]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][2]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[8][2]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][0]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][0]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][1]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][1]_bret__4
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][2]_bret
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/prio_q_reg[9][2]_bret__4
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][0]_bret
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][1]_bret
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret__3
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret_bret
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret_bret__0
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret_bret__1
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[0][2]_bret_bret__2
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][0]_bret
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][0]_bret__0
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][0]_bret__1
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][0]_bret__2
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][0]_bret__3
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][1]_bret
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][1]_bret__0
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][1]_bret__1
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][1]_bret__2
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][1]_bret__3
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][2]_bret
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][2]_bret__0
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][2]_bret__1
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][2]_bret__2
-		i_1/i_ariane_peripherals/i_plic/threshold_q_reg[1][2]_bret__3
-		i_1/i_axi2rom/ax_req_q_reg[addr][6]_fret
-		i_1/i_axi2rom/ax_req_q_reg[len][3]_fret
-		i_1/i_axi2rom/ax_req_q_reg[len][3]_fret__0
-		i_1/i_axi2rom/ax_req_q_reg[len][3]_fret__1
-		i_1/i_axi2rom/ax_req_q_reg[len][3]_fret__2
-		i_1/i_axi2rom/ax_req_q_reg[len][3]_fret__3
-		i_1/i_axi2rom/ax_req_q_reg[len][6]_fret
-		i_1/i_axi2rom/ax_req_q_reg[len][7]_fret
-		i_1/i_axi2rom/ax_req_q_reg[len][7]_fret__0
-		i_1/i_axi2rom/ax_req_q_reg[len][7]_fret__1
-		i_1/i_axi2rom/req_addr_q_reg[3]_bret
-		i_1/i_axi2rom/req_addr_q_reg[3]_bret__0
-		i_1/i_axi2rom/req_addr_q_reg[3]_bret__1
-		i_1/i_axi2rom/req_addr_q_reg[3]_bret__2
-		i_1/i_axi2rom/req_addr_q_reg[3]_bret__3
-		i_1/i_axi2rom/req_addr_q_reg[3]_bret__4
- 
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20__GCB1_tempName' done
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20' done
-
-
-INFO: [Common 17-14] Message 'Synth 8-3886' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
-INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core/multiplier.sv:146]
-INFO: [Synth 8-5844] Detected registers with asynchronous reset at DSP/BRAM block boundary. Consider using synchronous reset for optimal packing [/home/raffael/Desktop/Project/teste/cva6-softcore-contest/core/multiplier.sv:146]
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20_GT0_tempName`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20_GT0_tempName' done
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20`
-	Numbers of forward move = 0, and backward move = 0
-
-
-INFO: [Synth 8-5816] Retiming module `cva6_zybo_z7_20' done
-
-
-INFO: [Synth 8-7052] The timing for the instance i_cva6i_3/i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[0].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_cva6i_3/i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[0].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_cva6i_3/i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[1].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_cva6i_3/i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[1].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_cva6i_3/i_ariane/i_cva6/i_frontend/btb_gen.i_btb/gen_fpga_btb.gen_btb_ram[0].i_btb_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
----------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:04:02 ; elapsed = 00:04:42 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 337 ; free virtual = 34026
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start IO Insertion
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Flattening Before IO Insertion
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Flattening Before IO Insertion
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Final Netlist Cleanup
----------------------------------------------------------------------------------
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[0].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram/gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[1].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram/gen_cut[1].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[0].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[1].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[2].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_data_banks[3].i_data_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_tag_srams[0].i_tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/gen_cache_wt.i_cache_subsystem/i_wt_dcache/i_wt_dcache_mem/gen_tag_srams[1].i_tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[0].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[0].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[1].tag_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/ex_stage_i/lsu_i/gen_mmu_sv32.i_cva6_mmu/i_shared_tlb/gen_sram[1].pte_sram/gen_cut[0].i_tc_sram_wrapper/i_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_ariane/i_cva6/i_frontend/btb_gen.i_btb/gen_fpga_btb.gen_btb_ram[0].i_btb_ram/Mem_DP_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_bootrom/addr_q_reg_rep_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-7052] The timing for the instance i_bootrom/addr_q_reg_rep_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
-INFO: [Synth 8-4649] Removing BlackBox instance \i_ariane/i_cva6/i_frontend/btb_gen.i_btb/i_unread  of module unread having unconnected or no output ports
-INFO: [Synth 8-4649] Removing BlackBox instance \i_ariane/i_cva6/i_frontend/bht_gen.i_bht/i_unread  of module unread__6 having unconnected or no output ports
-INFO: [Synth 8-4649] Removing BlackBox instance \i_ariane/i_cva6/i_frontend/i_instr_queue/i_unread_address_fifo  of module unread__1 having unconnected or no output ports
-INFO: [Synth 8-4649] Removing BlackBox instance \i_ariane/i_cva6/i_frontend/i_instr_queue/i_unread_branch_mask  of module unread__2 having unconnected or no output ports
-INFO: [Synth 8-4649] Removing BlackBox instance \i_ariane/i_cva6/i_frontend/i_instr_queue/i_unread_lzc  of module unread__3 having unconnected or no output ports
-INFO: [Synth 8-4649] Removing BlackBox instance \i_ariane/i_cva6/i_frontend/i_instr_queue/i_unread_fifo_pos  of module unread__4 having unconnected or no output ports
-INFO: [Synth 8-4649] Removing BlackBox instance \i_ariane/i_cva6/i_frontend/i_instr_queue/i_unread_instr_fifo  of module unread__5 having unconnected or no output ports
----------------------------------------------------------------------------------
-Finished Final Netlist Cleanup
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:04:10 ; elapsed = 00:04:49 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 329 ; free virtual = 33995
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Renaming Generated Instances
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:04:10 ; elapsed = 00:04:50 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 329 ; free virtual = 33995
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Rebuilding User Hierarchy
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:04:14 ; elapsed = 00:04:54 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 339 ; free virtual = 34005
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Renaming Generated Ports
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:04:15 ; elapsed = 00:04:54 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 338 ; free virtual = 34005
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Handling Custom Attributes
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:04:15 ; elapsed = 00:04:55 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 330 ; free virtual = 33997
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Renaming Generated Nets
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:04:15 ; elapsed = 00:04:55 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 328 ; free virtual = 33997
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start ROM, RAM, DSP, Shift Register and Retiming Reporting
----------------------------------------------------------------------------------
-
-Retiming Report:
-+--------------------+-----+
-|Retiming summary:   |     | 
-+--------------------+-----+
-|Forward Retiming    | 5   | 
-|Backward Retiming   | 205 | 
-|New registers added | 764 | 
-|Registers deleted   | 171 | 
-+--------------------+-----+
-
----------------------------------------------------------------------------------
-Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
----------------------------------------------------------------------------------
----------------------------------------------------------------------------------
-Start Writing Synthesis Report
----------------------------------------------------------------------------------
-
-DSP Final Report (the ' indicates corresponding REG is set)
-+------------+-----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
-|Module Name | DSP Mapping     | A Size | B Size | C Size | D Size | P Size | AREG | BREG | CREG | DREG | ADREG | MREG | PREG | 
-+------------+-----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
-|mult        | A*B             | 17     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
-|mult        | (PCIN>>17+A*B)' | 30     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 1    | 
-|mult        | A*B             | 17     | 17     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
-|mult        | (PCIN>>17+A*B)' | 17     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 1    | 
-+------------+-----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
-
-
-Report BlackBoxes: 
-+------+------------------------------------+----------+
-|      |BlackBox name                       |Instances |
-+------+------------------------------------+----------+
-|1     |xlnx_axi_dwidth_converter_dm_slave  |         1|
-|2     |xlnx_axi_dwidth_converter_dm_master |         1|
-|3     |xlnx_clk_gen                        |         1|
-|4     |xlnx_blk_mem_gen                    |         1|
-+------+------------------------------------+----------+
-
-Report Cell Usage: 
-+------+------------------------------------+------+
-|      |Cell                                |Count |
-+------+------------------------------------+------+
-|1     |xlnx_axi_dwidth_converter_dm_master |     1|
-|2     |xlnx_axi_dwidth_converter_dm_slave  |     1|
-|3     |xlnx_blk_mem_gen                    |     1|
-|4     |xlnx_clk_gen                        |     1|
-|5     |BUFG                                |     2|
-|6     |CARRY4                              |  1175|
-|7     |DSP48E1                             |     4|
-|9     |LUT1                                |   217|
-|10    |LUT2                                |  3508|
-|11    |LUT3                                |  3392|
-|12    |LUT4                                |  2984|
-|13    |LUT5                                |  5096|
-|14    |LUT6                                |  8845|
-|15    |MUXF7                               |   363|
-|16    |MUXF8                               |    15|
-|17    |RAM128X1D                           |     3|
-|18    |RAM16X1D                            |     6|
-|19    |RAM32M                              |   184|
-|20    |RAM32X1D                            |    16|
-|21    |RAMB18E1                            |     1|
-|22    |RAMB36E1                            |    18|
-|25    |FDCE                                | 13654|
-|26    |FDPE                                |    71|
-|27    |FDRE                                |   104|
-|28    |LD                                  |    32|
-|29    |IBUF                                |     6|
-|30    |OBUF                                |     2|
-+------+------------------------------------+------+
----------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:04:16 ; elapsed = 00:04:56 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 326 ; free virtual = 33994
----------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 488 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:04:05 ; elapsed = 00:04:47 . Memory (MB): peak = 2790.855 ; gain = 825.809 ; free physical = 7688 ; free virtual = 41359
-Synthesis Optimization Complete : Time (s): cpu = 00:04:19 ; elapsed = 00:04:58 . Memory (MB): peak = 2790.855 ; gain = 1038.340 ; free physical = 7692 ; free virtual = 41350
-INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00.44 ; elapsed = 00:00:00.44 . Memory (MB): peak = 2790.855 ; gain = 0.000 ; free physical = 7684 ; free virtual = 41342
-INFO: [Netlist 29-17] Analyzing 1817 Unisim elements for replacement
-INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
-INFO: [Project 1-570] Preparing netlist for logic optimization
-INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2814.867 ; gain = 0.000 ; free physical = 7695 ; free virtual = 41355
-INFO: [Project 1-111] Unisim Transformation Summary:
-  A total of 241 instances were transformed.
-  LD => LDCE: 32 instances
-  RAM128X1D => RAM128X1D (MUXF7(x2), RAMD64E(x4)): 3 instances
-  RAM16X1D => RAM32X1D (RAMD32(x2)): 6 instances
-  RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 184 instances
-  RAM32X1D => RAM32X1D (RAMD32(x2)): 16 instances
-
-Synth Design complete | Checksum: faa48954
+INFO: [Common 17-41] Interrupt caught. Command should exit soon.
+1
+1
 INFO: [Common 17-83] Releasing license: Synthesis
-705 Infos, 417 Warnings, 0 Critical Warnings and 0 Errors encountered.
-synth_design completed successfully
-synth_design: Time (s): cpu = 00:04:29 ; elapsed = 00:05:08 . Memory (MB): peak = 2814.902 ; gain = 1413.949 ; free physical = 7695 ; free virtual = 41354
-INFO: [Common 17-2834] synth_design peak Physical Memory [PSS] (MB): overall = 9530.802; main = 2050.039; forked = 7637.841
-INFO: [Common 17-2834] synth_design peak Virtual Memory [VSS] (MB): overall = 14515.148; main = 2814.871; forked = 11748.301
-Write ShapeDB Complete: Time (s): cpu = 00:00:00.1 ; elapsed = 00:00:00.04 . Memory (MB): peak = 2838.879 ; gain = 0.000 ; free physical = 7695 ; free virtual = 41357
-INFO: [Common 17-1381] The checkpoint '/home/raffael/Desktop/Project/teste/cva6-softcore-contest/corev_apu/fpga/cva6_fpga.runs/synth_1/cva6_zybo_z7_20.dcp' has been generated.
-write_checkpoint: Time (s): cpu = 00:00:08 ; elapsed = 00:00:07 . Memory (MB): peak = 2838.879 ; gain = 23.977 ; free physical = 7543 ; free virtual = 41333
-INFO: [runtcl-4] Executing : report_utilization -file cva6_zybo_z7_20_utilization_synth.rpt -pb cva6_zybo_z7_20_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Tue Jan 23 13:26:44 2024...
+422 Infos, 331 Warnings, 0 Critical Warnings and 1 Errors encountered.
+synth_design failed
+INFO: [Common 17-344] 'source' was cancelled
+INFO: [Common 17-206] Exiting Vivado at Thu Feb  1 16:15:13 2024...
