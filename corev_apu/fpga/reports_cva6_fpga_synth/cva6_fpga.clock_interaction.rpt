@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2023.2 (lin64) Build 4029153 Fri Oct 13 20:13:54 MDT 2023
-| Date         : Mon Feb  5 22:34:39 2024
+| Date         : Wed Feb  7 19:48:25 2024
 | Host         : raffael running 64-bit Ubuntu 22.04.3 LTS
 | Command      : report_clock_interaction -file reports_cva6_fpga_synth/cva6_fpga.clock_interaction.rpt
 | Design       : cva6_zybo_z7_20
@@ -18,7 +18,7 @@ Clock Interaction Table
                                               WNS                            TNS Failing  TNS Total    WNS Path         Clock-Pair           Inter-Clock              
 From Clock             To Clock               Clock Edges  WNS(ns)  TNS(ns)    Endpoints    Endpoints  Requirement(ns)  Classification       Constraints              
 ---------------------  ---------------------  -----------  -------  -------  -----------  -----------  ---------------  -------------------  -----------------------  
-clk_out1_xlnx_clk_gen  clk_out1_xlnx_clk_gen  rise - rise     3.28     0.00            0        49045            20.00  Clean                Partial False Path       
+clk_out1_xlnx_clk_gen  clk_out1_xlnx_clk_gen  rise - rise     3.28     0.00            0        52602            20.00  Clean                Partial False Path       
 clk_out1_xlnx_clk_gen  tck                    rise - rise    18.92     0.00            0           36            20.00  Ignored              Max Delay Datapath Only  
 tck                    clk_out1_xlnx_clk_gen  rise - rise    13.10     0.00            0           43            20.00  No Common Clock      Timed (unsafe)           
 tck                    tck                    fall - rise     5.76     0.00            0          453            20.00  Clean                Timed                    

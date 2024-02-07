@@ -1,6 +1,6 @@
 -------------------------------------
 | Tool Version : Vivado v.2023.2
-| Date         : Mon Feb  5 22:35:52 2024
+| Date         : Wed Feb  7 19:49:36 2024
 | Host         : raffael
 | Design       : checkpoint_cva6_zybo_z7_20
 | Device       : xc7z020-clg400-1--
