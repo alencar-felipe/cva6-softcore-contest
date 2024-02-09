@@ -88,7 +88,7 @@ module perf_counters
         for (int unsigned j = 0; j < CVA6Cfg.NrCommitPorts; j++)
         if (commit_ack_i[j]) events[i] = commit_instr_i[j].fu == CTRL_FLOW;  //Branch instructions
         5'b01010:
-        events[i] = resolved_branch_i.valid && resolved_branch_i.is_mispredict;//Branch mispredicts
+        events[i] = 1; //resolved_branch_i.valid && resolved_branch_i.is_mispredict;//Branch mispredicts
         5'b01011: events[i] = branch_exceptions_i.valid;  //Branch exceptions
         // The standard software calling convention uses register x1 to hold the return address on a call
         // the unconditional jump is decoded as ADD op

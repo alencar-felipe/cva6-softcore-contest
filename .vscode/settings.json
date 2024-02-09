@@ -73,6 +73,11 @@
         "typeinfo": "c",
         "variant": "c",
         "*.ipp": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "util.h": "c",
+        "network.h": "c",
+        "typedefs.h": "c",
+        "env.h": "c",
+        "cpp_utils.h": "c"
     }
 }
