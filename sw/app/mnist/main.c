@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
         2) After, you need to set the event which you want to count, with this: hpmevent[6] 0x323 [+ i*0x1]
         3) Them, you will use the read_csr with the address offset of the counter to read the value of him.
     */
+
     write_csr(0xB03,0x0);    // mhpmcounter3 = 0
     write_csr(0xB04,0x0);    // mhpmcounter4 = 0
     write_csr(0xB0E,0x0);    // Branch mis-predicted = 0
