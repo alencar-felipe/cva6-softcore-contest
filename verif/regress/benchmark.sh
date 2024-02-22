@@ -8,10 +8,10 @@
 # Original Author: Guillaume Chauvon (guillaume.chauvon@thalesgroup.com)
 
 # where are the tools
-if [ -z "$RISCV" ]; then
-  echo "Error: RISCV variable undefined"
-  return
-fi
+#if [ -z "$RISCV" ]; then
+#  echo "Error: RISCV variable undefined"
+#  return
+#fi
 
 # install the required tools
 source verif/regress/install-cva6.sh
@@ -22,7 +22,8 @@ if [ -z "$DV_SIMULATORS" ]; then
 fi
 
 if [ -z "$DV_TARGET" ]; then
-  DV_TARGET=cv64a6_imafdc_sv39
+  #DV_TARGET=cv64a6_imafdc_sv39
+  DV_TARGET=cv32a6_imafc_sv32
 fi
 
 cd verif/sim/

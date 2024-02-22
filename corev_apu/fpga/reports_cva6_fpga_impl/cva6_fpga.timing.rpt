@@ -1,0 +1,237 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.2 (lin64) Build 4029153 Fri Oct 13 20:13:54 MDT 2023
+| Date         : Tue Jan 23 13:32:38 2024
+| Host         : raffael running 64-bit Ubuntu 22.04.3 LTS
+| Command      : report_timing -nworst 1 -delay_type max -sort_by group -file reports_cva6_fpga_impl/cva6_fpga.timing.rpt
+| Design       : cva6_zybo_z7_20
+| Device       : 7z020-clg400
+| Speed File   : -1  PRODUCTION 1.12 2019-11-22
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (VIOLATED) :        -0.283ns  (required time - arrival time)
+  Source:                 i_ariane/i_cva6/issue_stage_i/i_scoreboard/commit_pointer_q_reg[0][1]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_xlnx_clk_gen  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Destination:            i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q_reg[0][sbe][rd][0]/CE
+                            (rising edge-triggered cell FDCE clocked by clk_out1_xlnx_clk_gen  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Path Group:             clk_out1_xlnx_clk_gen
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            20.000ns  (clk_out1_xlnx_clk_gen rise@20.000ns - clk_out1_xlnx_clk_gen rise@0.000ns)
+  Data Path Delay:        19.940ns  (logic 4.618ns (23.160%)  route 15.322ns (76.840%))
+  Logic Levels:           24  (LUT2=2 LUT3=3 LUT4=4 LUT5=4 LUT6=11)
+  Clock Path Skew:        -0.059ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.604ns = ( 18.396 - 20.000 ) 
+    Source Clock Delay      (SCD):    -0.977ns
+    Clock Pessimism Removal (CPR):    0.567ns
+  Clock Uncertainty:      0.079ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.142ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_xlnx_clk_gen rise edge)
+                                                      0.000     0.000 r  
+    K17                                               0.000     0.000 r  clk_sys (IN)
+                         net (fo=0)                   0.000     0.000    i_xlnx_clk_gen/inst/clk_in1
+    K17                  IBUF (Prop_ibuf_I_O)         1.475     1.475 r  i_xlnx_clk_gen/inst/clkin1_ibufg/O
+                         net (fo=1, routed)           1.285     2.760    i_xlnx_clk_gen/inst/clk_in1_xlnx_clk_gen
+    MMCME2_ADV_X1Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.759    -4.999 r  i_xlnx_clk_gen/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           2.206    -2.793    i_xlnx_clk_gen/inst/clk_out1_xlnx_clk_gen
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.692 r  i_xlnx_clk_gen/inst/clkout1_buf/O
+                         net (fo=15833, routed)       1.715    -0.977    i_ariane/i_cva6/issue_stage_i/i_scoreboard/clk_out1
+    SLICE_X68Y23         FDCE                                         r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/commit_pointer_q_reg[0][1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X68Y23         FDCE (Prop_fdce_C_Q)         0.456    -0.521 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/commit_pointer_q_reg[0][1]/Q
+                         net (fo=10, routed)          0.556     0.035    i_ariane/i_cva6/issue_stage_i/i_scoreboard/commit_pointer_q_reg[0][1]_0[1]
+    SLICE_X66Y25         LUT2 (Prop_lut2_I1_O)        0.124     0.159 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___109_i_15/O
+                         net (fo=189, routed)         0.765     0.923    i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___109_i_15_n_1
+    SLICE_X67Y24         LUT4 (Prop_lut4_I0_O)        0.124     1.047 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___2_i_5__0/O
+                         net (fo=4, routed)           0.997     2.044    i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___2_i_5__0_n_1
+    SLICE_X69Y26         LUT5 (Prop_lut5_I2_O)        0.124     2.168 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/dcsr_q[step]_i_7/O
+                         net (fo=56, routed)          0.674     2.842    i_ariane/i_cva6/issue_stage_i/i_scoreboard/wfi_q_reg_1
+    SLICE_X69Y27         LUT3 (Prop_lut3_I1_O)        0.152     2.994 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___133_i_2__0/O
+                         net (fo=13, routed)          0.613     3.607    i_ariane/i_cva6/issue_stage_i/i_scoreboard/wfi_q_reg_5
+    SLICE_X68Y28         LUT2 (Prop_lut2_I1_O)        0.332     3.939 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___2_i_1/O
+                         net (fo=4, routed)           0.326     4.265    i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___133_i_2__0_1
+    SLICE_X70Y28         LUT6 (Prop_lut6_I0_O)        0.124     4.389 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/dcsr_q[step]_i_10/O
+                         net (fo=2, routed)           0.660     5.048    i_ariane/i_cva6/issue_stage_i/i_scoreboard/dcsr_q[step]_i_10_n_1
+    SLICE_X71Y28         LUT6 (Prop_lut6_I5_O)        0.124     5.172 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___2_i_7/O
+                         net (fo=6, routed)           0.459     5.631    i_ariane/i_cva6/issue_stage_i/i_scoreboard/csr_exception_csr_commit[cause][1]
+    SLICE_X71Y27         LUT5 (Prop_lut5_I2_O)        0.124     5.755 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___149_i_4/O
+                         net (fo=38, routed)          0.992     6.747    i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___149_i_4_n_1
+    SLICE_X72Y27         LUT3 (Prop_lut3_I2_O)        0.152     6.899 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___150_i_5/O
+                         net (fo=6, routed)           0.832     7.731    i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q_reg[3][sbe][ex][cause][4]_0
+    SLICE_X68Y27         LUT6 (Prop_lut6_I1_O)        0.332     8.063 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___137_i_6/O
+                         net (fo=3, routed)           0.653     8.716    i_ariane/i_cva6/issue_stage_i/i_scoreboard/i___137_i_6_n_1
+    SLICE_X69Y27         LUT3 (Prop_lut3_I2_O)        0.153     8.869 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/priv_lvl_q[1]_i_3/O
+                         net (fo=5, routed)           0.343     9.212    i_ariane/i_cva6/ex_stage_i/csr_buffer_i/FSM_sequential_state_q_reg[3]
+    SLICE_X70Y27         LUT6 (Prop_lut6_I5_O)        0.327     9.539 r  i_ariane/i_cva6/ex_stage_i/csr_buffer_i/FSM_sequential_state_q[3]_i_8/O
+                         net (fo=2, routed)           0.433     9.972    i_ariane/i_cva6/issue_stage_i/i_scoreboard/flush_csr_ctrl
+    SLICE_X70Y25         LUT6 (Prop_lut6_I1_O)        0.124    10.096 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/FSM_sequential_state_q[3]_i_2/O
+                         net (fo=144, routed)         0.592    10.688    i_ariane/i_cva6/issue_stage_i/i_issue_read_operands/mem_q_reg[0][trans_id][0]
+    SLICE_X69Y23         LUT6 (Prop_lut6_I2_O)        0.124    10.812 r  i_ariane/i_cva6/issue_stage_i/i_issue_read_operands/mem_q[0][sbe][rd][4]_i_38/O
+                         net (fo=8, routed)           0.654    11.465    i_ariane/i_cva6/issue_stage_i/i_scoreboard/asid_to_be_flushed[0]_i_17_0
+    SLICE_X66Y21         LUT6 (Prop_lut6_I3_O)        0.124    11.589 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/asid_to_be_flushed[0]_i_42/O
+                         net (fo=2, routed)           0.631    12.221    i_ariane/i_cva6/issue_stage_i/i_scoreboard/asid_to_be_flushed[0]_i_42_n_1
+    SLICE_X67Y21         LUT4 (Prop_lut4_I2_O)        0.124    12.345 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/asid_to_be_flushed[0]_i_17/O
+                         net (fo=2, routed)           0.428    12.773    i_ariane/i_cva6/issue_stage_i/i_scoreboard/asid_to_be_flushed[0]_i_17_n_1
+    SLICE_X63Y21         LUT6 (Prop_lut6_I2_O)        0.124    12.897 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/asid_to_be_flushed[0]_i_10/O
+                         net (fo=33, routed)          0.370    13.266    i_ariane/i_cva6/issue_stage_i/i_scoreboard/i_sel_rs2/gen_arbiter.req_nodes_1
+    SLICE_X63Y22         LUT4 (Prop_lut4_I1_O)        0.124    13.390 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/asid_to_be_flushed[0]_i_13/O
+                         net (fo=3, routed)           0.807    14.197    i_ariane/i_cva6/issue_stage_i/i_scoreboard/i_issue_read_operands/stall128_out
+    SLICE_X60Y24         LUT5 (Prop_lut5_I1_O)        0.124    14.321 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/issue_pointer_q[1]_i_3/O
+                         net (fo=1, routed)           0.304    14.625    i_ariane/i_cva6/issue_stage_i/i_scoreboard/issue_pointer_q[1]_i_3_n_1
+    SLICE_X62Y24         LUT6 (Prop_lut6_I2_O)        0.124    14.749 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/issue_pointer_q[1]_i_2/O
+                         net (fo=32, routed)          0.764    15.514    i_ariane/i_cva6/issue_stage_i/i_scoreboard/issue_pointer_q[1]_i_2_n_1
+    SLICE_X62Y24         LUT5 (Prop_lut5_I0_O)        0.152    15.666 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q[2][sbe][fu][0]_i_2/O
+                         net (fo=3, routed)           0.904    16.570    i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_n[2][sbe][fu][0]
+    SLICE_X63Y25         LUT4 (Prop_lut4_I2_O)        0.376    16.946 f  i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q[0][sbe][rd][4]_i_25/O
+                         net (fo=1, routed)           0.497    17.443    i_ariane/i_cva6/issue_stage_i/i_issue_read_operands/mem_q_reg[3][sbe][rd][0]_1
+    SLICE_X62Y25         LUT6 (Prop_lut6_I4_O)        0.326    17.769 f  i_ariane/i_cva6/issue_stage_i/i_issue_read_operands/mem_q[0][sbe][rd][4]_i_6/O
+                         net (fo=24, routed)          0.721    18.490    i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q_reg[3][sbe][rd][0]_1
+    SLICE_X64Y26         LUT6 (Prop_lut6_I4_O)        0.124    18.614 r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q[0][sbe][rd][4]_i_1/O
+                         net (fo=5, routed)           0.348    18.963    i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q[0][sbe][rd][4]_i_1_n_1
+    SLICE_X63Y26         FDCE                                         r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q_reg[0][sbe][rd][0]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_xlnx_clk_gen rise edge)
+                                                     20.000    20.000 r  
+    K17                                               0.000    20.000 r  clk_sys (IN)
+                         net (fo=0)                   0.000    20.000    i_xlnx_clk_gen/inst/clk_in1
+    K17                  IBUF (Prop_ibuf_I_O)         1.404    21.404 r  i_xlnx_clk_gen/inst/clkin1_ibufg/O
+                         net (fo=1, routed)           1.162    22.566    i_xlnx_clk_gen/inst/clk_in1_xlnx_clk_gen
+    MMCME2_ADV_X1Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.814    14.752 r  i_xlnx_clk_gen/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           2.012    16.764    i_xlnx_clk_gen/inst/clk_out1_xlnx_clk_gen
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091    16.855 r  i_xlnx_clk_gen/inst/clkout1_buf/O
+                         net (fo=15833, routed)       1.541    18.396    i_ariane/i_cva6/issue_stage_i/i_scoreboard/clk_out1
+    SLICE_X63Y26         FDCE                                         r  i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q_reg[0][sbe][rd][0]/C
+                         clock pessimism              0.567    18.964    
+                         clock uncertainty           -0.079    18.884    
+    SLICE_X63Y26         FDCE (Setup_fdce_C_CE)      -0.205    18.679    i_ariane/i_cva6/issue_stage_i/i_scoreboard/mem_q_reg[0][sbe][rd][0]
+  -------------------------------------------------------------------
+                         required time                         18.679    
+                         arrival time                         -18.963    
+  -------------------------------------------------------------------
+                         slack                                 -0.283    
+
+Slack (MET) :             1.502ns  (required time - arrival time)
+  Source:                 i_dmi_jtag/i_dmi_jtag_tap/td_o_reg/C
+                            (falling edge-triggered cell FDCE clocked by tck  {rise@0.000ns fall@50.000ns period=100.000ns})
+  Destination:            tdo
+                            (output port clocked by tck  {rise@0.000ns fall@50.000ns period=100.000ns})
+  Path Group:             tck
+  Path Type:              Max at Slow Process Corner
+  Requirement:            20.000ns  (MaxDelay Path 20.000ns)
+  Data Path Delay:        5.675ns  (logic 4.015ns (70.759%)  route 1.659ns (29.242%))
+  Logic Levels:           1  (OBUF=1)
+  Output Delay:           5.000ns
+  Clock Path Skew:        -7.321ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.000ns
+    Source Clock Delay      (SCD):    7.321ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.501ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    1.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+  Timing Exception:       MaxDelay Path 20.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock tck fall edge)        0.000     0.000 f  
+    H15                                               0.000     0.000 f  tck (IN)
+                         net (fo=0)                   0.000     0.000    tck
+    H15                  IBUF (Prop_ibuf_I_O)         1.500     1.500 f  tck_IBUF_inst/O
+                         net (fo=1, routed)           3.659     5.159    tck_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.101     5.260 f  tck_IBUF_BUFG_inst/O
+                         net (fo=258, routed)         2.061     7.321    i_dmi_jtag/i_dmi_jtag_tap/tck_ni
+    SLICE_X111Y100       FDCE                                         r  i_dmi_jtag/i_dmi_jtag_tap/td_o_reg/C  (IS_INVERTED)
+  -------------------------------------------------------------------    -------------------
+    SLICE_X111Y100       FDCE (Prop_fdce_C_Q)         0.459     7.780 r  i_dmi_jtag/i_dmi_jtag_tap/td_o_reg/Q
+                         net (fo=1, routed)           1.659     9.440    tdo_OBUF
+    J15                  OBUF (Prop_obuf_I_O)         3.556    12.996 r  tdo_OBUF_inst/O
+                         net (fo=0)                   0.000    12.996    tdo
+    J15                                                               r  tdo (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         max delay                   20.000    20.000    
+                         clock pessimism              0.000    20.000    
+                         clock uncertainty           -0.501    19.499    
+                         output delay                -5.000    14.499    
+  -------------------------------------------------------------------
+                         required time                         14.499    
+                         arrival time                         -12.996    
+  -------------------------------------------------------------------
+                         slack                                  1.502    
+
+Slack (MET) :             16.752ns  (required time - arrival time)
+  Source:                 i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/rstblk/ngwrdrst.grst.g7serrst.gnsckt_wrst.rst_wr_reg2_inst/arststages_ff_reg[1]/C
+                            (rising edge-triggered cell FDPE clocked by clk_out1_xlnx_clk_gen  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Destination:            i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/wpntr/gcc0.gc0.count_d1_reg[2]/CLR
+                            (recovery check against rising-edge clock clk_out1_xlnx_clk_gen  {rise@0.000ns fall@10.000ns period=20.000ns})
+  Path Group:             **async_default**
+  Path Type:              Recovery (Max at Slow Process Corner)
+  Requirement:            20.000ns  (clk_out1_xlnx_clk_gen rise@20.000ns - clk_out1_xlnx_clk_gen rise@0.000ns)
+  Data Path Delay:        2.777ns  (logic 0.718ns (25.859%)  route 2.059ns (74.141%))
+  Logic Levels:           1  (LUT3=1)
+  Clock Path Skew:        0.013ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    -1.288ns = ( 18.712 - 20.000 ) 
+    Source Clock Delay      (SCD):    -0.716ns
+    Clock Pessimism Removal (CPR):    0.585ns
+  Clock Uncertainty:      0.079ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.142ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_xlnx_clk_gen rise edge)
+                                                      0.000     0.000 r  
+    K17                                               0.000     0.000 r  clk_sys (IN)
+                         net (fo=0)                   0.000     0.000    i_xlnx_clk_gen/inst/clk_in1
+    K17                  IBUF (Prop_ibuf_I_O)         1.475     1.475 r  i_xlnx_clk_gen/inst/clkin1_ibufg/O
+                         net (fo=1, routed)           1.285     2.760    i_xlnx_clk_gen/inst/clk_in1_xlnx_clk_gen
+    MMCME2_ADV_X1Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.759    -4.999 r  i_xlnx_clk_gen/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           2.206    -2.793    i_xlnx_clk_gen/inst/clk_out1_xlnx_clk_gen
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.101    -2.692 r  i_xlnx_clk_gen/inst/clkout1_buf/O
+                         net (fo=15833, routed)       1.976    -0.716    i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/rstblk/ngwrdrst.grst.g7serrst.gnsckt_wrst.rst_wr_reg2_inst/dest_clk
+    SLICE_X105Y107       FDPE                                         r  i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/rstblk/ngwrdrst.grst.g7serrst.gnsckt_wrst.rst_wr_reg2_inst/arststages_ff_reg[1]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X105Y107       FDPE (Prop_fdpe_C_Q)         0.419    -0.297 f  i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/rstblk/ngwrdrst.grst.g7serrst.gnsckt_wrst.rst_wr_reg2_inst/arststages_ff_reg[1]/Q
+                         net (fo=3, routed)           0.828     0.530    i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/rstblk/ngwrdrst.rst_wr_reg2
+    SLICE_X105Y108       LUT3 (Prop_lut3_I2_O)        0.299     0.829 f  i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/rstblk/gpregsm1.curr_fwft_state[1]_i_2/O
+                         net (fo=32, routed)          1.231     2.060    i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/wpntr/AR[0]
+    SLICE_X106Y105       FDCE                                         f  i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/wpntr/gcc0.gc0.count_d1_reg[2]/CLR
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_xlnx_clk_gen rise edge)
+                                                     20.000    20.000 r  
+    K17                                               0.000    20.000 r  clk_sys (IN)
+                         net (fo=0)                   0.000    20.000    i_xlnx_clk_gen/inst/clk_in1
+    K17                  IBUF (Prop_ibuf_I_O)         1.404    21.404 r  i_xlnx_clk_gen/inst/clkin1_ibufg/O
+                         net (fo=1, routed)           1.162    22.566    i_xlnx_clk_gen/inst/clk_in1_xlnx_clk_gen
+    MMCME2_ADV_X1Y2      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -7.814    14.752 r  i_xlnx_clk_gen/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           2.012    16.764    i_xlnx_clk_gen/inst/clk_out1_xlnx_clk_gen
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.091    16.855 r  i_xlnx_clk_gen/inst/clkout1_buf/O
+                         net (fo=15833, routed)       1.857    18.712    i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/wpntr/clk
+    SLICE_X106Y105       FDCE                                         r  i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/wpntr/gcc0.gc0.count_d1_reg[2]/C
+                         clock pessimism              0.585    19.297    
+                         clock uncertainty           -0.079    19.217    
+    SLICE_X106Y105       FDCE (Recov_fdce_C_CLR)     -0.405    18.812    i_axi_dwidth_converter_dm_slave/inst/gen_downsizer.gen_simple_downsizer.axi_downsizer_inst/USE_WRITE.write_addr_inst/cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/wpntr/gcc0.gc0.count_d1_reg[2]
+  -------------------------------------------------------------------
+                         required time                         18.812    
+                         arrival time                          -2.060    
+  -------------------------------------------------------------------
+                         slack                                 16.752    
+
+
+
+
