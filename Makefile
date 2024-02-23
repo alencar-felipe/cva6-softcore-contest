@@ -164,59 +164,85 @@ endif
 
 
 # this list contains the standalone components
-src :=  core/include/$(target)_config_pkg.sv                                         \
-        corev_apu/src/ariane.sv                                                      \
-        $(wildcard corev_apu/bootrom/*.sv)                                           \
-        $(wildcard corev_apu/clint/*.sv)                                             \
-        $(wildcard corev_apu/fpga/src/axi2apb/src/*.sv)                              \
-        $(wildcard corev_apu/fpga/src/apb_timer/*.sv)                                \
-        $(wildcard corev_apu/fpga/src/axi_slice/src/*.sv)                            \
-        $(wildcard corev_apu/src/axi_riscv_atomics/src/*.sv)                         \
-        $(wildcard corev_apu/axi_mem_if/src/*.sv)                                    \
-        corev_apu/rv_plic/rtl/rv_plic_target.sv                                      \
-        corev_apu/rv_plic/rtl/rv_plic_gateway.sv                                     \
-        corev_apu/rv_plic/rtl/plic_regmap.sv                                         \
-        corev_apu/rv_plic/rtl/plic_top.sv                                            \
-        corev_apu/riscv-dbg/src/dmi_cdc.sv                                           \
-        corev_apu/riscv-dbg/src/dmi_jtag.sv                                          \
-        corev_apu/riscv-dbg/src/dmi_jtag_tap.sv                                      \
-        corev_apu/riscv-dbg/src/dm_csrs.sv                                           \
-        corev_apu/riscv-dbg/src/dm_mem.sv                                            \
-        corev_apu/riscv-dbg/src/dm_sba.sv                                            \
-        corev_apu/riscv-dbg/src/dm_top.sv                                            \
-        corev_apu/riscv-dbg/debug_rom/debug_rom.sv                                   \
-        corev_apu/register_interface/src/apb_to_reg.sv                               \
-        vendor/pulp-platform/axi/src/axi_multicut.sv                                 \
-        vendor/pulp-platform/common_cells/src/rstgen_bypass.sv                       \
-        vendor/pulp-platform/common_cells/src/rstgen.sv                              \
-        vendor/pulp-platform/common_cells/src/addr_decode.sv                         \
-	vendor/pulp-platform/common_cells/src/stream_register.sv                     \
-        vendor/pulp-platform/axi/src/axi_cut.sv                                      \
-        vendor/pulp-platform/axi/src/axi_join.sv                                     \
-        vendor/pulp-platform/axi/src/axi_delayer.sv                                  \
-        vendor/pulp-platform/axi/src/axi_to_axi_lite.sv                              \
-        vendor/pulp-platform/axi/src/axi_id_prepend.sv                               \
-        vendor/pulp-platform/axi/src/axi_atop_filter.sv                              \
-        vendor/pulp-platform/axi/src/axi_err_slv.sv                                  \
-        vendor/pulp-platform/axi/src/axi_mux.sv                                      \
-        vendor/pulp-platform/axi/src/axi_demux.sv                                    \
-        vendor/pulp-platform/axi/src/axi_xbar.sv                                     \
-        vendor/pulp-platform/common_cells/src/cdc_2phase.sv                          \
-        vendor/pulp-platform/common_cells/src/spill_register_flushable.sv            \
-        vendor/pulp-platform/common_cells/src/spill_register.sv                      \
-        vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv                  \
-        vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv                  \
-        vendor/pulp-platform/common_cells/src/stream_delay.sv                        \
-        vendor/pulp-platform/common_cells/src/lfsr_16bit.sv                          \
-        vendor/pulp-platform/tech_cells_generic/src/deprecated/cluster_clk_cells.sv  \
-        vendor/pulp-platform/tech_cells_generic/src/deprecated/pulp_clk_cells.sv     \
-        vendor/pulp-platform/tech_cells_generic/src/rtl/tc_clk.sv                    \
-        corev_apu/tb/ariane_testharness.sv                                           \
-        corev_apu/tb/ariane_peripherals.sv                                           \
-        corev_apu/tb/rvfi_tracer.sv                                                  \
-        corev_apu/tb/common/uart.sv                                                  \
-        corev_apu/tb/common/SimDTM.sv                                                \
-        corev_apu/tb/common/SimJTAG.sv
+src :=  \
+	core/include/$(target)_config_pkg.sv \
+	corev_apu/src/vproc_config.sv \
+	corev_apu/src/ariane.sv \
+	$(wildcard corev_apu/bootrom/*.sv) \
+	$(wildcard corev_apu/clint/*.sv) \
+	$(wildcard corev_apu/fpga/src/axi2apb/src/*.sv) \
+	$(wildcard corev_apu/fpga/src/apb_timer/*.sv) \
+	$(wildcard corev_apu/fpga/src/axi_slice/src/*.sv) \
+	$(wildcard corev_apu/src/axi_riscv_atomics/src/*.sv) \
+	$(wildcard corev_apu/axi_mem_if/src/*.sv) \
+	corev_apu/rv_plic/rtl/rv_plic_target.sv \
+	corev_apu/rv_plic/rtl/rv_plic_gateway.sv \
+	corev_apu/rv_plic/rtl/plic_regmap.sv \
+	corev_apu/rv_plic/rtl/plic_top.sv \
+	corev_apu/riscv-dbg/src/dmi_cdc.sv \
+	corev_apu/riscv-dbg/src/dmi_jtag.sv \
+	corev_apu/riscv-dbg/src/dmi_jtag_tap.sv \
+	corev_apu/riscv-dbg/src/dm_csrs.sv \
+	corev_apu/riscv-dbg/src/dm_mem.sv \
+	corev_apu/riscv-dbg/src/dm_sba.sv \
+	corev_apu/riscv-dbg/src/dm_top.sv \
+	corev_apu/riscv-dbg/debug_rom/debug_rom.sv \
+	corev_apu/register_interface/src/apb_to_reg.sv \
+	vendor/pulp-platform/axi/src/axi_multicut.sv \
+	vendor/pulp-platform/common_cells/src/rstgen_bypass.sv \
+	vendor/pulp-platform/common_cells/src/rstgen.sv \
+	vendor/pulp-platform/common_cells/src/addr_decode.sv \
+	vendor/pulp-platform/common_cells/src/stream_register.sv \
+	vendor/pulp-platform/axi/src/axi_cut.sv \
+	vendor/pulp-platform/axi/src/axi_join.sv \
+	vendor/pulp-platform/axi/src/axi_delayer.sv \
+	vendor/pulp-platform/axi/src/axi_to_axi_lite.sv \
+	vendor/pulp-platform/axi/src/axi_id_prepend.sv \
+	vendor/pulp-platform/axi/src/axi_atop_filter.sv \
+	vendor/pulp-platform/axi/src/axi_err_slv.sv \
+	vendor/pulp-platform/axi/src/axi_mux.sv \
+	vendor/pulp-platform/axi/src/axi_demux.sv \
+	vendor/pulp-platform/axi/src/axi_xbar.sv \
+	vendor/pulp-platform/common_cells/src/cdc_2phase.sv \
+	vendor/pulp-platform/common_cells/src/spill_register_flushable.sv \
+	vendor/pulp-platform/common_cells/src/spill_register.sv \
+	vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv \
+	vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv \
+	vendor/pulp-platform/common_cells/src/stream_delay.sv \
+	vendor/pulp-platform/common_cells/src/lfsr_16bit.sv \
+	vendor/pulp-platform/tech_cells_generic/src/deprecated/cluster_clk_cells.sv \
+	vendor/pulp-platform/tech_cells_generic/src/deprecated/pulp_clk_cells.sv \
+	vendor/pulp-platform/tech_cells_generic/src/rtl/tc_clk.sv \
+	corev_apu/tb/ariane_testharness.sv \
+	corev_apu/tb/ariane_peripherals.sv \
+	corev_apu/tb/rvfi_tracer.sv \
+	corev_apu/tb/common/uart.sv \
+	corev_apu/tb/common/SimDTM.sv \
+	corev_apu/tb/common/SimJTAG.sv \
+	corev_apu/vicuna/rtl/vproc_top.sv \
+	corev_apu/vicuna/rtl/vproc_vregunpack.sv \
+	corev_apu/vicuna/rtl/vproc_pipeline_wrapper.sv \
+	corev_apu/vicuna/rtl/vproc_pending_wr.sv \
+	corev_apu/vicuna/rtl/vproc_dispatcher.sv \
+	corev_apu/vicuna/rtl/vproc_sld.sv \
+	corev_apu/vicuna/rtl/vproc_vregpack.sv \
+	corev_apu/vicuna/rtl/vproc_decoder.sv \
+	corev_apu/vicuna/rtl/vproc_cache.sv \
+	corev_apu/vicuna/rtl/vproc_pipeline.sv \
+	corev_apu/vicuna/rtl/vproc_mul.sv \
+	corev_apu/vicuna/rtl/vproc_unit_wrapper.sv \
+	corev_apu/vicuna/rtl/vproc_vreg_wr_mux.sv \
+	corev_apu/vicuna/rtl/vproc_lsu.sv \
+	corev_apu/vicuna/rtl/vproc_core.sv \
+	corev_apu/vicuna/rtl/vproc_queue.sv \
+	corev_apu/vicuna/rtl/vproc_xif.sv \
+	corev_apu/vicuna/rtl/vproc_elem.sv \
+	corev_apu/vicuna/rtl/vproc_result.sv \
+	corev_apu/vicuna/rtl/vproc_pkg.sv \
+	corev_apu/vicuna/rtl/vproc_mul_block.sv \
+	corev_apu/vicuna/rtl/vproc_vregfile.sv \
+	corev_apu/vicuna/rtl/vproc_unit_mux.sv \
+	corev_apu/vicuna/rtl/vproc_alu.sv 
 
 src := $(addprefix $(root-dir), $(src))
 

@@ -33,7 +33,14 @@ module cvxif_fu
     output cvxif_pkg::cvxif_req_t                      cvxif_req_o,
     input  cvxif_pkg::cvxif_resp_t                     cvxif_resp_i
 );
+  
   localparam X_NUM_RS     = ariane_pkg::NR_RGPR_PORTS;
+
+  // Memory
+  assign cvxif_req_o.x_mem_ready        = '1;
+  assign cvxif_req_o.x_mem_resp         = '0;
+  assign cvxif_req_o.x_mem_result_valid = '1;
+  assign cvxif_req_o.x_mem_result       = '0;
 
   logic illegal_n, illegal_q;
   logic [TRANS_ID_BITS-1:0] illegal_id_n, illegal_id_q;
