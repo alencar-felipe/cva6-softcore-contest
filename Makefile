@@ -166,7 +166,6 @@ endif
 # this list contains the standalone components
 src :=  \
 	core/include/$(target)_config_pkg.sv \
-	corev_apu/src/vproc_config.sv \
 	corev_apu/src/ariane.sv \
 	$(wildcard corev_apu/bootrom/*.sv) \
 	$(wildcard corev_apu/clint/*.sv) \
@@ -219,6 +218,8 @@ src :=  \
 	corev_apu/tb/common/uart.sv \
 	corev_apu/tb/common/SimDTM.sv \
 	corev_apu/tb/common/SimJTAG.sv \
+	corev_apu/vicuna/rtl/vproc_pkg.sv \
+	corev_apu/src/vproc_config.sv \
 	corev_apu/vicuna/rtl/vproc_top.sv \
 	corev_apu/vicuna/rtl/vproc_vregunpack.sv \
 	corev_apu/vicuna/rtl/vproc_pipeline_wrapper.sv \
@@ -238,11 +239,10 @@ src :=  \
 	corev_apu/vicuna/rtl/vproc_xif.sv \
 	corev_apu/vicuna/rtl/vproc_elem.sv \
 	corev_apu/vicuna/rtl/vproc_result.sv \
-	corev_apu/vicuna/rtl/vproc_pkg.sv \
 	corev_apu/vicuna/rtl/vproc_mul_block.sv \
 	corev_apu/vicuna/rtl/vproc_vregfile.sv \
 	corev_apu/vicuna/rtl/vproc_unit_mux.sv \
-	corev_apu/vicuna/rtl/vproc_alu.sv 
+	corev_apu/vicuna/rtl/vproc_alu.sv
 
 src := $(addprefix $(root-dir), $(src))
 

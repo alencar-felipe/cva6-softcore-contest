@@ -36,12 +36,6 @@ module cvxif_fu
   
   localparam X_NUM_RS     = ariane_pkg::NR_RGPR_PORTS;
 
-  // Memory
-  assign cvxif_req_o.x_mem_ready        = '1;
-  assign cvxif_req_o.x_mem_resp         = '0;
-  assign cvxif_req_o.x_mem_result_valid = '1;
-  assign cvxif_req_o.x_mem_result       = '0;
-
   logic illegal_n, illegal_q;
   logic [TRANS_ID_BITS-1:0] illegal_id_n, illegal_id_q;
   logic [31:0] illegal_instr_n, illegal_instr_q;
@@ -72,6 +66,12 @@ module cvxif_fu
       cvxif_req_o.x_commit.id            = fu_data_i.trans_id;
       cvxif_req_o.x_commit.x_commit_kill = 1'b0;
     end
+
+    // Memory
+    cvxif_req_o.x_mem_ready        = '1;
+    cvxif_req_o.x_mem_resp         = '0;
+    cvxif_req_o.x_mem_result_valid = '1;
+    cvxif_req_o.x_mem_result       = '0;
   end
 
   always_comb begin
