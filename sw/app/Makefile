@@ -56,7 +56,8 @@ bmarks = \
 	spmv \
 	pmp \
 	mnist \
-	mnist_adac
+	mnist_adac \
+	mnist_unroll
 
 #--------------------------------------------------------------------
 # Build rules

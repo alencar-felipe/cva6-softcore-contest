@@ -47,7 +47,7 @@ package cva6_config_pkg;
   localparam CVA6ConfigWtDcacheWbufDepth = 2;
 
   localparam CVA6ConfigNrCommitPorts = 1;
-  localparam CVA6ConfigNrScoreboardEntries = 4;
+  localparam CVA6ConfigNrScoreboardEntries = 16;
 
   localparam CVA6ConfigFPGAEn = 1;
 
@@ -64,11 +64,11 @@ package cva6_config_pkg;
 
   localparam CVA6ConfigNrPMPEntries = 0;
 
-  localparam CVA6ConfigPerfCounterEn = 0;
+  localparam CVA6ConfigPerfCounterEn = 1;
 
   localparam config_pkg::cache_type_t CVA6ConfigDcacheType = config_pkg::WT;
 
-  localparam CVA6ConfigMmuPresent = 1;
+  localparam CVA6ConfigMmuPresent = 0;
 
   localparam CVA6ConfigRvfiTrace = 1;
 

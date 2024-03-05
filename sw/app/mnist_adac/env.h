@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#define CHOOSE_INPUT_IMAGE 3
+#define CHOOSE_INPUT_IMAGE 4618
 
 #define NO_EXCEPT
 
