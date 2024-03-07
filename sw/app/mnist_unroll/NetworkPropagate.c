@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <riscv_vector.h>
 
 #include "env.h"
 #include "mem_info.h"
@@ -11,7 +12,6 @@
 
 
 static DATA_T mem[MEMORY_SIZE];
-static bool vector[32]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 
 static int max(int lhs, int rhs) {
@@ -47,6 +47,7 @@ void macsOnRange(const uint8_t* __restrict inputs,
 {
     int iter = 0;
     int32_t sum = *weightedSum;
+    //vint32m1_t sum_vec = vle32_v_i32m1(weightedSum); // Load initial sum into vector register
 
     for (; iter <= nb_iterations - 4; iter += 4) {
         sum += inputs[iter+0]*weights[iter+0]; 
@@ -127,7 +128,8 @@ static void convcellPropagate1(
                     const ix = (ox * CONV1_STRIDE_X);
                 #else
                     const int sxMin = (CONV1_PADDING_X == 0) ? 0 : max(CONV1_PADDING_X - (ox * CONV1_STRIDE_X), 0);
-                    const int sxMax = (CONV1_PADDING_X == 0 && CONV1_OUTPUTS_WIDTH == CONV1_OUTPUTS_WIDTH_NOPAD) ? CONV1_KERNEL_WIDTH : clamp(CONV1_CHANNELS_WIDTH + CONV1_PADDING_X - (ox * CONV1_STRIDE_X), 0, CONV1_KERNEL_WIDTH);
+                    const int sxMax = (CONV1_PADDING_X == 0 && CONV1_OUTPUTS_WIDTH == CONV1_OUTPUTS_WIDTH_NOPAD) ? 
+                    CONV1_KERNEL_WIDTH : clamp(CONV1_CHANNELS_WIDTH + CONV1_PADDING_X - (ox * CONV1_STRIDE_X), 0, CONV1_KERNEL_WIDTH);
                     const int ix = (ox * CONV1_STRIDE_X) - CONV1_PADDING_X;
                 #endif
 
@@ -271,7 +273,8 @@ static void convcellPropagate2(
                     const ix = (ox * CONV2_STRIDE_X);
                 #else
                     const int sxMin = (CONV2_PADDING_X == 0) ? 0 : max(CONV2_PADDING_X - (ox * CONV2_STRIDE_X), 0);
-                    const int sxMax = (CONV2_PADDING_X == 0 && CONV2_OUTPUTS_WIDTH == CONV2_OUTPUTS_WIDTH_NOPAD) ? CONV2_KERNEL_WIDTH : clamp(CONV2_CHANNELS_WIDTH + CONV2_PADDING_X - (ox * CONV2_STRIDE_X), 0, CONV2_KERNEL_WIDTH);
+                    const int sxMax = (CONV2_PADDING_X == 0 && CONV2_OUTPUTS_WIDTH == CONV2_OUTPUTS_WIDTH_NOPAD) ?
+                    CONV2_KERNEL_WIDTH : clamp(CONV2_CHANNELS_WIDTH + CONV2_PADDING_X - (ox * CONV2_STRIDE_X), 0, CONV2_KERNEL_WIDTH);
                     const int ix = (ox * CONV2_STRIDE_X) - CONV2_PADDING_X;
                 #endif
 
@@ -567,7 +570,8 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 {
 #ifdef SAVE_OUTPUTS
     FILE* env_stream = fopen("env_output.txt", "w");
-    saveOutputs(ENV_NB_OUTPUTS, ENV_SIZE_Y, ENV_SIZE_X, ENV_MEM_CONT_OFFSET, ENV_MEM_CONT_SIZE, ENV_MEM_WRAP_OFFSET, ENV_MEM_WRAP_SIZE, ENV_MEM_STRIDE, inputs, env_stream, Network::Format::CHW);
+    saveOutputs(ENV_NB_OUTPUTS, ENV_SIZE_Y, ENV_SIZE_X, ENV_MEM_CONT_OFFSET, ENV_MEM_CONT_SIZE, ENV_MEM_WRAP_OFFSET, 
+    ENV_MEM_WRAP_SIZE, ENV_MEM_STRIDE, inputs, env_stream, Network::Format::CHW);
     fclose(env_stream);
 #endif
     // conv1
@@ -589,7 +593,8 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 
 #ifdef SAVE_OUTPUTS
     FILE* conv1_stream = fopen("conv1_output.txt", "w");
-    saveOutputs(CONV1_NB_OUTPUTS, CONV1_OUTPUTS_HEIGHT, CONV1_OUTPUTS_WIDTH, CONV1_MEM_CONT_OFFSET, CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, CONV1_MEM_STRIDE, conv1_output , conv1_stream, Network::Format::CHW);
+    saveOutputs(CONV1_NB_OUTPUTS, CONV1_OUTPUTS_HEIGHT, CONV1_OUTPUTS_WIDTH, CONV1_MEM_CONT_OFFSET, CONV1_MEM_CONT_SIZE, 
+    CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, CONV1_MEM_STRIDE, conv1_output , conv1_stream, Network::Format::CHW);
     fclose(conv1_stream);
 #endif
 
@@ -615,7 +620,8 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 
 #ifdef SAVE_OUTPUTS
     FILE* conv2_stream = fopen("conv2_output.txt", "w");
-    saveOutputs(CONV2_NB_OUTPUTS, CONV2_OUTPUTS_HEIGHT, CONV2_OUTPUTS_WIDTH, CONV2_MEM_CONT_OFFSET, CONV2_MEM_CONT_SIZE, CONV2_MEM_WRAP_OFFSET, CONV2_MEM_WRAP_SIZE, CONV2_MEM_STRIDE, conv2_output , conv2_stream, Network::Format::CHW);
+    saveOutputs(CONV2_NB_OUTPUTS, CONV2_OUTPUTS_HEIGHT, CONV2_OUTPUTS_WIDTH, CONV2_MEM_CONT_OFFSET, CONV2_MEM_CONT_SIZE, 
+    CONV2_MEM_WRAP_OFFSET, CONV2_MEM_WRAP_SIZE, CONV2_MEM_STRIDE, conv2_output , conv2_stream, Network::Format::CHW);
     fclose(conv2_stream);
 #endif
 
@@ -646,7 +652,8 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 
 #ifdef SAVE_OUTPUTS
     FILE* fc1_stream = fopen("fc1_output.txt", "w");
-    saveOutputs(FC1_NB_OUTPUTS, FC1_OUTPUTS_HEIGHT, FC1_OUTPUTS_WIDTH, FC1_MEM_CONT_OFFSET, FC1_MEM_CONT_SIZE, FC1_MEM_WRAP_OFFSET, FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE, fc1_output , fc1_stream, Network::Format::CHW);
+    saveOutputs(FC1_NB_OUTPUTS, FC1_OUTPUTS_HEIGHT, FC1_OUTPUTS_WIDTH, FC1_MEM_CONT_OFFSET, FC1_MEM_CONT_SIZE, 
+    FC1_MEM_WRAP_OFFSET, FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE, fc1_output , fc1_stream, Network::Format::CHW);
     fclose(fc1_stream);
 #endif
 
@@ -678,15 +685,18 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 
 #ifdef SAVE_OUTPUTS
     FILE* fc2_stream = fopen("fc2_output.txt", "w");
-    saveOutputs(FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE, fc2_output , fc2_stream, Network::Format::CHW);
+    saveOutputs(FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, 
+    FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE, fc2_output , fc2_stream, Network::Format::CHW);
     fclose(fc2_stream);
 #endif
 
-    maxPropagate1(fc2_output, outputs, maxPropagate_val, FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
+    maxPropagate1(fc2_output, outputs, maxPropagate_val, FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, 
+    FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
 
 #ifdef SAVE_OUTPUTS
     FILE* max_stream = fopen("max_output.txt", "w");
-    saveOutputs(FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE, outputs, max_stream, Network::Format::CHW);
+    saveOutputs(FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, 
+    FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE, outputs, max_stream, Network::Format::CHW);
     fclose(max_stream);
 #endif
 
