@@ -39,8 +39,8 @@ program tb_writeport  import tb_pkg::*; import ariane_pkg::*; #(
   output logic          seq_done_o,
 
   // interface to DUT
-  output dcache_req_i_t dut_req_port_o,
-  input  dcache_req_o_t dut_req_port_i
+  output dcache_req_t dut_req_port_o,
+  input  dcache_rsp_t dut_rsp_port_i
   );
 
   // leave this
@@ -110,7 +110,7 @@ program tb_writeport  import tb_pkg::*; import ariane_pkg::*; #(
         // generate random address
         void'(randomize(paddr) with {paddr >= 0; paddr < (MemWords<<3);});
         applyRandData();
-        `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+        `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
       end
       `APPL_WAIT_CYC(clk_i,1)
     end
@@ -139,7 +139,7 @@ program tb_writeport  import tb_pkg::*; import ariane_pkg::*; #(
       paddr = val;
       // generate linear read
       val = (val + 8) % (MemWords<<3);
-      `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+      `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
       `APPL_WAIT_CYC(clk_i,1)
     end
     paddr                        = '0;
@@ -163,7 +163,7 @@ program tb_writeport  import tb_pkg::*; import ariane_pkg::*; #(
       dut_req_port_o.data_size  = 2'b11;
       dut_req_port_o.data_be    = '1;
       dut_req_port_o.data_wdata = val;
-      `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+      `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
       `APPL_WAIT_CYC(clk_i,1)
     end
     paddr                        = '0;
@@ -189,7 +189,7 @@ program tb_writeport  import tb_pkg::*; import ariane_pkg::*; #(
       // generate wrapping read of 1 cacheline
       paddr = CachedAddrBeg + val;
       val = (val + 8) % (1*(DCACHE_LINE_WIDTH/64)*8);
-      `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+      `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
       `APPL_WAIT_CYC(clk_i,1)
     end
     paddr                        = '0;
@@ -229,7 +229,7 @@ program tb_writeport  import tb_pkg::*; import ariane_pkg::*; #(
         void'(randomize(burst_len) with {burst_len >= 1; burst_len < 100;});
         for(int k=0; k<burst_len && cnt < seq_num_vect_i && paddr < ((MemWords-1)<<3); k++) begin
           applyRandData();
-          `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+          `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
           `APPL_WAIT_CYC(clk_i,1)
           //void'(randomize(val) with {val>=0 val<=8;};);
           paddr += 8;

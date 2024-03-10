@@ -71,16 +71,16 @@ module tb import ariane_pkg::*; import wt_cache_pkg::*; import tb_pkg::*; #()();
                    logic [(TbAxiDataWidthFull/8)-1:0],
                    logic [    TbAxiUserWidthFull-1:0])
 
-  logic                enable_i;
-  logic                flush_i;
-  logic                flush_ack_o;
-  logic                miss_o;
-  amo_req_t            amo_req_i;
-  amo_resp_t           amo_resp_o;
-  dcache_req_i_t [2:0] req_ports_i;
-  dcache_req_o_t [2:0] req_ports_o;
-  axi_data_req_t       axi_data_o;
-  axi_data_resp_t      axi_data_i;
+  logic              enable_i;
+  logic              flush_i;
+  logic              flush_ack_o;
+  logic              miss_o;
+  amo_req_t          amo_req_i;
+  amo_resp_t         amo_resp_o;
+  dcache_req_t [2:0] req_ports_i;
+  dcache_rsp_t [2:0] rsp_ports_o;
+  axi_data_req_t     axi_data_o;
+  axi_data_resp_t    axi_data_i;
 
 ///////////////////////////////////////////////////////////////////////////////
 // TB signal declarations
@@ -400,7 +400,7 @@ module tb import ariane_pkg::*; import wt_cache_pkg::*; import tb_pkg::*; #()();
     .dcache_amo_resp_o  ( amo_resp_o  ),
     .dcache_miss_o      (             ),
     .dcache_req_ports_i ( req_ports_i ),
-    .dcache_req_ports_o ( req_ports_o ),
+    .dcache_rsp_ports_o ( rsp_ports_o ),
     .wbuffer_empty_o    (             ),
     .wbuffer_not_ni_o   (             ),
     .axi_req_o          ( axi_data_o  ),
@@ -446,9 +446,9 @@ axi_riscv_atomics_wrap #(
       for (genvar l=0; l<riscv::XLEN/8; l++)
         assign exp_rdata[k][l*8 +: 8] = tb_mem_port_t::shadow_q[{fifo_data[k].paddr[63:3], 3'b0} + l];
 
-      assign fifo_push[k]  = req_ports_i[k].data_req & req_ports_o[k].data_gnt;
+      assign fifo_push[k]  = req_ports_i[k].data_req & rsp_ports_o[k].data_gnt;
       assign fifo_flush[k] = req_ports_i[k].kill_req;
-      assign fifo_pop[k]   = req_ports_o[k].data_rvalid & ~req_ports_i[k].kill_req;
+      assign fifo_pop[k]   = rsp_ports_o[k].data_rvalid & ~req_ports_i[k].kill_req;
 
       fifo_v3 #(
         .dtype(resp_fifo_t)
@@ -504,7 +504,7 @@ axi_riscv_atomics_wrap #(
     .flush_o         ( flush[0]            ),
     .flush_ack_i     ( flush_ack_o         ),
     .dut_req_port_o  ( req_ports_i[0]      ),
-    .dut_req_port_i  ( req_ports_o[0]      )
+    .dut_req_port_i  ( rsp_ports_o[0]      )
     );
 
   tb_readport #(
@@ -537,7 +537,7 @@ axi_riscv_atomics_wrap #(
     .flush_o         ( flush[1]            ),
     .flush_ack_i     ( flush_ack_o         ),
     .dut_req_port_o  ( req_ports_i[1]      ),
-    .dut_req_port_i  ( req_ports_o[1]      )
+    .dut_req_port_i  ( rsp_ports_o[1]      )
   );
 
   tb_writeport #(
@@ -558,7 +558,7 @@ axi_riscv_atomics_wrap #(
     .seq_last_i     ( seq_last            ),
     .seq_done_o     ( seq_done[2]         ),
     .dut_req_port_o ( req_ports_i[2]      ),
-    .dut_req_port_i ( req_ports_o[2]      )
+    .dut_req_port_i ( rsp_ports_o[2]      )
   );
 
   tb_amoport  #(
@@ -588,7 +588,7 @@ axi_riscv_atomics_wrap #(
     forever begin
       `WAIT_CYC(clk_i,1)
 
-      write_en    = req_ports_i[2].data_req & req_ports_o[2].data_gnt & req_ports_i[2].data_we;
+      write_en    = req_ports_i[2].data_req & rsp_ports_o[2].data_gnt & req_ports_i[2].data_we;
       write_paddr = {req_ports_i[2].address_tag,  req_ports_i[2].address_index};
       write_data  = req_ports_i[2].data_wdata;
       write_be    = req_ports_i[2].data_be;

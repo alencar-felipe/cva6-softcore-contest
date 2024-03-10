@@ -48,7 +48,7 @@ module load_store_unit
     input logic en_ld_st_translation_i, // enable virtual memory translation for load/stores
 
     // icache translation requests
-    input  icache_arsp_t icache_areq_i,
+    input  icache_arsp_t icache_arsp_i,
     output icache_areq_t icache_areq_o,
 
     input  riscv::priv_lvl_t                   priv_lvl_i,             // From CSR register file
@@ -65,10 +65,10 @@ module load_store_unit
     output logic                               dtlb_miss_o,
 
     // interface to dcache
-    input  dcache_req_o_t  [ 2:0]                  dcache_req_ports_i,
-    output dcache_req_i_t  [ 2:0]                  dcache_req_ports_o,
-    input  logic                                   dcache_wbuffer_empty_i,
-    input  logic                                   dcache_wbuffer_not_ni_i,
+    output dcache_req_t [2:0] dcache_req_o,
+    input  dcache_rsp_t [2:0] dcache_rsp_i,
+    input  logic              dcache_wbuffer_empty_i,
+    input  logic              dcache_wbuffer_not_ni_i,
     // AMO interface
     output amo_req_t                               amo_req_o,
     input  amo_resp_t                              amo_resp_i,
@@ -158,10 +158,10 @@ module load_store_unit
         .lsu_dtlb_hit_o (dtlb_hit),               // send in the same cycle as the request
         .lsu_dtlb_ppn_o (dtlb_ppn),               // send in the same cycle as the request
         // connecting PTW to D$ IF
-        .req_port_i     (dcache_req_ports_i[0]),
-        .req_port_o     (dcache_req_ports_o[0]),
+        .req_port_i     (dcache_rsp_i[0]),
+        .req_port_o     (dcache_req_o[0]),
         // icache address translation requests
-        .icache_areq_i  (icache_areq_i),
+        .icache_arsp_i  (icache_arsp_i),
         .asid_to_be_flushed_i,
         .vaddr_to_be_flushed_i,
         .icache_areq_o  (icache_areq_o),
@@ -187,10 +187,10 @@ module load_store_unit
         .lsu_dtlb_hit_o (dtlb_hit),               // send in the same cycle as the request
         .lsu_dtlb_ppn_o (dtlb_ppn),               // send in the same cycle as the request
         // connecting PTW to D$ IF
-        .req_port_i     (dcache_req_ports_i[0]),
-        .req_port_o     (dcache_req_ports_o[0]),
+        .req_port_o     (dcache_req_o[0]),
+        .rsp_port_i     (dcache_rsp_i[0]),
         // icache address translation requests
-        .icache_areq_i  (icache_areq_i),
+        .icache_arsp_i  (icache_arsp_i),
         .asid_to_be_flushed_i,
         .vaddr_to_be_flushed_i,
         .icache_areq_o  (icache_areq_o),
@@ -202,25 +202,25 @@ module load_store_unit
 
     if (riscv::VLEN > riscv::PLEN) begin
       assign mmu_vaddr_plen   = mmu_vaddr[riscv::PLEN-1:0];
-      assign fetch_vaddr_plen = icache_areq_i.fetch_vaddr[riscv::PLEN-1:0];
+      assign fetch_vaddr_plen = icache_arsp_i.fetch_vaddr[riscv::PLEN-1:0];
     end else begin
       assign mmu_vaddr_plen   = {{{riscv::PLEN - riscv::VLEN} {1'b0}}, mmu_vaddr};
-      assign fetch_vaddr_plen = {{{riscv::PLEN - riscv::VLEN} {1'b0}}, icache_areq_i.fetch_vaddr};
+      assign fetch_vaddr_plen = {{{riscv::PLEN - riscv::VLEN} {1'b0}}, icache_arsp_i.fetch_vaddr};
     end
 
-    assign icache_areq_o.fetch_valid           = icache_areq_i.fetch_req;
+    assign icache_areq_o.fetch_valid           = icache_arsp_i.fetch_req;
     assign icache_areq_o.fetch_paddr           = fetch_vaddr_plen;
     assign icache_areq_o.fetch_exception       = '0;
 
-    assign dcache_req_ports_o[0].address_index = '0;
-    assign dcache_req_ports_o[0].address_tag   = '0;
-    assign dcache_req_ports_o[0].data_wdata    = '0;
-    assign dcache_req_ports_o[0].data_req      = 1'b0;
-    assign dcache_req_ports_o[0].data_be       = '1;
-    assign dcache_req_ports_o[0].data_size     = 2'b11;
-    assign dcache_req_ports_o[0].data_we       = 1'b0;
-    assign dcache_req_ports_o[0].kill_req      = '0;
-    assign dcache_req_ports_o[0].tag_valid     = 1'b0;
+    assign dcache_req_o[0].address_index = '0;
+    assign dcache_req_o[0].address_tag   = '0;
+    assign dcache_req_o[0].data_wdata    = '0;
+    assign dcache_req_o[0].data_req      = 1'b0;
+    assign dcache_req_o[0].data_be       = '1;
+    assign dcache_req_o[0].data_size     = 2'b11;
+    assign dcache_req_o[0].data_we       = 1'b0;
+    assign dcache_req_o[0].kill_req      = '0;
+    assign dcache_req_o[0].tag_valid     = 1'b0;
 
     assign itlb_miss_o                         = 1'b0;
     assign dtlb_miss_o                         = 1'b0;
@@ -280,8 +280,8 @@ module load_store_unit
       .amo_req_o,
       .amo_resp_i,
       // to memory arbiter
-      .req_port_i           (dcache_req_ports_i[2]),
-      .req_port_o           (dcache_req_ports_o[2])
+      .req_port_o           (dcache_req_o[2]),
+      .rsp_port_i           (dcache_rsp_i[2])
   );
 
   // ------------------
@@ -310,8 +310,8 @@ module load_store_unit
       .page_offset_matches_i(page_offset_matches),
       .store_buffer_empty_i (store_buffer_empty),
       // to memory arbiter
-      .req_port_i           (dcache_req_ports_i[1]),
-      .req_port_o           (dcache_req_ports_o[1]),
+      .req_port_o           (dcache_req_o[1]),
+      .rsp_port_i           (dcache_rsp_i[1]),
       .dcache_wbuffer_not_ni_i,
       .commit_tran_id_i,
       .*

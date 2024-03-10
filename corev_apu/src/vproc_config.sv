@@ -21,7 +21,11 @@ package vproc_config;
 
     import vproc_pkg::*;
 
+`ifdef SYNTHESIS
+    parameter vreg_type    VREG_TYPE                   = VREG_XLNX_RAM32M;
+`else
     parameter vreg_type    VREG_TYPE                   = VREG_GENERIC;
+`endif
     parameter int unsigned VREG_W                      = 128;
     parameter int unsigned VPORT_RD_CNT                = 2;
     parameter int unsigned VPORT_RD_W   [VPORT_RD_CNT] = '{default: VREG_W};

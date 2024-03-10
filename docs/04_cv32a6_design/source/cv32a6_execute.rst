@@ -246,13 +246,13 @@ The MMU SV32 maintains interfaces with the instruction cache (ICache) and the lo
    * - ``req_port_i``
      - in
      - Cache Subsystem
-     - dcache_req_o_t
+     - dcache_rsp_t
      - D Cache Data Requests
 
    * - ``req_port_o``
      - out
      - Cache Subsystem
-     - dcache_req_i_t
+     - dcache_req_t
      - D Cache Data Response
 
    * - ``pmpcfg_i``
@@ -1240,7 +1240,7 @@ In addition to its translation capabilities, the PTW module is equipped to detec
    * - ``req_port_i``
      - in
      - Cache Subsystem
-     - dcache_req_o_t
+     - dcache_rsp_t
      - D Cache Data Requests
 
    * - ``req_port_o``
@@ -1333,7 +1333,7 @@ In addition to its translation capabilities, the PTW module is equipped to detec
 
 .. raw:: html
 
-   <p style="text-align:center;"> <b>Table 13:</b> D Cache Response Struct </b>(dcache_req_i_t</b>) </p>
+   <p style="text-align:center;"> <b>Table 13:</b> D Cache Response Struct </b>(dcache_req_t</b>) </p>
 
 .. list-table::
    :header-rows: 1
@@ -1388,7 +1388,7 @@ In addition to its translation capabilities, the PTW module is equipped to detec
 
 .. raw:: html
 
-   <p style="text-align:center;"> <b>Table 14:</b> D Cache Request Struct </b>(dcache_req_o_t</b>) </p>
+   <p style="text-align:center;"> <b>Table 14:</b> D Cache Request Struct </b>(dcache_rsp_t</b>) </p>
 
 .. list-table::
    :header-rows: 1
