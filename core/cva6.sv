@@ -162,7 +162,7 @@ module cva6
 
   localparam int unsigned NrWbPorts = (CVA6Cfg.CvxifEn || EnableAccelerator) ? 5 : 4;
   localparam int unsigned NrRgprPorts = 2;
-  localparam int unsigned NrDcachePorts = 3;
+  localparam int unsigned NrDcachePorts = 4 + CVA6Cfg.CvxifEn;
 
   localparam config_pkg::cva6_cfg_t CVA6ExtendCfg = {
     CVA6Cfg.NrCommitPorts,
@@ -648,8 +648,7 @@ module cva6
   // ---------
   ex_stage #(
       .CVA6Cfg      (CVA6ExtendCfg),
-      .AsidWidth    (AsidWidth),
-      .NrDcachePorts(NrDcachePorts)
+      .AsidWidth    (AsidWidth)
   ) ex_stage_i (
       .clk_i                (clk_i),
       .rst_ni               (rst_ni),
