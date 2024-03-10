@@ -28,7 +28,7 @@
 # 2020-10-06  0.1      k.Eyssartier Created
 # =========================================================================== #
 
-ARCH ?= rv32imv_zicsr_xadac1
+ARCH ?= rv32im_zicsr_xadac1
 XLEN ?= 32
 
 default: all
@@ -57,7 +57,8 @@ bmarks = \
 	pmp \
 	mnist \
 	mnist_adac \
-	mnist_unroll
+	mnist_unroll \
+	test_unroll
 
 #--------------------------------------------------------------------
 # Build rules

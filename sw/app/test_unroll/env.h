@@ -5,7 +5,9 @@
 #define N2D2_EXPORTCPP_ENV_LAYER_H
 
 #include <stdint.h>
-#define PRINT_OUT
+
+
+//#define PRINT_OUT
 #define CHOOSE_INPUT_IMAGE 3
 
 #define NO_EXCEPT

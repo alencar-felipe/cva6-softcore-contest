@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <riscv_vector.h>
+//#include <riscv_vector.h>
 
 #include "env.h"
 #include "mem_info.h"

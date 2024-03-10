@@ -8,6 +8,7 @@
 #include "util.h"
 #include "perf.h"
 
+
 inline int xadac_max(int rs1, int rs2)
 {
     int rd;
@@ -54,13 +55,14 @@ int processInput(        UDATA_T* inputBuffer,
 
     propagate(inputBuffer, predictedOutputBuffer, output_value);
     #ifdef PRINT_OUT
-        printf("After Propagate:\n");
+        printf("After Propagate:");
     #endif
     // assert(expectedOutputBuffer.size() == predictedOutputBuffer.size());
     for(size_t i = 0; i < OUTPUTS_SIZE[0]; i++) {
         #ifdef PRINT_OUT
             printf("expectedOutputBuffer[%d];    %10lu\n",expectedOutputBuffer[i]);
         #endif
+        
         if (expectedOutputBuffer[i] >= 0) {
             ++nbPredictions;
 
@@ -68,7 +70,7 @@ int processInput(        UDATA_T* inputBuffer,
                 ++nbValidPredictions;
             }
         }
-    }
+    }   
 
     return (nbPredictions > 0)
         ? nbValidPredictions : 0;
@@ -115,7 +117,7 @@ int main(int argc, char* argv[]) {
     printf("image %s: %d instructions\n", stringify(MNIST_INPUT_IMAGE), (int)(instret));
     printf("image %s: %d cycles\n", stringify(MNIST_INPUT_IMAGE), (int)(cycles));
     
-    printf("\n\n\n");
+    //printf("\n\n\n");
 
 #ifdef OUTPUTFILE
     FILE *f = fopen("success_rate.txt", "w");

@@ -9,7 +9,8 @@
 #include "fc1.h"
 #include "fc2.h"
 
-
+const uint32_t CRC_POLY = 0xEDB88320;
+uint32_t conv[256];
 static DATA_T mem[MEMORY_SIZE];
 
 static int max(int lhs, int rhs) {
@@ -442,6 +443,41 @@ static void maxPropagate1(
     }
 }
 
+void buildCrc32Table() {
+    uint32_t i, ch, crc, b;
+    size_t j;
+
+    for(i = 0; i < 256; i++) {
+        ch = i;
+        crc = 0;
+
+        for(j = 0; j < 8; j++) {
+            b = (ch ^ crc) & 1;
+            crc >>= 1;
+            if(b) crc = crc ^ CRC_POLY;
+            ch >>= 1;
+        }
+
+        conv[i] = crc;
+    }
+}
+
+void crc32(uint32_t *crc, const uint8_t *data, size_t len) {
+    uint32_t t;
+    uint8_t *ptr;
+
+    (*crc) = ~(*crc);
+
+    ptr = (uint8_t *) data;
+
+    while(len--) {
+        t = (*(ptr++) ^ *crc) & 0xFF;
+        *crc = (*crc >> 8) ^ conv[t];
+    }
+
+    (*crc) = ~(*crc);
+}
+
 void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_val)
 {
 #ifdef SAVE_OUTPUTS
@@ -462,6 +498,20 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     CONV1_KERNEL_WIDTH, CONV1_ACTIVATION, ENV_MEM_CONT_OFFSET, ENV_MEM_CONT_SIZE, ENV_MEM_WRAP_OFFSET, 
     ENV_MEM_WRAP_SIZE, ENV_MEM_STRIDE, CONV1_MEM_CONT_OFFSET, CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, CONV1_MEM_STRIDE);
 
+    #ifdef PRINT_OUT
+        buildCrc32Table();
+        size_t crc = 0x000000;
+        crc32(&crc, inputs, sizeof(inputs));
+        crc32(&crc, conv1_output, sizeof(conv1_output));
+        crc32(&crc, conv1_biases, sizeof(conv1_biases));
+        crc32(&crc, conv1_weights, sizeof(conv1_weights));
+        printf("After First Convolution\n");
+        printf("Inputs;         %10lu\n",inputs);
+        printf("conv1_output;   %10lu\n",conv1_output);
+        printf("conv1_biases;   %10lu\n",conv1_biases);
+        printf("conv1_weights;  %10lu\n",conv1_weights);
+        printf("crc;            %10lu\n",crc);
+    #endif
     //convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, CONV1_SCALING);
 
 #ifdef BENCHMARK
@@ -494,7 +544,18 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, 
     CONV1_MEM_STRIDE, CONV2_MEM_CONT_OFFSET, CONV2_MEM_CONT_SIZE, CONV2_MEM_WRAP_OFFSET, 
     CONV2_MEM_WRAP_SIZE, CONV2_MEM_STRIDE);
-
+    #ifdef PRINT_OUT
+        crc32(&crc, conv1_output, sizeof(conv1_output));
+        crc32(&crc, conv2_output, sizeof(conv2_output));
+        crc32(&crc, conv2_biases, sizeof(conv2_biases));
+        crc32(&crc, conv2_weights, sizeof(conv2_weights));
+        printf("After Second Convolution\n");
+        printf("Inputs;         %10lu\n",conv1_output);
+        printf("conv2_output;   %10lu\n",conv2_output);
+        printf("conv2_biases;   %10lu\n",conv2_biases);
+        printf("conv2_weights;  %10lu\n",conv2_weights);
+        printf("crc;            %10lu\n",crc);
+    #endif
     //convcellPropagate2(conv1_output , conv2_output, conv2_biases, conv2_weights, CONV2_SCALING);
 
 #ifdef BENCHMARK
@@ -527,7 +588,18 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     CONV2_MEM_WRAP_OFFSET, CONV2_MEM_WRAP_SIZE, 
     CONV2_MEM_STRIDE, FC1_MEM_CONT_OFFSET, 
     FC1_MEM_CONT_SIZE, FC1_MEM_WRAP_OFFSET, FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE);
-
+    #ifdef PRINT_OUT
+        crc32(&crc, conv2_output, sizeof(conv2_output));
+        crc32(&crc, fc1_biases, sizeof(fc1_biases));
+        crc32(&crc, fc1_weights, sizeof(fc1_weights));
+        crc32(&crc, fc1_output, sizeof(fc1_output));
+        printf("After Fully Connected 1:\n");
+        printf("conv2_output;  %10lu\n",conv2_output);
+        printf("fc1_biases;    %10lu\n",fc1_biases);
+        printf("fc1_weights;   %10lu\n",fc1_weights);
+        printf("fc1_output;    %10lu\n",fc1_output);
+        printf("crc;            %10lu\n",crc);
+    #endif
 #ifdef BENCHMARK
     const Tick_T end_fc1 = tick();
     static RunningMean_T fc1_timing = {0.0, 0};
@@ -559,7 +631,18 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE, 
     FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, 
     FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
-
+    #ifdef PRINT_OUT
+        crc32(&crc, fc1_output, sizeof(fc1_output));
+        crc32(&crc, fc2_biases, sizeof(fc2_biases));
+        crc32(&crc, fc2_weights, sizeof(fc2_weights));
+        crc32(&crc, fc2_output, sizeof(fc2_output));
+        printf("After Fully Connected 2:\n");
+        printf("fc1_output;  %10lu\n",fc1_output);
+        printf("fc2_biases;  %10lu\n",fc2_biases);
+        printf("fc2_weights; %10lu\n",fc2_weights);
+        printf("fc2_output;  %10lu\n",fc2_output);
+        printf("crc;            %10lu\n",crc);
+    #endif
 #ifdef BENCHMARK
     const Tick_T end_fc2 = tick();
     static RunningMean_T fc2_timing = {0.0, 0};
@@ -573,7 +656,16 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 #endif
 
     maxPropagate1(fc2_output, outputs, maxPropagate_val, FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
-
+    #ifdef PRINT_OUT
+        crc32(&crc, fc2_output, sizeof(fc2_output));
+        crc32(&crc, outputs, sizeof(outputs));
+        crc32(&crc, maxPropagate_val, sizeof(maxPropagate_val));
+        printf("After ARGMAX 2:\n");
+        printf("fc2_output;  %10lu\n",fc2_output);
+        printf("outputs;     %10lu\n",outputs);
+        printf("credence;    %10lu\n",maxPropagate_val);
+        printf("crc;            %10lu\n",crc);
+    #endif
 #ifdef SAVE_OUTPUTS
     FILE* max_stream = fopen("max_output.txt", "w");
     saveOutputs(FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE, outputs, max_stream, Network::Format::CHW);
@@ -591,5 +683,4 @@ float Network::backpropagate(const DATA_T* input, const std::int32_t* labels){
 int Network::gradientCheck(){
    return(0);
 }*/
-
 
