@@ -128,6 +128,12 @@ module wt_cache_subsystem
         dcache_req_read[i] = dcache_req_ports_i[i];
         dcache_rsp_ports_o[i] = dcache_rsp_read[i];
       end
+
+      // Read result passthrough (Write does not generate a result)
+      dcache_rsp_ports_o[i].data_rvalid = dcache_rsp_read[i].data_rvalid;
+      dcache_rsp_ports_o[i].data_rid    = dcache_rsp_read[i].data_rid;
+      dcache_rsp_ports_o[i].data_rdata  = dcache_rsp_read[i].data_rdata;
+      dcache_rsp_ports_o[i].data_ruser  = dcache_rsp_read[i].data_ruser;
     end
   end
 
@@ -256,7 +262,7 @@ module wt_cache_subsystem
   end
 
 
-  for (genvar j = 0; j < NumPorts - 1; j++) begin : gen_assertion
+  for (genvar j = 0; j < NumPorts; j++) begin : gen_assertion
     a_invalid_read_data :
     assert property (
       @(posedge clk_i) disable iff (!rst_ni)
