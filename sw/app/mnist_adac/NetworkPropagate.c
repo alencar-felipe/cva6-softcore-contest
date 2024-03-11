@@ -156,7 +156,7 @@ static void convcellPropagate1(
                             || OUTPUTS_HEIGHT != OUTPUTS_HEIGHT_NOPAD)
                         && sy >= syMax - syMin)
                     {
-                        break;
+                       break;
                     }
 
                     const int iPos = ((sxMin + ix)
@@ -491,6 +491,17 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 #ifdef BENCHMARK
     const Tick_T start_conv1 = tick();
 #endif
+    printf("BEFORE OF FIRST CONVOLUTION!\n");
+    printf("Inputs;         %10lu\n",inputs);
+    printf("conv1_output;   %10lu\n",conv1_output);
+    printf("conv1_biases;   %10lu\n",conv1_biases);
+    printf("conv1_weights;  %10lu\n",conv1_weights);
+
+
+
+
+     printf("\n\n\n----------------------------------------------------------------\n");
+    
 
     convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, 8,
     CONV1_NB_CHANNELS, CONV1_CHANNELS_HEIGHT, CONV1_CHANNELS_WIDTH, CONV1_NB_OUTPUTS, CONV1_OUTPUTS_HEIGHT, 
@@ -498,19 +509,22 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     CONV1_KERNEL_WIDTH, CONV1_ACTIVATION, ENV_MEM_CONT_OFFSET, ENV_MEM_CONT_SIZE, ENV_MEM_WRAP_OFFSET, 
     ENV_MEM_WRAP_SIZE, ENV_MEM_STRIDE, CONV1_MEM_CONT_OFFSET, CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, CONV1_MEM_STRIDE);
 
+
     #ifdef PRINT_OUT
         buildCrc32Table();
-        size_t crc = 0x000000;
-        crc32(&crc, inputs, sizeof(inputs));
-        crc32(&crc, conv1_output, sizeof(conv1_output));
-        crc32(&crc, conv1_biases, sizeof(conv1_biases));
-        crc32(&crc, conv1_weights, sizeof(conv1_weights));
+        size_t crc0 = 0x000000;
+        crc32(&crc0, inputs, ENV_SIZE_Y*ENV_SIZE_X*ENV_NB_OUTPUTS);
+        crc32(&crc0, conv1_output, 2160 + CONV1_MEM_CONT_OFFSET);
+        crc32(&crc0, conv1_biases, CONV1_NB_OUTPUTS);
+        crc32(&crc0, conv1_weights, CONV1_WEIGHTS_SIZE);
         printf("After First Convolution\n");
         printf("Inputs;         %10lu\n",inputs);
         printf("conv1_output;   %10lu\n",conv1_output);
         printf("conv1_biases;   %10lu\n",conv1_biases);
         printf("conv1_weights;  %10lu\n",conv1_weights);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc0);
+        #endif
     #endif
     //convcellPropagate1(inputs , conv1_output, conv1_biases, conv1_weights, CONV1_SCALING);
 
@@ -544,17 +558,21 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     CONV1_MEM_CONT_SIZE, CONV1_MEM_WRAP_OFFSET, CONV1_MEM_WRAP_SIZE, 
     CONV1_MEM_STRIDE, CONV2_MEM_CONT_OFFSET, CONV2_MEM_CONT_SIZE, CONV2_MEM_WRAP_OFFSET, 
     CONV2_MEM_WRAP_SIZE, CONV2_MEM_STRIDE);
+
     #ifdef PRINT_OUT
-        crc32(&crc, conv1_output, sizeof(conv1_output));
-        crc32(&crc, conv2_output, sizeof(conv2_output));
-        crc32(&crc, conv2_biases, sizeof(conv2_biases));
-        crc32(&crc, conv2_weights, sizeof(conv2_weights));
+        size_t crc1 = 0x000000;
+        crc32(&crc1, conv1_output, 2160 + CONV1_MEM_CONT_OFFSET);
+        crc32(&crc1, conv2_output, 2160 + CONV2_MEM_CONT_OFFSET);
+        crc32(&crc1, conv2_biases, CONV2_NB_OUTPUTS);
+        crc32(&crc1, conv2_weights, CONV2_WEIGHTS_SIZE);
         printf("After Second Convolution\n");
         printf("Inputs;         %10lu\n",conv1_output);
         printf("conv2_output;   %10lu\n",conv2_output);
         printf("conv2_biases;   %10lu\n",conv2_biases);
         printf("conv2_weights;  %10lu\n",conv2_weights);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc1);
+        #endif
     #endif
     //convcellPropagate2(conv1_output , conv2_output, conv2_biases, conv2_weights, CONV2_SCALING);
 
@@ -589,16 +607,19 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     CONV2_MEM_STRIDE, FC1_MEM_CONT_OFFSET, 
     FC1_MEM_CONT_SIZE, FC1_MEM_WRAP_OFFSET, FC1_MEM_WRAP_SIZE, FC1_MEM_STRIDE);
     #ifdef PRINT_OUT
-        crc32(&crc, conv2_output, sizeof(conv2_output));
-        crc32(&crc, fc1_biases, sizeof(fc1_biases));
-        crc32(&crc, fc1_weights, sizeof(fc1_weights));
-        crc32(&crc, fc1_output, sizeof(fc1_output));
+        size_t crc2 = 0x000000;
+        crc32(&crc2, conv2_output, 2160 + CONV2_MEM_CONT_OFFSET);
+        crc32(&crc2, fc1_biases, FC1_OUTPUTS_SIZE);
+        crc32(&crc2, fc1_weights, FC1_WEIGHTS_SIZE);
+        crc32(&crc2, fc1_output, 2160 + FC1_MEM_CONT_OFFSET);
         printf("After Fully Connected 1:\n");
         printf("conv2_output;  %10lu\n",conv2_output);
         printf("fc1_biases;    %10lu\n",fc1_biases);
         printf("fc1_weights;   %10lu\n",fc1_weights);
         printf("fc1_output;    %10lu\n",fc1_output);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc2);
+        #endif
     #endif
 #ifdef BENCHMARK
     const Tick_T end_fc1 = tick();
@@ -632,16 +653,19 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
     FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, 
     FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
     #ifdef PRINT_OUT
-        crc32(&crc, fc1_output, sizeof(fc1_output));
-        crc32(&crc, fc2_biases, sizeof(fc2_biases));
-        crc32(&crc, fc2_weights, sizeof(fc2_weights));
-        crc32(&crc, fc2_output, sizeof(fc2_output));
+        size_t crc3 = 0x000000;
+        crc32(&crc3, fc1_output, 2160 + FC1_MEM_CONT_OFFSET);
+        crc32(&crc3, fc2_biases, FC2_OUTPUTS_SIZE);
+        crc32(&crc3, fc2_weights, FC2_WEIGHTS_SIZE);
+        crc32(&crc3, fc2_output, 2160 + FC2_MEM_CONT_OFFSET);
         printf("After Fully Connected 2:\n");
         printf("fc1_output;  %10lu\n",fc1_output);
         printf("fc2_biases;  %10lu\n",fc2_biases);
         printf("fc2_weights; %10lu\n",fc2_weights);
         printf("fc2_output;  %10lu\n",fc2_output);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc3);
+        #endif
     #endif
 #ifdef BENCHMARK
     const Tick_T end_fc2 = tick();
@@ -657,14 +681,21 @@ void propagate(const UDATA_T* inputs, Target_T* outputs, UDATA_T* maxPropagate_v
 
     maxPropagate1(fc2_output, outputs, maxPropagate_val, FC2_NB_OUTPUTS, FC2_OUTPUTS_HEIGHT, FC2_OUTPUTS_WIDTH, FC2_MEM_CONT_OFFSET, FC2_MEM_CONT_SIZE, FC2_MEM_WRAP_OFFSET, FC2_MEM_WRAP_SIZE, FC2_MEM_STRIDE);
     #ifdef PRINT_OUT
-        crc32(&crc, fc2_output, sizeof(fc2_output));
-        crc32(&crc, outputs, sizeof(outputs));
-        crc32(&crc, maxPropagate_val, sizeof(maxPropagate_val));
+        size_t crc4 =0x000000,crc5 = 0x000000;
+        crc32(&crc4, fc2_output, 2160 + FC2_MEM_CONT_OFFSET);
+        crc32(&crc4, outputs, 1);
+        crc32(&crc4, maxPropagate_val, sizeof(maxPropagate_val));
         printf("After ARGMAX 2:\n");
         printf("fc2_output;  %10lu\n",fc2_output);
         printf("outputs;     %10lu\n",outputs);
         printf("credence;    %10lu\n",maxPropagate_val);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc4);
+        #endif
+        #ifdef PRINT_LAST_CRC 
+            crc5 = crc4 + crc3 + crc2 + crc1 + crc0;
+            printf("crc_block %x\n",crc5);
+        #endif
     #endif
 #ifdef SAVE_OUTPUTS
     FILE* max_stream = fopen("max_output.txt", "w");

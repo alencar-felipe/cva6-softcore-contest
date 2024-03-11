@@ -53,9 +53,14 @@ int processInput(        UDATA_T* inputBuffer,
     size_t nbValidPredictions = 0;
 
     propagate(inputBuffer, predictedOutputBuffer, output_value);
-
+    #ifdef PRINT_OUT
+        printf("After Propagate:\n");
+    #endif
     // assert(expectedOutputBuffer.size() == predictedOutputBuffer.size());
     for(size_t i = 0; i < OUTPUTS_SIZE[0]; i++) {
+        #ifdef PRINT_OUT
+            printf("expectedOutputBuffer[%d];    %10lu\n",expectedOutputBuffer[i]);
+        #endif
         if (expectedOutputBuffer[i] >= 0) {
             ++nbPredictions;
 

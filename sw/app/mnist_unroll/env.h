@@ -6,6 +6,10 @@
 
 #include <stdint.h>
 
+#define PRINT_OUT
+#define PRINT_EACH_CRC
+#define PRINT_LAST_CRC
+
 #define CHOOSE_INPUT_IMAGE 3
 
 #define NO_EXCEPT

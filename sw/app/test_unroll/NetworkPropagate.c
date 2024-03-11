@@ -44,51 +44,50 @@ void mac(const uint8_t* __restrict inputs,
     *weightedSum = sum;
 }
 
-static void convcellPropagate1(const uint8_t *input, uint8_t *outputs, const int32_t *__restrict biasses, const int8_t *__restrict weights, ActivationFunction_T ACTIVATION) {
-    for (int output = 0; output < 16; ++output) {
-        for (int ox = 0; ox < 11; ox++) {  // OUTPUTS_WIDTH
-                int ix = ox << 1;
-            for (int oy = 0; oy < 11; oy++) {  // OUTPUTS_HEIGHT 
-                int iy = oy << 1;
-                int oOffset = ox + 11 * oy << 4;
-                oOffset += (oOffset >= 1584) ? -2160 : 0; 
-
+static inline void convcellPropagate1(const uint8_t *input, uint8_t *outputs, const int32_t *__restrict biasses, const int8_t *__restrict weights, ActivationFunction_T ACTIVATION){
+    for (int oy = 0; oy < 11; oy++){        //OUTPUTS_HEIGHT 
+        int iy = oy << 1;
+        for (int ox = 0; ox < 11; ox++){   // OUTPUTS_WIDTH
+            int ix = ox << 1;
+            int oOffset = ox + 11 * oy << 4;
+            oOffset += (oOffset >= 1584) ? -2160 : 0;       // 1584 = OUTPUT_MEM_CONT_SIZE    _|&&|_  2160 = UTPUT_MEM_WRAP_OFFSET - OUTPUT_MEM_CONT_OFFSET - OUTPUT_MEM_CONT_SIZE;
+            for (int output = 0; output < 16; ++output){
                 int32_t sum = biasses[output];
-                for (int ky = 0; ky < 4; ky++) {
+                for (int ky = 0; ky < 4; ky++){
                     int iPos = ix + (24 * (iy + ky));
                     int wOffset = ((ky + (output << 2)) << 2);
-                    for (int i = 0; i < 4; i++) {
+                    for (int i=0; i<4 ; i++){
                         sum += (((input + iPos)[i]) * ((weights + wOffset)[i]));
                     }
                 }
-                outputs[oOffset + output] = clamp(sum >> 8, 0, 255); 
+                //outputs[oOffset + output] = (ACTIVATION == ReLU && sum <= 0) ? clamp(0, 0,8) : clamp(sum >> 8,0, 8);
+                outputs[oOffset + output] = clamp(sum >> 8, 0, 255);
             }
         }
     }
 }
 
-
-static inline void convcellPropagate2(const uint8_t *input, uint8_t *outputs, const int32_t *__restrict biasses, 
-                                        const int8_t *__restrict weights, ActivationFunction_T ACTIVATION){
+static inline void convcellPropagate2(const uint8_t *input, uint8_t *outputs, const int32_t *__restrict biasses, const int8_t *__restrict weights, ActivationFunction_T ACTIVATION){
     for (int oy = 0; oy < 4; oy++){ 
         int iy = oy << 1;
-        for (int output = 0; output < 24; ++output){ // This loop has been moved up
-            for (int ox = 0; ox < 4; ox++){ // This loop has been moved down
-                int ix = ox << 1;
-                int oPos = (ox + 4 * oy);
-                int oOffset = 24 * oPos;
-                oOffset += (oOffset >= 1584) ? -2160 : 0;
-                int32_t sum = biasses[output]; // Moved inside to reset for each (ox, output) pair
+        for (int ox = 0; ox < 4; ox++){
+            int ix = ox << 1;
+            int oPos = (ox + 4 * oy);
+            int oOffset = 24 * oPos;
+            oOffset += (oOffset >= 1584) ? -2160 : 0;
+            for (int output = 0; output < 24; ++output){
+                int32_t sum = biasses[output];
                 for (int ky = 0; ky < 5; ky++){
                     int iOffset = ((ix) + 11 * (iy + ky)) << 4;
-                    iOffset += (iOffset >= 1584) ? -2160 : 0;     
+                    iOffset += (iOffset >= 1584) ? -2160 : 0;       // 1584 = OUTPUT_MEM_CONT_SIZE    _|&&|_  2160 = UTPUT_MEM_WRAP_OFFSET - OUTPUT_MEM_CONT_OFFSET - OUTPUT_MEM_CONT_SIZE;
                     int wOffset = (5 * (ky + 5 * output)) << 4;
                     for (int kx = 0; kx < 5; kx++){
                         int iOffsetInRange = iOffset + (kx << 4);
                         mac(input + iOffsetInRange, weights + wOffset + kx * 16, &sum, 16);
                     }
                 }
-                outputs[oOffset + output] = clamp(sum >> 8, 0, 255); // Now outputs are written after the innermost loop
+                //outputs[oOffset + output] = (ACTIVATION == ReLU && sum <= 0) ? clamp(0, 0,8) : clamp(sum >> 8, 0,8);
+                outputs[oOffset + output] = clamp(sum >> 8, 0, 255);
             }
         }
     }
@@ -174,14 +173,6 @@ void propagate(const uint8_t *inputs, int32_t *outputs, uint8_t *credence)
     // conv1
     uint8_t *conv1_output = (uint8_t *)mem + CONV1_MEM_CONT_OFFSET;
 
-    // printf("-1 => %d\n", conv1_output[0]);
-    // exit(-1);
-    
-    //uint32_t conv2[256];
-    //uint32_t fullcon1[256];
-    //uint32_t fullcon2[256];
-    //uint32_t max[256];
-
     convcellPropagate1(
         inputs,
         conv1_output,
@@ -193,24 +184,21 @@ void propagate(const uint8_t *inputs, int32_t *outputs, uint8_t *credence)
 
     #ifdef PRINT_OUT
         buildCrc32Table();
-        size_t crc = 0x000000;
-        crc32(&crc, inputs, sizeof(inputs));
-        crc32(&crc, conv1_output, sizeof(conv1_output));
-        crc32(&crc, conv1_biases, sizeof(conv1_biases));
-        crc32(&crc, conv1_weights, sizeof(conv1_weights));
+        size_t crc0 = 0x000000;
+        crc32(&crc0, inputs, ENV_SIZE_Y*ENV_SIZE_X*ENV_NB_OUTPUTS);
+        crc32(&crc0, conv1_output, 2160 + CONV1_MEM_CONT_OFFSET);
+        crc32(&crc0, conv1_biases, CONV1_NB_OUTPUTS);
+        crc32(&crc0, conv1_weights, CONV1_WEIGHTS_SIZE);
         printf("After First Convolution\n");
         printf("Inputs;         %10lu\n",inputs);
         printf("conv1_output;   %10lu\n",conv1_output);
         printf("conv1_biases;   %10lu\n",conv1_biases);
         printf("conv1_weights;  %10lu\n",conv1_weights);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc0);
+        #endif
     #endif
 
-
-    // printf("-1 => %10lu\n", conv1_output[0]);
-
-    // printf("mem : 0x%08x\n", conv1_output);
-    // exit(-1);
 
     // conv2
     uint8_t *conv2_output = (uint8_t *)mem + CONV2_MEM_CONT_OFFSET;
@@ -226,16 +214,19 @@ void propagate(const uint8_t *inputs, int32_t *outputs, uint8_t *credence)
 
 
     #ifdef PRINT_OUT
-        crc32(&crc, conv1_output, sizeof(conv1_output));
-        crc32(&crc, conv2_output, sizeof(conv2_output));
-        crc32(&crc, conv2_biases, sizeof(conv2_biases));
-        crc32(&crc, conv2_weights, sizeof(conv2_weights));
+        size_t crc1 = 0x000000;
+        crc32(&crc1, conv1_output, 2160 + CONV1_MEM_CONT_OFFSET);
+        crc32(&crc1, conv2_output, 2160 + CONV2_MEM_CONT_OFFSET);
+        crc32(&crc1, conv2_biases, CONV2_NB_OUTPUTS);
+        crc32(&crc1, conv2_weights, CONV2_WEIGHTS_SIZE);
         printf("After Second Convolution\n");
         printf("Inputs;         %10lu\n",conv1_output);
         printf("conv2_output;   %10lu\n",conv2_output);
         printf("conv2_biases;   %10lu\n",conv2_biases);
         printf("conv2_weights;  %10lu\n",conv2_weights);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc1);
+        #endif
     #endif
 
     // fc1
@@ -253,17 +244,21 @@ void propagate(const uint8_t *inputs, int32_t *outputs, uint8_t *credence)
     );
 
     #ifdef PRINT_OUT
-        crc32(&crc, conv2_output, sizeof(conv2_output));
-        crc32(&crc, fc1_biases, sizeof(fc1_biases));
-        crc32(&crc, fc1_weights, sizeof(fc1_weights));
-        crc32(&crc, fc1_output, sizeof(fc1_output));
+        size_t crc2 = 0x000000;
+        crc32(&crc2, conv2_output, 2160 + CONV2_MEM_CONT_OFFSET);
+        crc32(&crc2, fc1_biases, FC1_OUTPUTS_SIZE);
+        crc32(&crc2, fc1_weights, FC1_WEIGHTS_SIZE);
+        crc32(&crc2, fc1_output, 2160 + FC1_MEM_CONT_OFFSET);
         printf("After Fully Connected 1:\n");
         printf("conv2_output;  %10lu\n",conv2_output);
         printf("fc1_biases;    %10lu\n",fc1_biases);
         printf("fc1_weights;   %10lu\n",fc1_weights);
         printf("fc1_output;    %10lu\n",fc1_output);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc2);
+        #endif
     #endif
+
     // fc2
     int8_t *fc2_output = (int8_t *)mem + FC2_MEM_CONT_OFFSET;
 
@@ -279,27 +274,37 @@ void propagate(const uint8_t *inputs, int32_t *outputs, uint8_t *credence)
     );
      
     #ifdef PRINT_OUT
-        crc32(&crc, fc1_output, sizeof(fc1_output));
-        crc32(&crc, fc2_biases, sizeof(fc2_biases));
-        crc32(&crc, fc2_weights, sizeof(fc2_weights));
-        crc32(&crc, fc2_output, sizeof(fc2_output));
+        size_t crc3 = 0x000000;
+        crc32(&crc3, fc1_output, 2160 + FC1_MEM_CONT_OFFSET);
+        crc32(&crc3, fc2_biases, FC2_OUTPUTS_SIZE);
+        crc32(&crc3, fc2_weights, FC2_WEIGHTS_SIZE);
+        crc32(&crc3, fc2_output, 2160 + FC2_MEM_CONT_OFFSET);
         printf("After Fully Connected 2:\n");
         printf("fc1_output;  %10lu\n",fc1_output);
         printf("fc2_biases;  %10lu\n",fc2_biases);
         printf("fc2_weights; %10lu\n",fc2_weights);
         printf("fc2_output;  %10lu\n",fc2_output);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc3);
+        #endif
     #endif
     argmax(10, fc2_output, outputs, credence);
     
     #ifdef PRINT_OUT
-        crc32(&crc, fc2_output, sizeof(fc2_output));
-        crc32(&crc, outputs, sizeof(outputs));
-        crc32(&crc, credence, sizeof(credence));
+        size_t crc4 =0x000000,crc5 = 0x000000;
+        crc32(&crc4, fc2_output, 2160 + FC2_MEM_CONT_OFFSET);
+        crc32(&crc4, outputs, 1);
+        crc32(&crc4, credence, sizeof(credence));
         printf("After ARGMAX 2:\n");
         printf("fc2_output;  %10lu\n",fc2_output);
         printf("outputs;     %10lu\n",outputs);
         printf("credence;    %10lu\n",credence);
-        printf("crc;            %10lu\n",crc);
+        #ifdef PRINT_EACH_CRC
+            printf("crc;            %x\n",crc4);
+        #endif
+        #ifdef PRINT_LAST_CRC 
+            crc5 = crc4 + crc3 + crc2 + crc1 + crc0;
+            printf("crc_block %x\n",crc5);
+        #endif
     #endif
 }
