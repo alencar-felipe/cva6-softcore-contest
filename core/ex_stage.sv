@@ -20,7 +20,7 @@ module ex_stage
     parameter config_pkg::cva6_cfg_t CVA6Cfg = config_pkg::cva6_cfg_empty,
     parameter int unsigned AsidWidth = 1,
     // Dependent parameters, DO NOT OVERRIDE!
-    parameter int unsigned NrDcachePorts = 3 + CVA6Cfg.CvxifEn
+    parameter int unsigned NrDcachePorts = 2 + CVA6Cfg.CvxifEn
 ) (
     input logic clk_i,        // Clock
     input logic rst_ni,       // Asynchronous reset active low
@@ -354,8 +354,8 @@ module ex_stage
       .flush_tlb_i,
       .itlb_miss_o,
       .dtlb_miss_o,
-      .dcache_req_o(dcache_req_o[2:0]),
-      .dcache_rsp_i(dcache_rsp_i[2:0]),
+      .dcache_req_o(dcache_req_o[0]),
+      .dcache_rsp_i(dcache_rsp_i[0]),
       .dcache_wbuffer_empty_i,
       .dcache_wbuffer_not_ni_i,
       .amo_valid_commit_i,
@@ -390,8 +390,8 @@ module ex_stage
         .x_we_o,
         .cvxif_req_o,
         .cvxif_resp_i,
-        .dcache_req_o(dcache_req_o[3]),
-        .dcache_rsp_i(dcache_rsp_i[3])
+        .dcache_req_o(dcache_req_o[1]),
+        .dcache_rsp_i(dcache_rsp_i[1])
     );
   end
   else begin : gen_no_cvxif
@@ -400,7 +400,11 @@ module ex_stage
     assign x_exception_o = '0;
     assign x_result_o    = '0;
     assign x_valid_o     = '0;
+
+    assign dcache_req_o[1] = '0;
   end
+
+  assign dcache_req_o[2] = '0;
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (~rst_ni) begin
