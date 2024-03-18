@@ -58,6 +58,7 @@ add_benchmark(mnist)
 add_benchmark(mnist_adac)
 add_benchmark(mnist_base)
 add_benchmark(mnist_clean)
+add_benchmark(mnist_rvv)
 
 set(GITIGNORE_FILE "${CMAKE_BINARY_DIR}/.gitignore")
 if(NOT EXISTS "${GITIGNORE_FILE}")
