@@ -24,8 +24,6 @@ int main() {
     printf(TAG "Validation Run\n");
 #endif
 
-    ASSERT(__riscv_vsetvl_e32m1(VL) == VL);
-
     vint32m1_t a, b, c;
 
     a = __riscv_vle32_v_i32m1(a_mem, VL);

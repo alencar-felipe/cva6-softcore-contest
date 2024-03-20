@@ -112,6 +112,7 @@ RUN git clone https://github.com/riscv/riscv-isa-sim.git && \
     ../configure --prefix=/opt/riscv \
         --enable-histogram \
         --with-isa=rv32gcv \
+        --with-varch=vlen:128,elen:32 \
     && make -j$(nproc) && \
     make install && \
     cd ../.. && rm -rf riscv-isa-sim
@@ -119,11 +120,11 @@ RUN git clone https://github.com/riscv/riscv-isa-sim.git && \
 # Install RISC-V pk
 RUN git clone https://github.com/riscv-software-src/riscv-pk.git && \
     cd riscv-pk && \
-    git checkout fafaedd2825054222ce2874bf4a90164b5b071d4 && \
+    git checkout f03685954e825a974e59f278b5c8647440291fc7 && \
     mkdir build/ && cd build/ && \
     ../configure --prefix=/opt/riscv \
         --host=riscv32-unknown-elf \
-        --with-arch=rv32gcv \
+        --with-arch=rv32gc \
     && make -j$(nproc) && \
     make install && \
     cd ../.. && rm -rf riscv-pk
