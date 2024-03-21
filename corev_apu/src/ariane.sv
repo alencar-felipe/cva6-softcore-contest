@@ -91,7 +91,7 @@ module ariane import ariane_pkg::*; #(
   // end
 
   if (CVA6Cfg.CvxifEn) begin : gen_vicuna
-    
+
     vproc_xif #(
       .X_NUM_RS    (X_NUM_RS),
       .X_ID_WIDTH  (X_ID_WIDTH),
@@ -104,20 +104,20 @@ module ariane import ariane_pkg::*; #(
     // Compressed =============================================================
 
     assign x_compressed_ready = '0;
-    
+
     assign x_compressed_resp = '0;
 
     // Issue ==================================================================
 
     assign vproc_xif.issue_valid = cvxif_req.x_issue_valid;
     assign cvxif_resp.x_issue_ready = vproc_xif.issue_ready;
-    
+
     assign vproc_xif.issue_req.instr    = cvxif_req.x_issue_req.instr;
     assign vproc_xif.issue_req.mode     = cvxif_req.x_issue_req.mode;
     assign vproc_xif.issue_req.id       = cvxif_req.x_issue_req.id;
     assign vproc_xif.issue_req.rs       = cvxif_req.x_issue_req.rs;
     assign vproc_xif.issue_req.rs_valid = cvxif_req.x_issue_req.rs_valid;
-    
+
     assign cvxif_resp.x_issue_resp.accept    = vproc_xif.issue_resp.accept;
     assign cvxif_resp.x_issue_resp.writeback = vproc_xif.issue_resp.writeback;
     assign cvxif_resp.x_issue_resp.dualwrite = vproc_xif.issue_resp.dualwrite;
@@ -128,7 +128,7 @@ module ariane import ariane_pkg::*; #(
     // Commit =================================================================
 
     assign vproc_xif.commit_valid = cvxif_req.x_commit_valid;
-    
+
     assign vproc_xif.commit.id          = cvxif_req.x_commit.id;
     assign vproc_xif.commit.commit_kill = cvxif_req.x_commit.x_commit_kill;
 
@@ -136,7 +136,7 @@ module ariane import ariane_pkg::*; #(
 
     assign cvxif_resp.x_mem_valid = vproc_xif.mem_valid;
     assign vproc_xif.mem_ready = cvxif_req.x_mem_ready;
-    
+
     assign cvxif_resp.x_mem_req.id    = vproc_xif.mem_req.id;
     assign cvxif_resp.x_mem_req.addr  = vproc_xif.mem_req.addr;
     assign cvxif_resp.x_mem_req.mode  = vproc_xif.mem_req.mode;
@@ -147,7 +147,7 @@ module ariane import ariane_pkg::*; #(
     assign cvxif_resp.x_mem_req.wdata = vproc_xif.mem_req.wdata;
     assign cvxif_resp.x_mem_req.last  = vproc_xif.mem_req.last;
     assign cvxif_resp.x_mem_req.spec  = vproc_xif.mem_req.spec;
-    
+
     assign vproc_xif.mem_resp.exc     = cvxif_req.x_mem_resp.exc;
     assign vproc_xif.mem_resp.exccode = cvxif_req.x_mem_resp.exccode;
     assign vproc_xif.mem_resp.dbg     = '0;
@@ -155,7 +155,7 @@ module ariane import ariane_pkg::*; #(
     // Memory result ==========================================================
 
     assign vproc_xif.mem_result_valid = cvxif_req.x_mem_result_valid;
-    
+
     assign vproc_xif.mem_result.id    = cvxif_req.x_mem_result.id;
     assign vproc_xif.mem_result.rdata = cvxif_req.x_mem_result.rdata;
     assign vproc_xif.mem_result.err   = cvxif_req.x_mem_result.err;
@@ -164,7 +164,7 @@ module ariane import ariane_pkg::*; #(
 
     assign cvxif_resp.x_result_valid = vproc_xif.result_valid;
     assign vproc_xif.result_ready = cvxif_req.x_result_ready;
-    
+
     assign cvxif_resp.x_result.id       = vproc_xif.result.id;
     assign cvxif_resp.x_result.data     = vproc_xif.result.data;
     assign cvxif_resp.x_result.rd       = vproc_xif.result.rd;
@@ -195,7 +195,7 @@ module ariane import ariane_pkg::*; #(
       .csr_vl_o         (),
       .csr_vlenb_o      (),
       .csr_vstart_o     (),
-      .csr_vstart_i     (),
+      .csr_vstart_i     ('0),
       .csr_vstart_set_i ('0),
       .csr_vxrm_o       (),
       .csr_vxrm_i       ('0),

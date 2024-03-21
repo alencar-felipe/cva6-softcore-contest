@@ -129,6 +129,10 @@ module wt_cache_subsystem
         dcache_rsp_ports_o[i] = dcache_rsp_read[i];
       end
 
+      // Tag passthrough (tag_valid is not asserted in writes)
+      dcache_req_read[i].address_tag = dcache_req_ports_i[i].address_tag;
+      dcache_req_read[i].tag_valid   = dcache_req_ports_i[i].tag_valid;
+
       // Read result passthrough (Write does not generate a result)
       dcache_rsp_ports_o[i].data_rvalid = dcache_rsp_read[i].data_rvalid;
       dcache_rsp_ports_o[i].data_rid    = dcache_rsp_read[i].data_rid;

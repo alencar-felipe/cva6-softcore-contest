@@ -17,7 +17,7 @@ module cvxif_dcache_adapter
     output logic          x_mem_result_valid_o,
 
     output dcache_req_t dcache_req_o,
-    output dcache_rsp_t dcache_rsp_i
+    input  dcache_rsp_t dcache_rsp_i
 );
 
   typedef logic [DCACHE_TAG_WIDTH-1:0] address_tag_t;
@@ -27,8 +27,11 @@ module cvxif_dcache_adapter
   logic         outstanding_d, outstanding_q;
 
   always_comb begin
-    x_mem_resp_o = '0;
-    dcache_req_o = '0;
+    x_mem_resp_o         = '0;
+    x_mem_ready_o        = '0;
+    x_mem_result_o       = '0;
+    x_mem_result_valid_o = '0;
+    dcache_req_o         = '0;
 
     tag_valid_d   = tag_valid_q;
     req_buffer_d  = req_buffer_q;
@@ -61,7 +64,7 @@ module cvxif_dcache_adapter
 
     // Tag ====================================================================
 
-    if (tag_valid_d) begin
+    if (tag_valid_q) begin
       dcache_req_o.address_tag = req_buffer_d.addr[VLEN-1:DCACHE_INDEX_WIDTH];
       dcache_req_o.tag_valid = 1;
       tag_valid_d = '0;
@@ -69,7 +72,10 @@ module cvxif_dcache_adapter
 
     // Req / Resp =============================================================
 
-    if (x_mem_valid_i && !outstanding_d) begin
+    if (
+      (x_mem_valid_i && !outstanding_d) &&
+      (!tag_valid_q || !x_mem_req_i.we)
+    ) begin
       dcache_req_o.address_index = x_mem_req_i.addr[DCACHE_INDEX_WIDTH-1:0];
       dcache_req_o.data_wdata    = x_mem_req_i.wdata;
       dcache_req_o.data_wuser    = '0;
@@ -86,12 +92,17 @@ module cvxif_dcache_adapter
         default:                            dcache_req_o.data_size = 2'b11;
       endcase
 
+      if (x_mem_req_i.we) begin
+        dcache_req_o.address_tag = req_buffer_d.addr[VLEN-1:DCACHE_INDEX_WIDTH];
+      end
+
       x_mem_resp_o.exc     = '0;
       x_mem_resp_o.exccode = '0;
 
       if (dcache_rsp_i.data_gnt) begin
         req_buffer_d  = x_mem_req_i;
-        tag_valid_d   = '1;
+        tag_valid_d   = !x_mem_req_i.we;
+        outstanding_d = '1;
         x_mem_ready_o = '1;
       end
     end
