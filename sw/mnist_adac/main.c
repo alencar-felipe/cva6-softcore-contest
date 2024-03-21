@@ -34,6 +34,7 @@ void experiments(void)
 
     printf("experiments end\n");
 }
+
 void readStimulus(
                   UDATA_T* inputBuffer,
                   Target_T* expectedOutputBuffer)
@@ -84,6 +85,8 @@ int main(int argc, char* argv[]) {
     Target_T expectedOutputBuffer[OUTPUTS_SIZE[0]];
     Target_T predictedOutputBuffer[OUTPUTS_SIZE[0]];
     UDATA_T output_value;
+
+    printf("IM ALIVE\n");
 
     readStimulus(inputBuffer, expectedOutputBuffer);
 

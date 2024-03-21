@@ -12,60 +12,61 @@
 
 module cvxif_fu
   import ariane_pkg::*;
+  import riscv::*;
 #(
     parameter config_pkg::cva6_cfg_t CVA6Cfg = config_pkg::cva6_cfg_empty
 ) (
-    input  logic                                       clk_i,
-    input  logic                                       rst_ni,
-    input  fu_data_t                                   fu_data_i,
-    input  riscv::priv_lvl_t                           priv_lvl_i,
+    input  logic             clk_i,
+    input  logic             rst_ni,
+    input  fu_data_t         fu_data_i,
+    input  riscv::priv_lvl_t priv_lvl_i,
     //from issue
-    input  logic                                       x_valid_i,
-    output logic                                       x_ready_o,
-    input  logic                   [             31:0] x_off_instr_i,
+    input  logic        x_valid_i,
+    output logic        x_ready_o,
+    input  logic [31:0] x_off_instr_i,
     //to writeback
-    output logic                   [TRANS_ID_BITS-1:0] x_trans_id_o,
-    output exception_t                                 x_exception_o,
-    output riscv::xlen_t                               x_result_o,
-    output logic                                       x_valid_o,
-    output logic                                       x_we_o,
+    output logic         [TRANS_ID_BITS-1:0] x_trans_id_o,
+    output exception_t                       x_exception_o,
+    output riscv::xlen_t                     x_result_o,
+    output logic                             x_valid_o,
+    output logic                             x_we_o,
     //to coprocessor
-    output cvxif_pkg::cvxif_req_t                      cvxif_req_o,
-    input  cvxif_pkg::cvxif_resp_t                     cvxif_resp_i
+    output cvxif_pkg::cvxif_req_t  cvxif_req_o,
+    input  cvxif_pkg::cvxif_resp_t cvxif_resp_i,
+    //dcache
+    output dcache_req_t dcache_req_o,
+    input  dcache_rsp_t dcache_rsp_i
 );
-  localparam X_NUM_RS     = ariane_pkg::NR_RGPR_PORTS;
+
+  localparam int unsigned NumRs = cvxif_pkg::X_NUM_RS;
 
   logic illegal_n, illegal_q;
   logic [TRANS_ID_BITS-1:0] illegal_id_n, illegal_id_q;
   logic [31:0] illegal_instr_n, illegal_instr_q;
-  logic [X_NUM_RS-1:0] rs_valid;
+  logic [NumRs-1:0] rs_valid;
 
-  if (cvxif_pkg::X_NUM_RS == 3) begin : gen_third_operand
+  assign cvxif_req_o.x_result_ready = 1'b1;
+  assign x_ready_o = cvxif_resp_i.x_issue_ready;
+
+  assign cvxif_req_o.x_issue_valid     = x_valid_i;
+  assign cvxif_req_o.x_issue_req.instr = x_off_instr_i;
+  assign cvxif_req_o.x_issue_req.mode  = priv_lvl_i;
+  assign cvxif_req_o.x_issue_req.id    = fu_data_i.trans_id;
+  assign cvxif_req_o.x_issue_req.rs[0] = fu_data_i.operand_a;
+  assign cvxif_req_o.x_issue_req.rs[1] = fu_data_i.operand_b;
+
+  if (NumRs == 3) begin : gen_rs3
+    assign cvxif_req_o.x_issue_req.rs[2] = fu_data_i.imm;
     assign rs_valid = 3'b111;
-  end else begin : gen_no_third_operand
+  end
+  else begin : gen_rs2
     assign rs_valid = 2'b11;
   end
 
-  always_comb begin
-    cvxif_req_o = '0;
-    cvxif_req_o.x_result_ready = 1'b1;
-    x_ready_o = cvxif_resp_i.x_issue_ready;
-    if (x_valid_i) begin
-      cvxif_req_o.x_issue_valid     = x_valid_i;
-      cvxif_req_o.x_issue_req.instr = x_off_instr_i;
-      cvxif_req_o.x_issue_req.mode  = priv_lvl_i;
-      cvxif_req_o.x_issue_req.id    = fu_data_i.trans_id;
-      cvxif_req_o.x_issue_req.rs[0] = fu_data_i.operand_a;
-      cvxif_req_o.x_issue_req.rs[1] = fu_data_i.operand_b;
-      if (cvxif_pkg::X_NUM_RS == 3) begin
-        cvxif_req_o.x_issue_req.rs[2] = fu_data_i.imm;
-      end
-      cvxif_req_o.x_issue_req.rs_valid   = rs_valid;
-      cvxif_req_o.x_commit_valid         = x_valid_i;
-      cvxif_req_o.x_commit.id            = fu_data_i.trans_id;
-      cvxif_req_o.x_commit.x_commit_kill = 1'b0;
-    end
-  end
+  assign cvxif_req_o.x_issue_req.rs_valid   = rs_valid;
+  assign cvxif_req_o.x_commit_valid         = x_valid_i;
+  assign cvxif_req_o.x_commit.id            = fu_data_i.trans_id;
+  assign cvxif_req_o.x_commit.x_commit_kill = 1'b0;
 
   always_comb begin
     illegal_n       = illegal_q;
@@ -108,5 +109,23 @@ module cvxif_fu
       illegal_instr_q <= illegal_instr_n;
     end
   end
+
+  cvxif_dcache_adapter #(
+      .CVA6Cfg (CVA6Cfg)
+  ) i_cvxif_dcache_adapter (
+      .rst_ni,
+      .clk_i,
+
+      .x_mem_req_i  (cvxif_resp_i.x_mem_req),
+      .x_mem_resp_o (cvxif_req_o.x_mem_resp),
+      .x_mem_valid_i(cvxif_resp_i.x_mem_valid),
+      .x_mem_ready_o(cvxif_req_o.x_mem_ready),
+
+      .x_mem_result_o      (cvxif_req_o.x_mem_result),
+      .x_mem_result_valid_o(cvxif_req_o.x_mem_result_valid),
+
+      .dcache_req_o,
+      .dcache_rsp_i
+  );
 
 endmodule

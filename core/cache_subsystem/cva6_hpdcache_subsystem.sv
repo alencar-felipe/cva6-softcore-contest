@@ -60,8 +60,8 @@ module cva6_hpdcache_subsystem
     input  cmo_req_t                                 dcache_cmo_req_i,    // from CMO FU
     output cmo_rsp_t                                 dcache_cmo_resp_o,   // to CMO FU
     //  Request ports
-    input  ariane_pkg::dcache_req_i_t [NumPorts-1:0] dcache_req_ports_i,  // from LSU
-    output ariane_pkg::dcache_req_o_t [NumPorts-1:0] dcache_req_ports_o,  // to LSU
+    input  ariane_pkg::dcache_req_t [NumPorts-1:0] dcache_req_ports_i,  // from LSU
+    output ariane_pkg::dcache_rsp_t [NumPorts-1:0] dcache_rsp_ports_o,  // to LSU
     //  Write Buffer status
     output logic                                     wbuffer_empty_o,
     output logic                                     wbuffer_not_ni_o,
@@ -208,7 +208,7 @@ module cva6_hpdcache_subsystem
   hwpf_stride_pkg::hwpf_stride_throttle_t [NrHwPrefetchers-1:0] hwpf_throttle_out;
 
   generate
-    ariane_pkg::dcache_req_i_t dcache_req_ports[HPDCACHE_NREQUESTERS-1:0];
+    ariane_pkg::dcache_req_t dcache_req_ports[HPDCACHE_NREQUESTERS-1:0];
 
     for (genvar r = 0; r < (NumPorts - 1); r++) begin : cva6_hpdcache_load_if_adapter_gen
       assign dcache_req_ports[r] = dcache_req_ports_i[r];
@@ -223,7 +223,7 @@ module cva6_hpdcache_subsystem
           .hpdcache_req_sid_i(hpdcache_pkg::hpdcache_req_sid_t'(r)),
 
           .cva6_req_i     (dcache_req_ports[r]),
-          .cva6_req_o     (dcache_req_ports_o[r]),
+          .cva6_rsp_o     (dcache_rsp_ports_o[r]),
           .cva6_amo_req_i ('0),
           .cva6_amo_resp_o(  /* unused */),
 
@@ -249,7 +249,7 @@ module cva6_hpdcache_subsystem
         .hpdcache_req_sid_i(hpdcache_pkg::hpdcache_req_sid_t'(NumPorts - 1)),
 
         .cva6_req_i     (dcache_req_ports_i[NumPorts-1]),
-        .cva6_req_o     (dcache_req_ports_o[NumPorts-1]),
+        .cva6_req_o     (dcache_rsp_ports_o[NumPorts-1]),
         .cva6_amo_req_i (dcache_amo_req_i),
         .cva6_amo_resp_o(dcache_amo_resp_o),
 
@@ -594,13 +594,13 @@ module cva6_hpdcache_subsystem
   for (genvar j = 0; j < 2; j++) begin : gen_assertion
     a_invalid_read_data :
     assert property (
-      @(posedge clk_i) disable iff (!rst_ni) dcache_req_ports_o[j].data_rvalid && ~dcache_req_ports_i[j].kill_req |-> (|dcache_req_ports_o[j].data_rdata) !== 1'hX)
+      @(posedge clk_i) disable iff (!rst_ni) dcache_rsp_ports[j].data_rvalid && ~dcache_req_ports_i[j].kill_req |-> (|dcache_rsp_ports[j].data_rdata) !== 1'hX)
     else
       $warning(
           1,
           "[l1 dcache] reading invalid data on port %01d: data=%016X",
           j,
-          dcache_req_ports_o[j].data_rdata
+          dcache_rsp_ports[j].data_rdata
       );
   end
   //  pragma translate_on

@@ -52,10 +52,10 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
   input  logic [63:0]   act_paddr_i,
 
   // interface to DUT
-  output logic          flush_o,
-  input  logic          flush_ack_i,
-  output dcache_req_i_t dut_req_port_o,
-  input  dcache_req_o_t dut_req_port_i
+  output logic        flush_o,
+  input  logic        flush_ack_i,
+  output dcache_req_t dut_req_port_o,
+  input  dcache_rsp_t dut_rsp_port_i
 );
 
   // leave this
@@ -97,10 +97,9 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
           tag_vld_q <= 1'b1;
         end else begin
           tag_vld_q <= 1'b0;
-        end
-
-        `APPL_ACQ_WAIT;
-        if(dut_req_port_i.data_gnt) begin
+      end
+       `APPL_ACQ_WAIT;
+        if(dut_rsp_port_i.data_gnt) begin
           tmp_paddr = paddr;
           tmp_vld   = 1;
 
@@ -181,10 +180,8 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
               2'b01: paddr[0]   = 1'b0;
               2'b10: paddr[1:0] = 2'b00;
               2'b11: paddr[2:0] = 3'b000;
-              default: ;
-            endcase
-
-            `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+              defau  ;
+            endcase            `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
           end
           `APPL_WAIT_CYC(clk_i,1)
         end
@@ -207,10 +204,8 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
     while(~seq_end_req) begin
       dut_req_port_o.data_req  = 1'b1;
       dut_req_port_o.data_size = 2'b11;
-      paddr = val;
-      // generate linear read
-      val = (val + 8) % (MemWords<<3);
-      `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+      paddr = val;     // generate linear re      val = (val + 8) % (MemWords<<3);
+      `APPL_WAIT_CO MB_SIG(clk_i, dut_rsp_port_i.data_gnt)
       `APPL_WAIT_CYC(clk_i,1)
     end
     dut_req_port_o.data_req      = '0;
@@ -230,10 +225,9 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
       void'(randomize(rnd) with {rnd > 0; rnd <= 100;});
       if(rnd < req_rate_i) begin
         dut_req_port_o.data_req  = 1'b1;
-        dut_req_port_o.data_size = 2'b11;
-        paddr = val;
-        // generate linear read
-        `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+        dut_req_port data_size = 2'b11;
+        paddr = val;       // generate linear read
+        `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
         // increment by set size
         val = (val + 2 ** DCACHE_INDEX_WIDTH) % (MemWords<<3);
       end
@@ -256,10 +250,10 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
       dut_req_port_o.data_req  = 1'b1;
       dut_req_port_o.data_size = 2'b11;
       paddr = val;
-      // generate wrapping read of 1 cachelines
-      paddr = CachedAddrBeg + val;
+      // generate wrapping  d of 1 cachelines
+      paddr = CachedAddrBegv al;
       val = (val + 8) % (1*(DCACHE_LINE_WIDTH/64)*8);
-      `APPL_WAIT_COMB_SIG(clk_i, dut_req_port_i.data_gnt)
+      `APPL_WAIT_COMB_SIG(clk_i, dut_rsp_port_i.data_gnt)
       `APPL_WAIT_CYC(clk_i,1)
     end
     dut_req_port_o.data_req      = '0;
@@ -360,10 +354,10 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
       `ACQ_WAIT_SIG(clk_i,seq_run_i)
       seq_done_o = 1'b0;
 
-      $display("%s> %s", PortName, test_name_i);
-      status.reset(seq_num_resp_i);
+      $display("%s> %s", rtName, test_name_i);
+      status.reset(seq_nr esp_i);
       for (int k=0;k<seq_num_resp_i && seq_type_i != IDLE_SEQ;k++) begin
-        `ACQ_WAIT_SIG(clk_i, (dut_req_port_i.data_rvalid & ~dut_req_port_o.kill_req))
+        `ACQ_WAIT_SIG(clk_i, (dut_rsp_port_i.data_rvalid & ~dut_req_port_o.kill_req))
 
         exp_rdata = 'x;
         unique case(exp_size_i)
@@ -371,16 +365,15 @@ program tb_readport  import tb_pkg::*; import ariane_pkg::*; #(
           2'b01: exp_rdata[exp_paddr_i[2:1]*16 +: 16] = exp_rdata_i[exp_paddr_i[2:1]*16 +: 16];
           2'b10: exp_rdata[exp_paddr_i[2]  *32 +: 32] = exp_rdata_i[exp_paddr_i[2]  *32 +: 32];
           2'b11: exp_rdata                            = exp_rdata_i;
-        endcase // exp_size
-
-        // note: wildcard as defined in right operand!
-        ok=(dut_req_port_i.data_rdata ==? exp_rdata) && (exp_paddr_i == act_paddr_i);
+      endcase // exp_size
+       // note: wildcard as defined in right operand!
+        ok=(dut_rsp_port_i.data_rdata ==? exp_rdata) && (exp_paddr_i == act_paddr_i);
 
         if(Verbose | !ok) begin
-          tmpstr1 =  $psprintf("vector: %02d - %06d -- exp_paddr: %16X -- exp_data: %16X -- access size: %01d Byte",
-                      n, k, exp_paddr_i, exp_rdata, 2**exp_size_i);
+          tmpstr1 =  $psprintf("vec : %02d - %06d -- exp_paddr: %16X -- exp_data: %16X -- access size: %01d Byte",
+                      n, k, exp_padi , exp_rdata, 2**exp_size_i);
           tmpstr2 =  $psprintf("vector: %02d - %06d -- act_paddr: %16X -- act_data: %16X -- access size: %01d Byte",
-                      n, k, act_paddr_i, dut_req_port_i.data_rdata, 2**exp_size_i);
+                      n, k, act_paddr_i, dut_rsp_port_i.data_rdata, 2**exp_size_i);
           $display("%s> %s", PortName, tmpstr1);
           $display("%s> %s", PortName, tmpstr2);
         end

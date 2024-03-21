@@ -40,8 +40,8 @@ module cva6_mmu_sv32
     input logic enable_translation_i,
     input logic en_ld_st_translation_i,  // enable virtual memory translation for load/stores
     // IF interface
-    input icache_arsp_t icache_areq_i,
     output icache_areq_t icache_areq_o,
+    input  icache_arsp_t icache_arsp_i,
     // LSU interface
     // this is a more minimalistic interface because the actual addressing logic is handled
     // in the LSU as we distinguish load and stores, what we do here is simple address translation
@@ -72,8 +72,8 @@ module cva6_mmu_sv32
     output logic itlb_miss_o,
     output logic dtlb_miss_o,
     // PTW memory interface
-    input dcache_req_o_t req_port_i,
-    output dcache_req_i_t req_port_o,
+    output dcache_req_t req_port_o,
+    input  dcache_rsp_t rsp_port_i,
     // PMP
     input riscv::pmpcfg_t [15:0] pmpcfg_i,
     input logic [15:0][riscv::PLEN-3:0] pmpaddr_i
@@ -108,7 +108,7 @@ module cva6_mmu_sv32
 
 
   // Assignments
-  assign itlb_lu_access = icache_areq_i.fetch_req;
+  assign itlb_lu_access = icache_arsp_i.fetch_req;
   assign dtlb_lu_access = lsu_req_i;
 
 
@@ -127,7 +127,7 @@ module cva6_mmu_sv32
       .lu_asid_i            (asid_i),
       .asid_to_be_flushed_i (asid_to_be_flushed_i),
       .vaddr_to_be_flushed_i(vaddr_to_be_flushed_i),
-      .lu_vaddr_i           (icache_areq_i.fetch_vaddr),
+      .lu_vaddr_i           (icache_arsp_i.fetch_vaddr),
       .lu_content_o         (itlb_content),
 
       .lu_is_4M_o(itlb_is_4M),
@@ -174,7 +174,7 @@ module cva6_mmu_sv32
       // did we miss?
       .itlb_access_i(itlb_lu_access),
       .itlb_hit_i   (itlb_lu_hit),
-      .itlb_vaddr_i (icache_areq_i.fetch_vaddr),
+      .itlb_vaddr_i (icache_arsp_i.fetch_vaddr),
 
       .dtlb_access_i(dtlb_lu_access),
       .dtlb_hit_i   (dtlb_lu_hit),
@@ -211,9 +211,9 @@ module cva6_mmu_sv32
       .ptw_access_exception_o(ptw_access_exception),
 
       .lsu_is_store_i(lsu_is_store_i),
-      // PTW memory interface
-      .req_port_i    (req_port_i),
-      .req_port_o    (req_port_o),
+      // PTW memory inte rface
+      .req_port_o (req_port_o),
+      .rsp_port_i (rsp_port_i),
 
       // to Shared TLB, update logic
       .shared_tlb_update_o(update_shared_tlb),
@@ -248,9 +248,9 @@ module cva6_mmu_sv32
   //     .clk(clk_i), // input wire clk
   //     .probe0({req_port_o.address_tag, req_port_o.address_index}),
   //     .probe1(req_port_o.data_req), // input wire [63:0]  probe1
-  //     .probe2(req_port_i.data_gnt), // input wire [0:0]  probe2
-  //     .probe3(req_port_i.data_rdata), // input wire [0:0]  probe3
-  //     .probe4(req_port_i.data_rvalid), // input wire [0:0]  probe4
+  //      .probe2(rsp_port_i.data_gnt), // input wire [0:0]  probe2
+  //      .probe3(rsp_port_i.data_rdata), // input wire [0:0]  probe3
+  //      .probe4(rsp_port_i.data_rvalid), // input wire [0:0]  probe4
   //     .probe5(ptw_error), // input wire [1:0]  probe5
   //     .probe6(update_vaddr), // input wire [0:0]  probe6
   //     .probe7(update_itlb.valid), // input wire [0:0]  probe7
@@ -259,7 +259,7 @@ module cva6_mmu_sv32
   //     .probe10(lsu_vaddr_i), // input wire [0:0]  probe10
   //     .probe11(dtlb_lu_hit), // input wire [0:0]  probe11
   //     .probe12(itlb_lu_access), // input wire [0:0]  probe12
-  //     .probe13(icache_areq_i.fetch_vaddr), // input wire [0:0]  probe13
+  //     .probe13(icache_arsp_i.fetch_vaddr), // input wire [0:0]  probe13
   //     .probe14(itlb_lu_hit) // input wire [0:0]  probe13
   // );
 
@@ -272,19 +272,19 @@ module cva6_mmu_sv32
   // The instruction interface is a simple request response interface
   always_comb begin : instr_interface
     // MMU disabled: just pass through
-    icache_areq_o.fetch_valid = icache_areq_i.fetch_req;
+    icache_areq_o.fetch_valid = icache_arsp_i.fetch_req;
     if (riscv::PLEN > riscv::VLEN)
       icache_areq_o.fetch_paddr = {
-        {riscv::PLEN - riscv::VLEN{1'b0}}, icache_areq_i.fetch_vaddr
+        {riscv::PLEN - riscv::VLEN{1'b0}}, icache_arsp_i.fetch_vaddr
       };  // play through in case we disabled address translation
     else
-      icache_areq_o.fetch_paddr = {2'b00, icache_areq_i.fetch_vaddr[riscv::VLEN-1:0]};// play through in case we disabled address translation
+      icache_areq_o.fetch_paddr = {2'b00, icache_arsp_i.fetch_vaddr[riscv::VLEN-1:0]};// play through in case we disabled address translation
     // two potential exception sources:
     // 1. HPTW threw an exception -> signal with a page fault exception
     // 2. We got an access error because of insufficient permissions -> throw an access exception
     icache_areq_o.fetch_exception = '0;
     // Check whether we are allowed to access this memory region from a fetch perspective
-    iaccess_err   = icache_areq_i.fetch_req && (((priv_lvl_i == riscv::PRIV_LVL_U) && ~itlb_content.u)
+    iaccess_err   = icache_arsp_i.fetch_req && (((priv_lvl_i == riscv::PRIV_LVL_U) && ~itlb_content.u)
                                                  || ((priv_lvl_i == riscv::PRIV_LVL_S) && itlb_content.u));
 
     // MMU enabled: address from TLB, request delayed until hit. Error when TLB
@@ -293,10 +293,10 @@ module cva6_mmu_sv32
     // an error.
     if (enable_translation_i) begin
       // we work with SV32, so if VM is enabled, check that all bits [riscv::VLEN-1:riscv::SV-1] are equal
-      if (icache_areq_i.fetch_req && !((&icache_areq_i.fetch_vaddr[riscv::VLEN-1:riscv::SV-1]) == 1'b1 || (|icache_areq_i.fetch_vaddr[riscv::VLEN-1:riscv::SV-1]) == 1'b0)) begin
+      if (icache_arsp_i.fetch_req && !((&icache_arsp_i.fetch_vaddr[riscv::VLEN-1:riscv::SV-1]) == 1'b1 || (|icache_arsp_i.fetch_vaddr[riscv::VLEN-1:riscv::SV-1]) == 1'b0)) begin
         icache_areq_o.fetch_exception = {
           riscv::INSTR_ACCESS_FAULT,
-          {{riscv::XLEN - riscv::VLEN{1'b0}}, icache_areq_i.fetch_vaddr},
+          {{riscv::XLEN - riscv::VLEN{1'b0}}, icache_arsp_i.fetch_vaddr},
           1'b1
         };
       end
@@ -304,10 +304,10 @@ module cva6_mmu_sv32
       icache_areq_o.fetch_valid = 1'b0;
 
       // 4K page
-      icache_areq_o.fetch_paddr = {itlb_content.ppn, icache_areq_i.fetch_vaddr[11:0]};
+      icache_areq_o.fetch_paddr = {itlb_content.ppn, icache_arsp_i.fetch_vaddr[11:0]};
       // Mega page
       if (itlb_is_4M) begin
-        icache_areq_o.fetch_paddr[21:12] = icache_areq_i.fetch_vaddr[21:12];
+        icache_areq_o.fetch_paddr[21:12] = icache_arsp_i.fetch_vaddr[21:12];
       end
 
 
@@ -316,18 +316,18 @@ module cva6_mmu_sv32
       // --------
       // if we hit the ITLB output the request signal immediately
       if (itlb_lu_hit) begin
-        icache_areq_o.fetch_valid = icache_areq_i.fetch_req;
+        icache_areq_o.fetch_valid = icache_arsp_i.fetch_req;
         // we got an access error
         if (iaccess_err) begin
           // throw a page fault
           icache_areq_o.fetch_exception = {
             riscv::INSTR_PAGE_FAULT,
-            {{riscv::XLEN - riscv::VLEN{1'b0}}, icache_areq_i.fetch_vaddr},
+            {{riscv::XLEN - riscv::VLEN{1'b0}}, icache_arsp_i.fetch_vaddr},
             1'b1
           };  //to check on wave --> not connected
         end else if (!pmp_instr_allow) begin
           icache_areq_o.fetch_exception = {
-            riscv::INSTR_ACCESS_FAULT, icache_areq_i.fetch_vaddr, 1'b1
+            riscv::INSTR_ACCESS_FAULT, icache_arsp_i.fetch_vaddr, 1'b1
           };  //to check on wave --> not connected
         end
       end else

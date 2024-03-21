@@ -48,7 +48,7 @@ module load_store_unit
     input logic en_ld_st_translation_i, // enable virtual memory translation for load/stores
 
     // icache translation requests
-    input  icache_arsp_t icache_areq_i,
+    input  icache_arsp_t icache_arsp_i,
     output icache_areq_t icache_areq_o,
 
     input  riscv::priv_lvl_t                   priv_lvl_i,             // From CSR register file
@@ -65,10 +65,10 @@ module load_store_unit
     output logic                               dtlb_miss_o,
 
     // interface to dcache
-    input  dcache_req_o_t  [ 2:0]                  dcache_req_ports_i,
-    output dcache_req_i_t  [ 2:0]                  dcache_req_ports_o,
-    input  logic                                   dcache_wbuffer_empty_i,
-    input  logic                                   dcache_wbuffer_not_ni_i,
+    output dcache_req_t dcache_req_o,
+    input  dcache_rsp_t dcache_rsp_i,
+    input  logic        dcache_wbuffer_empty_i,
+    input  logic        dcache_wbuffer_not_ni_i,
     // AMO interface
     output amo_req_t                               amo_req_o,
     input  amo_resp_t                              amo_resp_i,
@@ -83,6 +83,49 @@ module load_store_unit
     output [          (riscv::XLEN/8)-1:0] lsu_wmask_o,
     output [ariane_pkg::TRANS_ID_BITS-1:0] lsu_addr_trans_id_o
 );
+
+  // D$ multiplexer ===========================================================
+
+  dcache_req_t mmu_dcache_req;
+  dcache_rsp_t mmu_dcache_rsp;
+
+  dcache_req_t store_dcache_req;
+  dcache_rsp_t store_dcache_rsp;
+
+  dcache_req_t load_dcache_req;
+  dcache_rsp_t load_dcache_rsp;
+
+  assign mmu_dcache_rsp = '0;
+
+  always_comb begin
+    if (load_dcache_req.data_req || load_dcache_req.tag_valid) begin
+        dcache_req_o = load_dcache_req;
+        store_dcache_rsp = '0;
+        load_dcache_rsp = dcache_rsp_i;
+    end
+    else begin
+      dcache_req_o = store_dcache_req;
+      store_dcache_rsp = dcache_rsp_i;
+      load_dcache_rsp = '0;
+    end
+
+    store_dcache_rsp.data_rvalid = '0;
+    store_dcache_rsp.data_rid    = '0;
+    store_dcache_rsp.data_rdata  = '0;
+    store_dcache_rsp.data_ruser  = '0;
+
+    load_dcache_rsp.data_rvalid = dcache_rsp_i.data_rvalid;
+    load_dcache_rsp.data_rid    = dcache_rsp_i.data_rid;
+    load_dcache_rsp.data_rdata  = dcache_rsp_i.data_rdata;
+    load_dcache_rsp.data_ruser  = dcache_rsp_i.data_ruser;
+  end
+
+`ifndef VERILATOR
+  if (MMU_PRESENT) $error("MMU's D$ port is tied off.");
+`endif
+
+  //===========================================================================
+
   // data is misaligned
   logic                               data_misaligned;
   // --------------------------------------
@@ -158,10 +201,10 @@ module load_store_unit
         .lsu_dtlb_hit_o (dtlb_hit),               // send in the same cycle as the request
         .lsu_dtlb_ppn_o (dtlb_ppn),               // send in the same cycle as the request
         // connecting PTW to D$ IF
-        .req_port_i     (dcache_req_ports_i[0]),
-        .req_port_o     (dcache_req_ports_o[0]),
+        .req_port_i     (mmu_dcache_rsp),
+        .req_port_o     (mmu_dcache_req),
         // icache address translation requests
-        .icache_areq_i  (icache_areq_i),
+        .icache_arsp_i  (icache_arsp_i),
         .asid_to_be_flushed_i,
         .vaddr_to_be_flushed_i,
         .icache_areq_o  (icache_areq_o),
@@ -187,10 +230,10 @@ module load_store_unit
         .lsu_dtlb_hit_o (dtlb_hit),               // send in the same cycle as the request
         .lsu_dtlb_ppn_o (dtlb_ppn),               // send in the same cycle as the request
         // connecting PTW to D$ IF
-        .req_port_i     (dcache_req_ports_i[0]),
-        .req_port_o     (dcache_req_ports_o[0]),
+        .req_port_o     (mmu_dcache_req),
+        .rsp_port_i     (mmu_dcache_rsp),
         // icache address translation requests
-        .icache_areq_i  (icache_areq_i),
+        .icache_arsp_i  (icache_arsp_i),
         .asid_to_be_flushed_i,
         .vaddr_to_be_flushed_i,
         .icache_areq_o  (icache_areq_o),
@@ -202,30 +245,30 @@ module load_store_unit
 
     if (riscv::VLEN > riscv::PLEN) begin
       assign mmu_vaddr_plen   = mmu_vaddr[riscv::PLEN-1:0];
-      assign fetch_vaddr_plen = icache_areq_i.fetch_vaddr[riscv::PLEN-1:0];
+      assign fetch_vaddr_plen = icache_arsp_i.fetch_vaddr[riscv::PLEN-1:0];
     end else begin
       assign mmu_vaddr_plen   = {{{riscv::PLEN - riscv::VLEN} {1'b0}}, mmu_vaddr};
-      assign fetch_vaddr_plen = {{{riscv::PLEN - riscv::VLEN} {1'b0}}, icache_areq_i.fetch_vaddr};
+      assign fetch_vaddr_plen = {{{riscv::PLEN - riscv::VLEN} {1'b0}}, icache_arsp_i.fetch_vaddr};
     end
 
-    assign icache_areq_o.fetch_valid           = icache_areq_i.fetch_req;
-    assign icache_areq_o.fetch_paddr           = fetch_vaddr_plen;
-    assign icache_areq_o.fetch_exception       = '0;
+    assign icache_areq_o.fetch_valid     = icache_arsp_i.fetch_req;
+    assign icache_areq_o.fetch_paddr     = fetch_vaddr_plen;
+    assign icache_areq_o.fetch_exception = '0;
 
-    assign dcache_req_ports_o[0].address_index = '0;
-    assign dcache_req_ports_o[0].address_tag   = '0;
-    assign dcache_req_ports_o[0].data_wdata    = '0;
-    assign dcache_req_ports_o[0].data_req      = 1'b0;
-    assign dcache_req_ports_o[0].data_be       = '1;
-    assign dcache_req_ports_o[0].data_size     = 2'b11;
-    assign dcache_req_ports_o[0].data_we       = 1'b0;
-    assign dcache_req_ports_o[0].kill_req      = '0;
-    assign dcache_req_ports_o[0].tag_valid     = 1'b0;
+    assign mmu_dcache_req.address_index = '0;
+    assign mmu_dcache_req.address_tag   = '0;
+    assign mmu_dcache_req.data_wdata    = '0;
+    assign mmu_dcache_req.data_req      = 1'b0;
+    assign mmu_dcache_req.data_be       = '1;
+    assign mmu_dcache_req.data_size     = 2'b11;
+    assign mmu_dcache_req.data_we       = 1'b0;
+    assign mmu_dcache_req.kill_req      = '0;
+    assign mmu_dcache_req.tag_valid     = 1'b0;
 
-    assign itlb_miss_o                         = 1'b0;
-    assign dtlb_miss_o                         = 1'b0;
-    assign dtlb_ppn                            = mmu_vaddr_plen[riscv::PLEN-1:12];
-    assign dtlb_hit                            = 1'b1;
+    assign itlb_miss_o = 1'b0;
+    assign dtlb_miss_o = 1'b0;
+    assign dtlb_ppn    = mmu_vaddr_plen[riscv::PLEN-1:12];
+    assign dtlb_hit    = 1'b1;
 
     always_ff @(posedge clk_i or negedge rst_ni) begin
       if (~rst_ni) begin
@@ -280,8 +323,8 @@ module load_store_unit
       .amo_req_o,
       .amo_resp_i,
       // to memory arbiter
-      .req_port_i           (dcache_req_ports_i[2]),
-      .req_port_o           (dcache_req_ports_o[2])
+      .req_port_o           (store_dcache_req),
+      .rsp_port_i           (store_dcache_rsp)
   );
 
   // ------------------
@@ -310,8 +353,8 @@ module load_store_unit
       .page_offset_matches_i(page_offset_matches),
       .store_buffer_empty_i (store_buffer_empty),
       // to memory arbiter
-      .req_port_i           (dcache_req_ports_i[1]),
-      .req_port_o           (dcache_req_ports_o[1]),
+      .req_port_o           (load_dcache_req),
+      .rsp_port_i           (load_dcache_rsp),
       .dcache_wbuffer_not_ni_i,
       .commit_tran_id_i,
       .*
