@@ -51,15 +51,17 @@ static void conv1(
     const int8_t  *weight
 )
 {
+
     for (size_t oy = 0; oy < CONV1_OX; oy++) {
         for (size_t ox = 0; ox < CONV1_OY; ox++) {
             
-            int32_t sum[CONV1_ON];
+            // int32_t sum[CONV1_ON];
+            // for(size_t on = 0;on < CONV1_ON; on++){
+            //     //MV initialization
+            //     sum[on] = CONV1_BIAS;
+            // }        
 
-            for(size_t on = 0;on < CONV1_ON; on++){
-                //MV initialization
-                sum[on] = CONV1_BIAS;
-            }        
+            vint32m1_t sum_v = __riscv_vmv_v_x_i32m1(CONV1_BIAS, CONV1_ON);
 
             for (size_t wy = 0; wy < CONV1_WY; wy++) {
                 for (size_t wx = 0; wx < CONV1_WX; wx++) {
@@ -68,28 +70,46 @@ static void conv1(
                         size_t ix = CONV1_SX*ox + wx;
                             
                         size_t i = (iy*CONV1_IX + ix)*CONV1_IN + in;
+                        size_t w = ((in*CONV1_WY + wy)*CONV1_WX + wx)*CONV1_ON + 0;
 
-                        for (size_t on = 0; on < CONV1_ON; on++) {
-                            // MAC with v_x
-                            size_t w = ((on*CONV1_WY + wy)*CONV1_WX + wx)*CONV1_IN + in;
-                            
-                            sum[on] += input[i] * weight[w];
-                        }
+                        //vint32m1_t weight_v = (vint32m1_t) __riscv_vle8_v_i8mf4(&weight[w], CONV1_BIAS);
+                        //sum_v = __riscv_vmacc_vx_i32m1(weight_v, input[i], sum_v, CONV1_ON);
+
+
+                        // vint32m1_t weight_v = __riscv_vluxei8_v_i32m1(weight + w, offset_v, CONV1_ON);
+
+                        // for (size_t on = 0; on < CONV1_ON; on++) {
+                        //     //size_t w = ((on*CONV1_WY + wy)*CONV1_WX + wx)*CONV1_IN + in; [CONV_ON][x][y][z]  [x][y][z][CONV_ON]
+
+                        //     size_t w = ((in*CONV1_WY + wy)*CONV1_WX + wx)*CONV1_ON + on;
+
+                        //     // MAC with v_x
+        
+                        //     //temp[new_w] = weight[w];
+
+                        //     //printf("%d\n", w);
+                           
+                        //     sum[on] += input[i] * weight[w];
+                        // }
                     }
                 }
             }
 
-            for(size_t on = 0;on < CONV1_ON; on++){
-                size_t o = (oy*CONV1_OX + ox)*CONV1_ON + on;
-                // activation
-                if (sum[on] > 0) {
-                    output[o] = (sum[on] >> 8) & 0xFF;
-                } else {
-                    output[o] = 0;
-                }
-            }           
+            // for(size_t on = 0;on < CONV1_ON; on++){
+            //     size_t o = (oy*CONV1_OX + ox)*CONV1_ON + on;
+            //     // activation
+            //     if (sum[on] > 0) {
+            //         output[o] = (sum[on] >> 8) & 0xFF;
+            //     } else {
+            //         output[o] = 0;
+            //     }
+            // }           
         }
     }
+
+
+    // hexdump(temp, CONV1_W_SIZE);
+    // exit(0);
 }
 
 static void conv2(

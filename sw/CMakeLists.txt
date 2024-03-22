@@ -19,7 +19,7 @@ set(CMAKE_BIN2MEM ${PROJECT_SOURCE_DIR}/../util/bin2mem.py)
 set(CMAKE_MEM2COE ${PROJECT_SOURCE_DIR}/../util/mem2coe.py)
 
 set(COMMON_FLAGS " \
-    -march=rv32imv_zicsr_xadac1 -mabi=ilp32 -g -O3 -mcmodel=medany \
+    -march=rv32im_zve32x_zicsr_xadac1 -mabi=ilp32 -g -O3 -mcmodel=medany \
     -DPREALLOCATE=1 -DSTDIO_THRU_UART \
     -fvisibility=hidden -static -Wall -pedantic")
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${COMMON_FLAGS}")
