@@ -8,12 +8,6 @@
 #include "network.h"
 #include "resources/all.h"
 
-#define VL (4)
-
-int32_t a_mem[VL] = {0, 1, 2, 3};
-int32_t b_mem[VL] = {4, 5, 6, 7};
-int32_t c_mem[VL] = {9, 9, 9, 9};
-
 int main() {
 
 #ifdef PERFORMANCE_RUN
@@ -23,18 +17,6 @@ int main() {
 #ifdef VALIDATION_RUN
     printf(TAG "Validation Run\n");
 #endif
-
-    vint32m1_t a, b, c;
-
-    a = __riscv_vle32_v_i32m1(a_mem, VL);
-    b = __riscv_vle32_v_i32m1(b_mem, VL);
-    c = __riscv_vadd_vv_i32m1(a, b, VL);
-    __riscv_vse32_v_i32m1(c_mem, c, VL);
-
-    for (size_t i = 0; i < VL; i++) {
-        printf("%d ", c_mem[i]);
-    }
-    printf("\n");
 
     uint8_t *input;
     int32_t expected;
