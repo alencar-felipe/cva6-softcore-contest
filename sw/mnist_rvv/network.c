@@ -40,70 +40,21 @@
 #define FC2_I    ( 150) // Number of Inputs
 #define FC2_BIAS (1024) // Bias Value
 
-#define VMV_VX   __riscv_vmv_v_x_i32m4
-#define VMACC_VX __riscv_vmacc_vx_i32m4
-#define VSRA_VX  __riscv_vsra_vx_i32m4
-#define VAND_VX  __riscv_vand_vx_i32m4
-#define VMAX_VX  __riscv_vmax_vx_i32m4
-
-typedef vint32m4_t vec_t;
-
 static uint8_t conv1_output[CONV1_O_SIZE];
 static uint8_t conv2_output[CONV2_O_SIZE];
 static uint8_t fc1_output[FC1_O];
 static uint8_t fc2_output[FC2_O];
 
-static inline vec_t vle_u8(const uint8_t *ptr, size_t vl)
-{
-    vuint8m1_t vu8m1 = __riscv_vle8_v_u8m1(ptr, vl);
-    vuint32m4_t vu32m4 = __riscv_vzext_vf4_u32m4(vu8m1, vl);
-    vint32m4_t vi32m4 = __riscv_vreinterpret_v_u32m4_i32m4(vu32m4);
-    return (vec_t) vi32m4;
-}
-
-static inline vec_t vle_i8(const int8_t *ptr, size_t vl)
-{
-    vint8m1_t vi8m1 = __riscv_vle8_v_i8m1(ptr, vl);
-    vint32m4_t vi32m4 = __riscv_vsext_vf4_i32m4(vi8m1, vl);
-    return (vec_t) vi32m4;
-}
-
-static inline void vsrlse8(uint8_t *ptr, vec_t vec, int32_t shift, size_t vl)
-{
-    vint32m4_t vi32m4;
-    vuint32m4_t vu32m4;
-    vuint16m2_t vu16m2;
-    vuint8m1_t vu8m1;
-
-    vi32m4 = vec;
-
-    vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
-    vu16m2 = __riscv_vnsrl_wx_u16m2(vu32m4, shift, vl);
-    vu8m1 = __riscv_vnsrl_wx_u8m1(vu16m2, 0, vl);
-
-    __riscv_vse8_v_u8m1(ptr, vu8m1, vl);
-}
-
 static void conv1(
+    uint8_t *output,
     const uint8_t *input,
-          uint8_t *output,
-    const int8_t  *weight
+    const int8_t *weight
 )
 {
-
-#ifdef VALIDATION_RUN
-    ASSERT(__riscv_vsetvlmax_e32m4() >= CONV1_ON);
-#endif
-
     for (size_t oy = 0; oy < CONV1_OX; oy++) {
         for (size_t ox = 0; ox < CONV1_OY; ox++) {
- 
-            vec_t sum_v = VMV_VX(CONV1_BIAS, CONV1_ON);
 
-            int32_t sum[CONV1_ON];
-            for(size_t on = 0; on < CONV1_ON; on++){
-                sum[on] = CONV1_BIAS;
-            }       
+            vec_t sum_v = vmv_vx(CONV1_BIAS, CONV1_ON);
 
             for (size_t wy = 0; wy < CONV1_WY; wy++) {
                 for (size_t wx = 0; wx < CONV1_WX; wx++) {
@@ -113,58 +64,19 @@ static void conv1(
                         size_t i = (iy*CONV1_IX + ix)*CONV1_IN + in;
 
                         size_t w = ((in*CONV1_WY + wy)*CONV1_WX + wx)*CONV1_ON;                
-                        vec_t weight_v = vle_i8(&weight[w], CONV1_ON);
+                        vec_t weight_v = vlei8(&weight[w], CONV1_ON);
                         
-                        sum_v = VMACC_VX(sum_v, input[i], weight_v, CONV1_ON);
-
-                        for (size_t on = 0; on < CONV1_ON; on++) {
-                            size_t w_on = ((in*CONV1_WY + wy)*CONV1_WX + wx)*CONV1_ON + on;                           
-                            sum[on] += input[i] * weight[w_on];
-                        }
+                        sum_v = vmacc_vx(sum_v, input[i], weight_v, CONV1_ON);
                     }
                 }
             }
 
-            for(size_t on = 0;on < CONV1_ON; on++){
-                sum[on] = (sum[on] > 0) ? sum[on] : 0;
-                sum[on] >>= 8;
-                sum[on] &= 0xFF;
-            }
-
-            //Activation
-            sum_v = VMAX_VX(sum_v, 0, CONV1_ON);
-            // sum_v = VSRA_VX(sum_v, 8, CONV1_ON);
-            // sum_v = VAND_VX(sum_v, 0xFF, CONV1_ON);
-
-
-            // int32_t tmp[CONV1_ON];
-            // __riscv_vse32_v_i32m4(tmp, sum_v, CONV1_ON);
-            // for (int i = 0; i < CONV1_ON; i++) {
-            //     ASSERT(tmp[i] == sum[i]);
-            // }
-
-            
+            sum_v = vmax_vx(sum_v, 0, CONV1_ON);
 
             size_t o = (oy*CONV1_OX + ox)*CONV1_ON;
-            vsrlse8(&output[o], sum_v, 8, CONV1_ON);   
-
-            // for (int i = 0; i < CONV1_ON; i++) {
-            //     printf("%3d ", output[o + i]);
-            // }
-            // printf("\n");
-
-
-            //     output[o + on] = sum[on];
-            // }
-
-            // for (int i = 0; i < CONV1_ON; i++) {
-            //     printf("%3d ", output[o + i]);
-            // }
-            // printf("\n");  
-            // printf("\n");         
+            vnsrlse8(&output[o], sum_v, 8, CONV1_ON);          
         }
     }
-
 }
 
 static void conv2(
@@ -276,6 +188,8 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 {
 
 #ifdef VALIDATION_RUN
+    ASSERT(MAXVL >= vsetvlmax());
+    
     uint32_t crc;
     crc32_table_init();
 
@@ -284,7 +198,7 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     ASSERT(crc == 0x4dfde263);
 #endif
 
-    conv1(input, conv1_output, conv1_weight);
+    conv1(conv1_output, input, conv1_weight);
 
 #ifdef VALIDATION_RUN
     crc = 0;

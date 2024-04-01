@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <riscv_vector.h>
 
 #include "misc.h"
+#include "vector.h"
 
 #include "resources/all.h"
 
