@@ -2,7 +2,7 @@
 
 #include <riscv_vector.h>
 
-#define MAXVL (16)
+#define MAXVL (8)
 
 typedef vint32m4_t vec_t;
 
@@ -33,7 +33,7 @@ static inline vec_t vlei8(const int8_t *ptr, size_t vl)
     return (vec_t) vi32m4;
 }
 
-static inline void vnsrlse8(uint8_t *ptr, vec_t vec, int32_t shift, size_t vl)
+static inline void vnsrl_vse8(uint8_t *ptr, vec_t vec, int32_t shift, size_t vl)
 {
     vint32m4_t vi32m4;
     vuint32m4_t vu32m4;
