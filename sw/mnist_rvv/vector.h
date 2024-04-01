@@ -33,7 +33,11 @@ static inline vec_t vlei8(const int8_t *ptr, size_t vl)
     return (vec_t) vi32m4;
 }
 
-static inline void vnsrl_vse8(uint8_t *ptr, vec_t vec, int32_t shift, size_t vl)
+static inline void vnclip_vse8(
+    uint8_t *ptr,
+    vec_t vec,
+    int32_t shift,
+    size_t vl)
 {
     vint32m4_t vi32m4;
     vuint32m4_t vu32m4;
@@ -42,6 +46,10 @@ static inline void vnsrl_vse8(uint8_t *ptr, vec_t vec, int32_t shift, size_t vl)
 
     vi32m4 = vec;
 
+    // vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
+    // vu16m2 = __riscv_vnclipu_wx_u16m2(vu32m4, shift, vl);
+    // vu8m1 = __riscv_vnclipu_wx_u8m1(vu16m2, 0, vl);
+    
     vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
     vu16m2 = __riscv_vnsrl_wx_u16m2(vu32m4, shift, vl);
     vu8m1 = __riscv_vnsrl_wx_u8m1(vu16m2, 0, vl);

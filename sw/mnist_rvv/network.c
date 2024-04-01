@@ -34,9 +34,39 @@
 #define C2_I_SIZE (C2_IN*C2_IY*C2_IX)
 #define C2_W_SIZE (C2_ON*C2_WX*C2_WY*C2_IN)
 
-#define FC1_O    (150) // Number of Outputs
-#define FC1_I    (384) // Number of Inputs
-#define FC1_BIAS (128) // Bias Value
+#define C3_ON    (150) // Number of Outputs               
+#define C3_OY    (  1) // Output Height
+#define C3_OX    (  1) // Output Width
+#define C3_IN    (384) // Number of Inputs
+#define C3_IX    (  1) // Input Height
+#define C3_IY    (  1) // Input Width
+#define C3_WY    (  1) // Weight Height (Kernel Height)
+#define C3_WX    (  1) // Weight Width (Kernel Width)
+#define C3_SY    (  1) // Input Stride Y
+#define C3_SX    (  1) // Input Stride X
+#define C3_BIAS  (128) // Bias Value
+#define C3_SHIFT (  8) // Output Left Shift
+
+#define C3_O_SIZE (C3_ON*C3_OY*C3_OX)
+#define C3_I_SIZE (C3_IN*C3_IY*C3_IX)
+#define C3_W_SIZE (C3_ON*C3_WX*C3_WY*C3_IN)
+
+#define C4_ON    (  10) // Number of Outputs               
+#define C4_OY    (   1) // Output Height
+#define C4_OX    (   1) // Output Width
+#define C4_IN    ( 150) // Number of Inputs
+#define C4_IX    (   1) // Input Height
+#define C4_IY    (   1) // Input Width
+#define C4_WY    (   1) // Weight Height (Kernel Height)
+#define C4_WX    (   1) // Weight Width (Kernel Width)
+#define C4_SY    (   1) // Input Stride Y
+#define C4_SX    (   1) // Input Stride X
+#define C4_BIAS  (1024) // Bias Value
+#define C4_SHIFT (   8) // Output Left Shift
+
+#define C4_O_SIZE (C4_ON*C4_OY*C4_OX)
+#define C4_I_SIZE (C4_IN*C4_IY*C4_IX)
+#define C4_W_SIZE (C4_ON*C4_WX*C4_WY*C4_IN)
 
 #define FC2_O    (  10) // Number of Outputs
 #define FC2_I    ( 150) // Number of Inputs
@@ -44,7 +74,7 @@
 
 static uint8_t conv1_output[C1_O_SIZE];
 static uint8_t conv2_output[C2_O_SIZE];
-static uint8_t fc1_output[FC1_O];
+static uint8_t fc1_output[C3_O_SIZE];
 static uint8_t fc2_output[FC2_O];
 
 static void conv1(
@@ -82,7 +112,7 @@ static void conv1(
                 sum_v = vmax_vx(sum_v, 0, vl);
 
                 size_t o = (oy*C1_OX + ox)*C1_ON + on;
-                vnsrl_vse8(&output[o], sum_v, C1_SHIFT, vl);        
+                vnclip_vse8(&output[o], sum_v, C1_SHIFT, vl);        
             }  
         }
     }
@@ -123,34 +153,54 @@ static void conv2(
                 sum_v = vmax_vx(sum_v, 0, vl);
 
                 size_t o = (oy*C2_OX + ox)*C2_ON + on;
-                vnsrl_vse8(&output[o], sum_v, C2_SHIFT, vl);        
+                vnclip_vse8(&output[o], sum_v, C2_SHIFT, vl);        
             }  
         }
     }
 }
 
-static void fc1(
+static void conv3(
+    uint8_t *output,
     const uint8_t *input,
-          uint8_t *output,
-    const int8_t  *weight
+    const int8_t *weight
 )
 {
-    for (size_t o = 0; o < FC1_O; o++) {
-        int32_t sum = FC1_BIAS;
+    size_t avl;
+    size_t vl;
 
-        for (size_t i = 0; i < FC1_I; i++) {
-            size_t w = o*FC1_I + i;
-            sum += input[i] * weight[w];
-        }
+    for (size_t oy = 0; oy < C3_OX; oy++) {
+        for (size_t ox = 0; ox < C3_OY; ox++) {
+            for (size_t on = 0; on < C3_ON; on += vl) {
+                avl = C3_ON - on;
+                vl = (avl <= MAXVL) ? avl : MAXVL; 
+            
+                vec_t sum_v = vmv_vx(C3_BIAS, vl);
 
-        // activation
-        if (sum > 0) {
-            output[o] = (sum >> 8) & 0xFF;
-        } else {
-            output[o] = 0;
+                for (size_t wy = 0; wy < C3_WY; wy++) {
+                    for (size_t wx = 0; wx < C3_WX; wx++) {
+                        for (size_t in = 0; in < C3_IN; in++) {   
+                            size_t iy = C3_SY*oy + wy;
+                            size_t ix = C3_SX*ox + wx;
+                            size_t i = (iy*C3_IX + ix)*C3_IN + in;
+
+                            size_t w = ((in*C3_WY + wy)*C3_WX + wx)*C3_ON + on;                
+                            vec_t weight_v = vlei8(&weight[w], vl);
+                            
+                            sum_v = vmacc_vx(sum_v, input[i], weight_v, vl);
+                        }
+                    }
+                }
+
+                sum_v = vmax_vx(sum_v, 0, vl);
+
+                size_t o = (oy*C3_OX + ox)*C3_ON + on;
+                vnclip_vse8(&output[o], sum_v, C3_SHIFT, vl);        
+            }  
         }
-    }    
+    }
 }
+
+int8_t FC2[C4_W_SIZE];
 
 static void fc2(
     const uint8_t *input,
@@ -163,11 +213,14 @@ static void fc2(
 
         for (size_t i = 0; i < FC2_I; i++) {
             size_t w = o*FC2_I + i;
-            sum += input[i] * weight[w];
+            size_t nw = i*FC2_O + o;
+            sum += input[i] * weight[nw];
+            FC2[nw] = weight[w];
         }
 
         // activation
         sum = (sum >> 11);
+        output[o] = sum;
         if (sum < 0) {
             output[o] =  0;
         } else if (sum > 255) { // 2047
@@ -176,6 +229,8 @@ static void fc2(
             output[o] = sum;
         }
     }    
+
+    //hexdump(FC2, sizeof(FC2));
 }
 
 static void argmax1(
@@ -199,7 +254,7 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 {
 
 #ifdef VALIDATION_RUN
-    ASSERT(MAXVL >= vsetvlmax());
+    ASSERT(MAXVL < vsetvlmax());
     
     uint32_t crc;
     crc32_table_init();
@@ -225,11 +280,11 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     ASSERT(crc == 0x0aa1524f);
 #endif
 
-    fc1(conv2_output, fc1_output, fc1_weight);
+    conv3(fc1_output, conv2_output, fc1_weight);
 
 #ifdef VALIDATION_RUN 
     crc = 0;
-    crc32(&crc, fc1_output, FC1_O);
+    crc32(&crc, fc1_output, C3_O_SIZE);
     ASSERT(crc == 0x7e1d772e);
 #endif
 
