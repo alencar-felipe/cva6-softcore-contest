@@ -46,13 +46,13 @@ static inline void vnclip_vse8(
 
     vi32m4 = vec;
 
-    // vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
-    // vu16m2 = __riscv_vnclipu_wx_u16m2(vu32m4, shift, vl);
-    // vu8m1 = __riscv_vnclipu_wx_u8m1(vu16m2, 0, vl);
-    
     vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
-    vu16m2 = __riscv_vnsrl_wx_u16m2(vu32m4, shift, vl);
-    vu8m1 = __riscv_vnsrl_wx_u8m1(vu16m2, 0, vl);
+    vu16m2 = __riscv_vnclipu_wx_u16m2(vu32m4, shift, vl);
+    vu8m1 = __riscv_vnclipu_wx_u8m1(vu16m2, 0, vl);
+    
+    // vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
+    // vu16m2 = __riscv_vnsrl_wx_u16m2(vu32m4, shift, vl);
+    // vu8m1 = __riscv_vnsrl_wx_u8m1(vu16m2, 0, vl);
 
     __riscv_vse8_v_u8m1(ptr, vu8m1, vl);
 }

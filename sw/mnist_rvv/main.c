@@ -10,6 +10,9 @@
 
 int main() {
 
+    // Set RVV rounding mode to round-down (truncate).
+    asm volatile ("csrw vxrm, %0" :: "rK"(0b10));
+
 #ifdef PERFORMANCE_RUN
     printf(TAG "Performance Run\n");
 #endif

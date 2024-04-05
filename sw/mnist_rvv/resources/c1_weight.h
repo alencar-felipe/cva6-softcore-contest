@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-static const uint32_t conv2_weight_data[] = {
+static const uint32_t c1_weight_data[] = {
     0x00000005, 0x00000000, 0x00000000, 0x01000000, 
     0x00000000, 0x00ff0000, 0x00000002, 0x00000000, 
     0x00000000, 0x06000000, 0x00000000, 0x06ff0000, 
@@ -1205,4 +1205,4 @@ static const uint32_t conv2_weight_data[] = {
     // 0x11030702, 0x06060d0f, 0xfafe060f, 0xf8ff0e05, 
 };
 
-static const int8_t *conv2_weight = (int8_t *) conv2_weight_data;
+static const int8_t *c1_weight = (int8_t *) c1_weight_data;

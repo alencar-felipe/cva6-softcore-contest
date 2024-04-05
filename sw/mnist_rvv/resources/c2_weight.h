@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-static uint32_t fc1_weight_data[] = {
+static uint32_t c2_weight_data[] = {
     0x0f0eff0e, 0x2808f30d, 0xfb1c0202, 0xea1afafb, 
     0x21f1f418, 0x031532e4, 0x08deedea, 0x24e613eb, 
     0x1414d810, 0xe30a19ee, 0xf9fce115, 0x20fff119, 
@@ -7205,4 +7205,4 @@ static uint32_t fc1_weight_data[] = {
     // 0xf1fef401, 0xe3f002f9, 0xebf3102d, 0x340efbba, 
 };
 
-static const int8_t *fc1_weight = (int8_t *) fc1_weight_data;
+static const int8_t *c2_weight = (int8_t *) c2_weight_data;
