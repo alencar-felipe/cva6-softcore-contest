@@ -1,6 +1,6 @@
 #include "network.h"
 
-#define L0_ON    ( 16) // Number of Outputs               
+#define L0_ON    ( 16) // Number of Outputs
 #define L0_OY    ( 11) // Output Height
 #define L0_OX    ( 11) // Output Width
 #define L0_IN    (  1) // Number of Inputs
@@ -17,7 +17,7 @@
 #define L0_I_SIZE (L0_IN*L0_IY*L0_IX)
 #define L0_W_SIZE (L0_ON*L0_WX*L0_WY*L0_IN)
 
-#define L1_ON    ( 24) // Number of Outputs               
+#define L1_ON    ( 24) // Number of Outputs
 #define L1_OY    (  4) // Output Height
 #define L1_OX    (  4) // Output Width
 #define L1_IN    ( 16) // Number of Inputs
@@ -34,7 +34,7 @@
 #define L1_I_SIZE (L1_IN*L1_IY*L1_IX)
 #define L1_W_SIZE (L1_ON*L1_WX*L1_WY*L1_IN)
 
-#define L2_ON    (150) // Number of Outputs               
+#define L2_ON    (150) // Number of Outputs
 #define L2_OY    (  1) // Output Height
 #define L2_OX    (  1) // Output Width
 #define L2_IN    (384) // Number of Inputs
@@ -51,7 +51,7 @@
 #define L2_I_SIZE (L2_IN*L2_IY*L2_IX)
 #define L2_W_SIZE (L2_ON*L2_WX*L2_WY*L2_IN)
 
-#define L3_ON    (  10) // Number of Outputs               
+#define L3_ON    (  10) // Number of Outputs
 #define L3_OY    (   1) // Output Height
 #define L3_OX    (   1) // Output Width
 #define L3_IN    ( 150) // Number of Inputs
@@ -114,7 +114,7 @@ static void argmax1(
     int32_t *output,
     uint8_t *max,
     const uint8_t *input
-) 
+)
 {
     *output = 0;
     *max = input[*output];
@@ -130,9 +130,12 @@ static void argmax1(
 void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 {
 
+    // Set RVV rounding mode to round-down (truncate).
+    asm volatile ("csrw vxrm, %0" :: "rK"(0b10));
+
 #ifdef VALIDATION_RUN
     ASSERT(MAXVL < vsetvlmax());
-    
+
     uint32_t crc;
     crc32_table_init();
 
@@ -141,6 +144,7 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     ASSERT(crc == 0x4dfde263);
 #endif
 
+    // conv1
     CONV(L0, l0_out, input, l0_weight);
 
 #ifdef VALIDATION_RUN
@@ -148,23 +152,26 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     crc32(&crc, l0_out, L0_O_SIZE);
     ASSERT(crc == 0xa6062dba);
 #endif
-    
+
+    // conv2
     CONV(L1, l1_out, l0_out, l1_weight);
 
-#ifdef VALIDATION_RUN    
+#ifdef VALIDATION_RUN
     crc = 0;
     crc32(&crc, l1_out, L1_O_SIZE);
     ASSERT(crc == 0x0aa1524f);
 #endif
 
+    // fc1
     CONV(L2, l2_out, l1_out, l2_weight);
 
-#ifdef VALIDATION_RUN 
+#ifdef VALIDATION_RUN
     crc = 0;
     crc32(&crc, l2_out, L2_O_SIZE);
     ASSERT(crc == 0x7e1d772e);
 #endif
 
+    // fc2
     CONV(L3, l3_out, l2_out, l3_weight);
 
 #ifdef VALIDATION_RUN
@@ -182,8 +189,3 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 #endif
 
 }
-
-
-
-
-
