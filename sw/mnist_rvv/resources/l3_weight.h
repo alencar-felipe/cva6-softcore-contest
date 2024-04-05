@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-static uint32_t c3_weight_data[] = {
+static uint32_t l3_weight_data[] = {
     0xf9e70ec9, 0x27d7252e, 0x34fb27c7, 0xf5f1e827, 
     0xeee01bfa, 0x1d30e2fa, 0x27d7fae4, 0x04e4d128, 
     0xfef6fd32, 0xe0ec36e9, 0xd9dfebe6, 0xed3823ed, 
@@ -193,4 +193,4 @@ static uint32_t c3_weight_data[] = {
     // 0x03d41410, 0x09f61a27, 0x202b3305, 
 };
 
-static const int8_t *c3_weight = (int8_t *) c3_weight_data;
+static const int8_t *l3_weight = (int8_t *) l3_weight_data;

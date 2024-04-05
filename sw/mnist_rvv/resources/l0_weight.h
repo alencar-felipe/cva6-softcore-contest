@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-static const uint32_t c0_weight_data[] = {
+static const uint32_t l0_weight_data[] = {
     0xdfd3060d, 0x25f7fbf3, 0x0801c810, 0xff08fc11, 
     0xf1c6f608, 0x17e10100, 0xe4140324, 0xef1dfb11, 
     0x06c3f9fa, 0xffea160a, 0xf5231bfc, 0xf435eb25, 
@@ -37,4 +37,4 @@ static const uint32_t c0_weight_data[] = {
     // 0xf0f4efff, 0x03fef710, 0xfff90c0c, 0xf3f6fc15,
 };
 
-static const int8_t *c0_weight = (int8_t *) c0_weight_data;
+static const int8_t *l0_weight = (int8_t *) l0_weight_data;
