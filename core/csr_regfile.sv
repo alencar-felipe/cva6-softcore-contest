@@ -223,6 +223,28 @@ module csr_regfile
             read_access_exception = 1'b1;
           end
         end
+        // Vector CSRs
+        riscv::CSR_VSTART: begin
+          csr_rdata = '0;
+        end
+        riscv::CSR_VXSAT: begin
+          csr_rdata = '0;
+        end
+        riscv::CSR_VXRM: begin
+          csr_rdata = 'b10;
+        end
+        riscv::CSR_VCSR: begin
+          csr_rdata = 'b100;
+        end
+        riscv::CSR_VL: begin
+          csr_rdata = 'd16;
+        end
+        riscv::CSR_VTYPE: begin
+          csr_rdata = '0;
+        end
+        riscv::CSR_VLENB: begin
+          csr_rdata = 'd16;
+        end
         // debug registers
         riscv::CSR_DCSR: csr_rdata = {{riscv::XLEN - 32{1'b0}}, dcsr_q};
         riscv::CSR_DPC: csr_rdata = dpc_q;
@@ -633,6 +655,21 @@ module csr_regfile
           end else begin
             update_access_exception = 1'b1;
           end
+        end
+        // Vector CSRs
+        riscv::CSR_VSTART: begin
+        end
+        riscv::CSR_VXSAT: begin
+        end
+        riscv::CSR_VXRM: begin
+        end
+        riscv::CSR_VCSR: begin
+        end
+        riscv::CSR_VL: begin
+        end
+        riscv::CSR_VTYPE: begin
+        end
+        riscv::CSR_VLENB: begin
         end
         // debug CSR
         riscv::CSR_DCSR: begin

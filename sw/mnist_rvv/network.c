@@ -94,9 +94,9 @@ do { \
                             size_t i = (iy * L##_IX + ix) * L##_IN + in; \
                             \
                             size_t w = ((in * L##_WY + wy) * L##_WX + wx) * L##_ON + on; \
-                            vec_t weight_v = vlei8(&W[w], vl); \
+                            vec_t weight_v = vlei8(&(W)[w], vl); \
                             \
-                            sum_v = vmacc_vx(sum_v, I[i], weight_v, vl); \
+                            sum_v = vmacc_vx(sum_v, (I)[i], weight_v, vl); \
                         } \
                     } \
                 } \
@@ -104,7 +104,7 @@ do { \
                 sum_v = vmax_vx(sum_v, 0, vl); \
                 \
                 size_t o = (oy * L##_OX + ox) * L##_ON + on; \
-                vnclip_vse8(&O[o], sum_v, L##_SHIFT, vl); \
+                vnclip_vse8(&(O)[o], sum_v, L##_SHIFT, vl); \
             } \
         } \
     } \
@@ -131,10 +131,10 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 {
 
     // Set RVV rounding mode to round-down (truncate).
-    asm volatile ("csrw vxrm, %0" :: "rK"(0b10));
+    asm volatile ("csrw vxrm, %0" :: "rK"(0x02));
 
 #ifdef VALIDATION_RUN
-    ASSERT(MAXVL < vsetvlmax());
+    ASSERT(MAXVL <= vsetvlmax());
 
     uint32_t crc;
     crc32_table_init();

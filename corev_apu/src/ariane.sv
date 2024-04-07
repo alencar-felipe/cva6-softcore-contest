@@ -209,5 +209,22 @@ module ariane import ariane_pkg::*; #(
 
   end
 
+  assert property (
+    @(posedge clk_i)
+    cvxif_req.x_issue_valid && cvxif_resp.x_issue_ready |->
+    cvxif_resp.x_issue_resp.accept
+  ) else $error("Issued instruction was not accepted.");
+
+  assert property (
+    @(posedge clk_i)
+    cvxif_req.x_issue_valid && !cvxif_resp.x_issue_ready |=>
+    cvxif_req.x_issue_valid
+  ) else $error("Ilegal deassertion of x_issue_valid.");
+
+  assert property (
+    @(posedge clk_i)
+    cvxif_resp.x_result_valid && cvxif_req.x_result_ready |->
+    !cvxif_resp.x_result.exc
+  ) else $error("Exception occurred.");
 
 endmodule // ariane

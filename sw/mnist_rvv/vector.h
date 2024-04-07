@@ -2,7 +2,7 @@
 
 #include <riscv_vector.h>
 
-#define MAXVL (8)
+#define MAXVL (16)
 
 typedef vint32m4_t vec_t;
 
@@ -29,7 +29,8 @@ static inline vec_t vmax_vx(vec_t vs2, int32_t rs1, size_t vl)
 static inline vec_t vlei8(const int8_t *ptr, size_t vl)
 {
     vint8m1_t vi8m1 = __riscv_vle8_v_i8m1(ptr, vl);
-    vint32m4_t vi32m4 = __riscv_vsext_vf4_i32m4(vi8m1, vl);
+    vint16m2_t vi16m2 = __riscv_vsext_vf2_i16m2(vi8m1, vl);
+    vint32m4_t vi32m4 = __riscv_vsext_vf2_i32m4(vi16m2, vl);
     return (vec_t) vi32m4;
 }
 
@@ -49,10 +50,6 @@ static inline void vnclip_vse8(
     vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
     vu16m2 = __riscv_vnclipu_wx_u16m2(vu32m4, shift, vl);
     vu8m1 = __riscv_vnclipu_wx_u8m1(vu16m2, 0, vl);
-    
-    // vu32m4 = __riscv_vreinterpret_v_i32m4_u32m4(vi32m4);
-    // vu16m2 = __riscv_vnsrl_wx_u16m2(vu32m4, shift, vl);
-    // vu8m1 = __riscv_vnsrl_wx_u8m1(vu16m2, 0, vl);
 
     __riscv_vse8_v_u8m1(ptr, vu8m1, vl);
 }
