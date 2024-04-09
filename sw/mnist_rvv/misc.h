@@ -23,6 +23,18 @@
         } \
     } while (0)
 
+// csr ========================================================================
+
+#define READ_CSR(reg) ({ \
+    unsigned long __tmp; \
+    asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
+  __tmp; \
+})
+
+#define WRITE_CSR(reg, val) ({ \
+  asm volatile ("csrw " #reg ", %0" :: "rK"(val)); \
+})
+
 // crc32 ======================================================================
 
 #define CRC32_POLY (0xEDB88320)

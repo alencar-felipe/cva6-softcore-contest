@@ -28,18 +28,18 @@ set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${COMMON_FLAGS}")
 
 set(CVA6_LINK_SCRIPT "${CMAKE_SOURCE_DIR}/cva6/link.ld")
 include_directories(${PROJECT_SOURCE_DIR}/cva6)
-file(GLOB CVA6_SOURCES 
+file(GLOB CVA6_SOURCES
     "${PROJECT_SOURCE_DIR}/cva6/*.S"
     "${PROJECT_SOURCE_DIR}/cva6/*.c")
 
 function(add_benchmark NAME)
     file(GLOB BM_SOURCES "${PROJECT_SOURCE_DIR}/${NAME}/*.c")
-    
+
     add_executable(${NAME} ${BM_SOURCES} ${CVA6_SOURCES})
     set_target_properties(${NAME} PROPERTIES LINK_FLAGS
         "-static -nostartfiles -T ${CVA6_LINK_SCRIPT} -Wl,-Map=${NAME}.map")
     add_custom_command(TARGET ${NAME} POST_BUILD
-        COMMAND ${CMAKE_OBJDUMP} -D $<TARGET_FILE:${NAME}> > ${NAME}.dump
+        COMMAND ${CMAKE_OBJDUMP} -S $<TARGET_FILE:${NAME}> > ${NAME}.dump
         COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${NAME}> ${NAME}.bin
         COMMAND ${CMAKE_BIN2MEM} ${NAME}.bin
         COMMAND ${CMAKE_MEM2COE} ${NAME}.mem)

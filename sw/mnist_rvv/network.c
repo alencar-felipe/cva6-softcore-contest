@@ -131,7 +131,7 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 {
 
     // Set RVV rounding mode to round-down (truncate).
-    asm volatile ("csrw vxrm, %0" :: "rK"(0x02));
+    WRITE_CSR(vxrm, 0x02);
 
 #ifdef VALIDATION_RUN
     ASSERT(MAXVL <= vsetvlmax());

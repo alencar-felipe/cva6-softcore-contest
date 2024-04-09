@@ -5,6 +5,7 @@
 
 #include <riscv_vector.h>
 
+#include "misc.h"
 #include "network.h"
 #include "resources/all.h"
 
@@ -24,8 +25,8 @@ int main() {
 
 #ifdef PERFORMANCE_RUN
     size_t instret, cycles;
-    instret = -read_csr(minstret);
-    cycles = -read_csr(mcycle);
+    instret = -READ_CSR(minstret);
+    cycles = -READ_CSR(mcycle);
 #endif
 
     int32_t output;
@@ -33,17 +34,17 @@ int main() {
     inference(input, &output, &credence);
 
 #ifdef PERFORMANCE_RUN
-    instret += read_csr(minstret);
-    cycles += read_csr(mcycle);
+    instret += READ_CSR(minstret);
+    cycles += READ_CSR(mcycle);
 #endif
 
-    printf(TAG "expected: %d\n", expected);
+    printf(TAG "expected: %ld\n", expected);
     printf(TAG "output: %ld\n", output);
     printf(TAG "credence: %d\n", credence);
 
 #ifdef PERFORMANCE_RUN
-    printf(TAG "instrutions: %ld\n", instret);
-    printf(TAG "cycles: %ld\n", cycles);
+    printf(TAG "instrutions: %u\n", instret);
+    printf(TAG "cycles: %u\n", cycles);
 #endif
 
 }

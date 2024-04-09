@@ -24,7 +24,7 @@ package vproc_config;
 `ifdef SYNTHESIS
     parameter vreg_type    VREG_TYPE                   = VREG_XLNX_RAM32M;
 `else
-    parameter vreg_type    VREG_TYPE                   = VREG_GENERIC;
+    parameter vreg_type    VREG_TYPE                   = VREG_ASIC;
 `endif
     parameter int unsigned VREG_W                      = 128;
     parameter int unsigned VPORT_RD_CNT                = 2;
