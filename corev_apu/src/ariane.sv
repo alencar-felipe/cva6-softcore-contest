@@ -176,8 +176,8 @@ module ariane import ariane_pkg::*; #(
       .XIF_ID_W  (X_ID_WIDTH),
       .XIF_MEM_W (X_MEM_WIDTH),
 
-      .DONT_CARE_ZERO (1'b0),
-      .ASYNC_RESET    (1'b1)
+      .DONT_CARE_ZERO ('0),
+      .ASYNC_RESET    ('1)
     ) i_vproc_core (
       .clk_i  (clk_i),
       .rst_ni (rst_ni),
@@ -209,22 +209,26 @@ module ariane import ariane_pkg::*; #(
 
   end
 
+`ifndef VERILATOR
+
   assert property (
     @(posedge clk_i)
     cvxif_req.x_issue_valid && cvxif_resp.x_issue_ready |->
     cvxif_resp.x_issue_resp.accept
-  ) else $error("Issued instruction was not accepted.");
+  ) else $fatal(1, "Issued instruction was not accepted.");
 
   assert property (
     @(posedge clk_i)
     cvxif_req.x_issue_valid && !cvxif_resp.x_issue_ready |=>
     cvxif_req.x_issue_valid
-  ) else $error("Ilegal deassertion of x_issue_valid.");
+  ) else $fatal(1, "Ilegal deassertion of x_issue_valid.");
 
   assert property (
     @(posedge clk_i)
     cvxif_resp.x_result_valid && cvxif_req.x_result_ready |->
     !cvxif_resp.x_result.exc
-  ) else $error("Exception occurred.");
+  ) else $fatal(1, "Exception occurred.");
+
+`endif
 
 endmodule // ariane

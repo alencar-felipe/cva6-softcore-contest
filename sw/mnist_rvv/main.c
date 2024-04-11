@@ -11,6 +11,8 @@
 
 int main() {
 
+    printf(TAG "mnist_rvv\n");
+
 #ifdef PERFORMANCE_RUN
     printf(TAG "Performance Run\n");
 #endif

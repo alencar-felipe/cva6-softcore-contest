@@ -86,14 +86,14 @@ module cvxif_dcache_adapter
       dcache_req_o.kill_req      = '0;
 
       case (x_mem_req_i.be)
-        4'b0001, 4'b0010, 4'b0100, 4'b1000: dcache_req_o.data_size = 2'b01;
-        4'b0011, 4'b0110, 4'b1100:          dcache_req_o.data_size = 2'b10;
-        4'b1111:                            dcache_req_o.data_size = 2'b11;
+        4'b0001, 4'b0010, 4'b0100, 4'b1000: dcache_req_o.data_size = 2'b00;
+        4'b0011, 4'b0110, 4'b1100:          dcache_req_o.data_size = 2'b01;
+        4'b1111:                            dcache_req_o.data_size = 2'b10;
         default:                            dcache_req_o.data_size = 2'b11;
       endcase
 
       if (x_mem_req_i.we) begin
-        dcache_req_o.address_tag = req_buffer_d.addr[VLEN-1:DCACHE_INDEX_WIDTH];
+        dcache_req_o.address_tag = x_mem_req_i.addr[VLEN-1:DCACHE_INDEX_WIDTH];
       end
 
       x_mem_resp_o.exc     = '0;

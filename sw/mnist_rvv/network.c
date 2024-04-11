@@ -77,32 +77,25 @@ static uint8_t l3_out[L3_O_SIZE];
 do { \
     size_t avl; \
     size_t vl; \
-    \
     for (size_t oy = 0; oy < L##_OX; oy++) { \
         for (size_t ox = 0; ox < L##_OY; ox++) { \
             for (size_t on = 0; on < L##_ON; on += vl) { \
                 avl = L##_ON - on; \
                 vl = (avl <= MAXVL) ? avl : MAXVL; \
-                \
                 vec_t sum_v = vmv_vx(L##_BIAS, vl); \
-                \
                 for (size_t wy = 0; wy < L##_WY; wy++) { \
                     for (size_t wx = 0; wx < L##_WX; wx++) { \
                         for (size_t in = 0; in < L##_IN; in++) { \
                             size_t iy = L##_SY * oy + wy; \
                             size_t ix = L##_SX * ox + wx; \
                             size_t i = (iy * L##_IX + ix) * L##_IN + in; \
-                            \
                             size_t w = ((in * L##_WY + wy) * L##_WX + wx) * L##_ON + on; \
                             vec_t weight_v = vlei8(&(W)[w], vl); \
-                            \
                             sum_v = vmacc_vx(sum_v, (I)[i], weight_v, vl); \
                         } \
                     } \
                 } \
-                \
                 sum_v = vmax_vx(sum_v, 0, vl); \
-                \
                 size_t o = (oy * L##_OX + ox) * L##_ON + on; \
                 vnclip_vse8(&(O)[o], sum_v, L##_SHIFT, vl); \
             } \
@@ -144,8 +137,12 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     ASSERT(crc == 0x4dfde263);
 #endif
 
+    printf("%p\n", l0_out);
+
     // conv1
     CONV(L0, l0_out, input, l0_weight);
+
+    hexdump(l0_out, L0_O_SIZE);
 
 #ifdef VALIDATION_RUN
     crc = 0;
