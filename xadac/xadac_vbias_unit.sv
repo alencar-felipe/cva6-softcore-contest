@@ -19,7 +19,7 @@ module xadac_vbias_unit
             (slv.req_valid && slv.req_ready) &&
             (slv.resp_valid && slv.resp_ready)
         ) begin
-            for (int i = 0; i < slv.req_imm; i++) begin
+            for (ImmT i = 0; i < slv.req_imm; i++) begin
                 slv.resp_vd[SumWidth*i +: SumWidth] = SumT'(slv.req_rs1);
             end
         end

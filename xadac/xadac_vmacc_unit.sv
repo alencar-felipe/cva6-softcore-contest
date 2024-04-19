@@ -30,9 +30,10 @@ module xadac_vmacc_unit
             slv.resp_vd = slv.req_vs3;
             for (int i = 0; i < ilen; i++) begin
                 for (int j = 0; j < jlen; j++) begin
-                    slv.resp_vd[SumWidth*i +: SumWidth] +=
-                        slv.req_vs1[imm*i + j] *
-                        slv.req_vs2[imm*i + j];
+                    slv.resp_vd[SumWidth*i +: SumWidth] += $unsigned(
+                        $signed  (slv.req_vs1[imm*i + j]) *
+                        $unsigned(slv.req_vs2[imm*i + j])
+                    );
                 end
             end
         end

@@ -107,12 +107,16 @@ module xadac_vload_unit
 
         for(IdT id = 0; id < NoEntries; id++) begin
             if(!resp_valid_d && entries_d[id].obi_r_done) begin
-                resp_id_d    = id;
-                resp_vd_d    = entries_d[id].rdata;
+                resp_id_d = id;
+                resp_vd_d = '0;
+                for (ImmT i = 0; i < VectorWidth/ElemWidth; i++) begin
+                    automatic ImmT j = i % entries_d[id].imm;
+                    resp_vd_d[ElemWidth*i +: ElemWidth] =
+                        entries_d[id].rdata[ElemWidth*j +: ElemWidth];
+                end
                 resp_valid_d = 1;
             end
         end
-
     end
 
     always_ff @(posedge clk, negedge rstn) begin
@@ -123,9 +127,9 @@ module xadac_vload_unit
             slv.resp_vd    <= '0;
             slv.resp_valid <= '0;
 
-            slv.obi_req  <= '0;
-            slv.obi_addr <= '0;
-            slv.obi_aid  <= '0;
+            obi.req  <= '0;
+            obi.addr <= '0;
+            obi.aid  <= '0;
         end
         else begin
             entries_q <= entries_q;
