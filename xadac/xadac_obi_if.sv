@@ -1,4 +1,4 @@
-interface obi_if #(
+interface xadac_obi_if #(
     parameter int unsigned AddrWidth = 0,
     parameter int unsigned DataWidth = 0,
     parameter int unsigned IdWidth = 0
@@ -22,7 +22,7 @@ interface obi_if #(
     DataT rdata;
     IdT   rid;
 
-    modport Master (
+    modport mst (
         output req,
         input  gnt,
         output addr,
@@ -37,7 +37,7 @@ interface obi_if #(
         input  rid
     );
 
-    modport Slave (
+    modport slv (
         input  req,
         output gnt,
         input  addr,
@@ -48,21 +48,6 @@ interface obi_if #(
 
         output rvalid,
         input  rready,
-        output rdata,
-        output rid
-    );
-
-    modport Monitor (
-        output req,
-        output gnt,
-        output addr,
-        output we,
-        output be,
-        output wdata,
-        output aid,
-
-        output rvalid,
-        output rready,
         output rdata,
         output rid
     );

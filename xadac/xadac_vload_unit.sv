@@ -1,11 +1,9 @@
 module xadac_vload_unit
     import xadac_pkg::*;
 (
-    input logic clk,
-    input logic rstn,
-
-    xadac_ex_if.Slave slv,
-    obi_if.Master     obi
+    input logic     clk,
+    input logic     rstn,
+    xadac_ex_if.slv slv
 );
 
     // Scoreboard =============================================================

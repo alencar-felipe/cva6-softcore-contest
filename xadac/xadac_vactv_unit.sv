@@ -1,11 +1,9 @@
 module xadac_vactv_unit
     import xadac_ex_if::*;
 (
-    input logic clk_i,
-    input logic rst_ni,
-
-    xadac_ex_if.Slave slv,
-    obi_if.Master     obi
+    input logic     clk,
+    input logic     rstn,
+    xadac_ex_if.slv slv
 );
 
     // Scoreboard =============================================================
