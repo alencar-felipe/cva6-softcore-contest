@@ -28,19 +28,6 @@ interface xadac_ex_if
     logic   resp_valid;
     logic   resp_ready;
 
-    logic   obi_req;
-    logic   obi_gnt;
-    AddrT   obi_addr;
-    logic   obi_we;
-    BeT     obi_be;
-    VectorT obi_wdata;
-    IdT     obi_aid;
-
-    logic   obi_rvalid;
-    logic   obi_rready;
-    VectorT obi_rdata;
-    IdT     obi_rid;
-
     modport mst (
         output req_id,
         output req_instr,
@@ -65,20 +52,7 @@ interface xadac_ex_if
         input  resp_rd_write,
         input  resp_vd_write,
         input  resp_valid,
-        output resp_ready,
-
-        input  obi_req,
-        output obi_gnt,
-        input  obi_addr,
-        input  obi_we,
-        input  obi_be,
-        input  obi_wdata,
-        input  obi_aid,
-
-        output obi_rvalid,
-        input  obi_rready,
-        output obi_rdata,
-        output obi_rid
+        output resp_ready
     );
 
     modport slv (
@@ -105,20 +79,7 @@ interface xadac_ex_if
         output resp_rd_write,
         output resp_vd_write,
         output resp_valid,
-        input  resp_ready,
-
-        output obi_req,
-        input  obi_gnt,
-        output obi_addr,
-        output obi_we,
-        output obi_be,
-        output obi_wdata,
-        output obi_aid,
-
-        input  obi_rvalid,
-        output obi_rready,
-        input  obi_rdata,
-        input  obi_rid
+        input  resp_ready
     );
 
 endinterface

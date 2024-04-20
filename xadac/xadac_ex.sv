@@ -3,7 +3,8 @@ module xadac_ex
 (
     input logic     clk,
     input logic     rstn,
-    xadac_ex_if.slv slv
+    xadac_ex_if.slv slv,
+    OBI_BUS.Manager obi
 );
 
     typedef struct {
@@ -11,7 +12,8 @@ module xadac_ex
         InstrT match;
     } row_t;
 
-    localparam int unsigned NoUnits = 4;
+    localparam int unsigned NoUnits    = 4;
+    localparam int unsigned NoObiUnits = 2;
 
     localparam row_t Table [NoUnits] = '{
         '{mask: 32'h0000_707f, match: 32'h0000_3077},
@@ -22,8 +24,8 @@ module xadac_ex
 
     // Unit Interfaces ========================================================
 
-    xadac_ex_if  unit_if     [NoUnits] ();
-    xadac_obi_if unit_obi_if [NoUnits] ();
+    xadac_ex_if  unit_if  [NoUnits]    ();
+    OBI_BUS      unit_obi [NoObiUnits] (.OBI_CFG (ObiCfg));
 
     IdT     unit_req_id         [NoUnits];
     InstrT  unit_req_instr      [NoUnits];
@@ -184,12 +186,28 @@ module xadac_ex
         end
     end
 
+    // OBI Mux ================================================================
+
+    obi_mux_intf #(
+        .SbrPortObiCfg   (ObiCfg),
+        .NumSbrPorts     (NoObiUnits),
+        .NumMaxTrans     (2**IdWidth),
+        .UseIdForRouting ('0)
+    ) i_obi_mux (
+        .clk_i      (clk),
+        .rst_ni     (rstn),
+        .testmode_i ('0),
+        .sbr_ports  (unit_obi),
+        .mgr_port   (obi)
+    );
+
     // Units ==================================================================
 
     xadac_vactv_unit i_vactv_unit (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (unit_if[0])
+        .slv  (unit_if[0]),
+        .obi  (unit_obi[0])
     );
 
     xadac_vbias_unit i_vbias_unit (
@@ -201,7 +219,8 @@ module xadac_ex
     xadac_vload_unit i_vload_unit (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (unit_if[2])
+        .slv  (unit_if[2]),
+        .obi  (unit_obi[1])
     );
 
     xadac_vmacc_unit i_vmacc_unit (

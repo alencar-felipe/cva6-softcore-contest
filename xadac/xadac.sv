@@ -1,7 +1,10 @@
-module xadac #(
-) (
-    input logic clk_i,
-    input logic rst_ni
+module xadac
+    import xadac_pkg::*;
+(
+    input logic clk,
+    input logic rstn,
+
+
 );
 
 
