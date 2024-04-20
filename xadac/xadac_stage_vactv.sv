@@ -1,4 +1,4 @@
-module xadac_vactv_unit
+module xadac_stage_vactv
     import xadac_if::*;
 (
     input logic  clk,

@@ -1,4 +1,4 @@
-module xadac_vbias_unit
+module xadac_stage_vbias
     import xadac_pkg::*;
 (
     input logic  clk,

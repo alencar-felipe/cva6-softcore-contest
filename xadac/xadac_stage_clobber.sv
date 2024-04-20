@@ -1,8 +1,8 @@
-module xadac_clobber
+module xadac_stage_clobber
     import xadac_pkg::*;
 (
-    input logic      clk,
-    input logic      rstn,
+    input logic clk,
+    input logic rstn,
 
     xadac_dec_if.slv dec_slv,
     xadac_dec_if.mst dec_mst,

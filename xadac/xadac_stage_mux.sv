@@ -1,4 +1,4 @@
-module xadac_units
+module xadac_stage_mux
     import xadac_pkg::*;
 (
     input logic      clk,

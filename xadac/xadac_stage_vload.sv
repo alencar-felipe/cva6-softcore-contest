@@ -1,4 +1,4 @@
-module xadac_vload_unit
+module xadac_stage_vload
     import xadac_pkg::*;
 (
     input logic  clk,
