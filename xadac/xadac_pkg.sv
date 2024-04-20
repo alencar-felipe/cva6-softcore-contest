@@ -2,6 +2,9 @@ package xadac_pkg;
 
     import obi_pkg::*;
 
+    localparam int unsigned NoRs = 2;
+    localparam int unsigned NoVs = 3;
+
     localparam int unsigned AddrWidth   = 32;
     localparam int unsigned XlenWidth   = 32;
     localparam int unsigned ElemWidth   = 8;

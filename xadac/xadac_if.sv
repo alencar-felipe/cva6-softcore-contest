@@ -10,12 +10,9 @@ interface xadac_dec_if;
     typedef struct {
         IdT   id;
         logic rd_clobber;
-        logic rs1_read;
-        logic rs2_read;
         logic vd_clobber;
-        logic vs1_read;
-        logic vs2_read;
-        logic vs3_read;
+        logic [NoRs-1:0] rs_read;
+        logic [NoVs-1:0] vs_read;
         logic accept;
     } rsp_t;
 
@@ -56,18 +53,19 @@ interface xadac_exe_if;
     typedef struct {
         IdT     id;
         InstrT  instr;
-        XlenT   rs1;
-        XlenT   rs2;
-        VectorT vs1;
-        VectorT vs2;
-        VectorT vs3;
+        RegIdT  [NoRs-1:0] rs_addr;
+        XlenT   [NoRs-1:0] rs_data;
+        RegIdT  [NoVs-1:0] vs_addr;
+        VectorT [NoVs-1:0] vs_data;
     } req_t;
 
     typedef struct {
         IdT     id;
-        XlenT   rd;
-        VectorT vd;
+        RegIdT  rd_addr;
+        XlenT   rd_data;
         logic   rd_write;
+        XlenT   vd_addr;
+        VectorT vd_data;
         logic   vd_write;
     } rsp_t;
 
