@@ -6,20 +6,16 @@ module xadac_vrf
 
     input  RegIdT  [2:0] rid,
     output VectorT [2:0] rdata,
-
-    input RegIdT  wid,
-    input VectorT wdata,
-    input BeT     wbe,
-    input logic   we
+    input  RegIdT        wid,
+    input  VectorT       wdata,
+    input  logic         we
 );
-
-    localparam int unsigned VrfLen = 2**RegIdT;
 
     VectorT [VrfLen-1:0] vrf;
 
     always_ff @(posedge clk) begin
-        for (int i = 0; i < VectorWidth/8; i++) begin
-            if (we & wbe[i]) vrf[wid][i*8 +: 8] <= wdata[i*8 +: 8];
+        if (we) begin
+            vrf[wid] <= wdata;
         end
     end
 

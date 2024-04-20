@@ -1,9 +1,9 @@
 module xadac_vload_unit
     import xadac_pkg::*;
 (
-    input logic     clk,
-    input logic     rstn,
-    xadac_ex_if.slv slv
+    input logic  clk,
+    input logic  rstn,
+    xadac_if.slv slv
 );
 
     // Scoreboard =============================================================

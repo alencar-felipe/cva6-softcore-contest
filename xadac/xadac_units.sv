@@ -1,10 +1,11 @@
-module xadac_ex
+module xadac_units
     import xadac_pkg::*;
 (
-    input logic     clk,
-    input logic     rstn,
-    xadac_ex_if.slv slv,
-    OBI_BUS.Manager obi
+    input logic      clk,
+    input logic      rstn,
+    xadac_dec_if.slv dec,
+    xadac_exe_if.slv exe,
+    OBI_BUS.Manager  obi
 );
 
     typedef struct {
@@ -24,7 +25,7 @@ module xadac_ex
 
     // Unit Interfaces ========================================================
 
-    xadac_ex_if  unit_if  [NoUnits]    ();
+    xadac_if  unit_if  [NoUnits]    ();
     OBI_BUS      unit_obi [NoObiUnits] (.OBI_CFG (ObiCfg));
 
     IdT     unit_req_id         [NoUnits];
