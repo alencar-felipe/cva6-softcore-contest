@@ -2,32 +2,72 @@ package xadac_pkg;
 
     import obi_pkg::*;
 
-    localparam int unsigned NoRs = 2;
-    localparam int unsigned NoVs = 3;
+    localparam type SizeT = int unsigned;
 
-    localparam int unsigned AddrWidth   = 32;
-    localparam int unsigned XlenWidth   = 32;
-    localparam int unsigned ElemWidth   = 8;
-    localparam int unsigned IdWidth     = 4;
-    localparam int unsigned InstrWidth  = 32;
-    localparam int unsigned VLenWidth   = 7;
-    localparam int unsigned VrfIdWidth  = 5;
-    localparam int unsigned SumWidth    = 32;
-    localparam int unsigned VectorWidth = 128;
+    localparam SizeT NoRs = 2;
+    localparam SizeT NoVs = 3;
 
-    localparam int unsigned BeWidth = VectorWidth/8;
-    localparam int unsigned VrfLen  = 2**VrfIdWidth;
-    localparam int unsigned SbLen   = 2**IdWidth;
+    localparam SizeT AddrWidth    = 32;
+    localparam SizeT IdWidth      = 4;
+    localparam SizeT InstrWidth   = 32;
+    localparam SizeT RegAddrWidth = 5;
+    localparam SizeT RegDataWidth = 32;
 
-    localparam type AddrT   = logic [AddrWidth-1:0];
-    localparam type XlenT   = logic [XlenWidth-1:0];
-    localparam type ElemT   = logic [ElemWidth-1:0];
-    localparam type IdT     = logic [IdWidth-1:0];
-    localparam type InstrT  = logic [InstrT-1:0];
-    localparam type VLenT   = logic [VLenWidth-1:0];
-    localparam type VrfIdT  = logic [VrfIdWidth-1:0];
-    localparam type SumT    = logic [SumWidth-1:0];
-    localparam type VectorT = logic [VectorWidth-1:0];
+    localparam type AddrT    = logic [AddrWidth-1:0];
+    localparam type IdT      = logic [IdWidth-1:0];
+    localparam type InstrT   = logic [InstrT-1:0];
+    localparam type RegAddrT = logic [RegAddrWidth-1:0];
+    localparam type RegDataT = logic [RegDataWidth-1:0];
+
+    localparam SizeT VecAddrWidth = 5;
+    localparam SizeT VecDataWidth = 128;
+    localparam SizeT VecElemWidth = 8;
+    localparam SizeT VecLenWidth  = $clog(VecDataWidth/VecElemWidth);
+    localparam SizeT VecSumWidth  = 32;
+
+    localparam type VecAddrT = logic [VecAddrWidth-1:0];
+    localparam type VecDataT = logic [VecDataWidth-1:0];
+    localparam type VecElemT = logic [VecElemWidth-1:0];
+    localparam type VecLenT  = logic [VecLenWidth-1:0];
+    localparam type VecSumT  = logic [VecSumWidth-1:0];
+
+    localparam SizeT NoReg      = 2**RegAddrWidth;
+    localparam SizeT NoVec      = 2**VecAddrWidth;
+    localparam SizeT SbLen      = 2**IdWidth;
+    localparam SizeT VecBeWidth = VecDataWidth/8;
+
+    localparam type DecReqT = struct packed {
+        IdT    id;
+        InstrT instr;
+    };
+
+    localparam type DecRspT = struct packed {
+        IdT   id;
+        logic rd_clobber;
+        logic vd_clobber;
+        logic [NoRs-1:0] rs_read;
+        logic [NoVs-1:0] vs_read;
+        logic accept;
+    };
+
+    localparam type ExeReqT = struct packed {
+        IdT    id;
+        InstrT instr;
+        RegAddrT [NoRs-1:0] rs_addr;
+        RegDataT [NoRs-1:0] rs_data;
+        VecAddrT [NoVs-1:0] vs_addr;
+        VecDataT [NoVs-1:0] vs_data;
+    };
+
+    localparam type ExeRspT = struct packed {
+        IdT      id;
+        RegAddrT rd_addr;
+        RegDataT rd_data;
+        logic    rd_write;
+        VecAddrT vd_addr;
+        VecDataT vd_data;
+        logic    vd_write;
+    };
 
     localparam obi_cfg_t ObiCfg = obi_default_cfg(
         AddrWidth,
@@ -35,5 +75,13 @@ package xadac_pkg;
         IdWidth,
         ObiMinimalOptionalConfig
     );
+
+    function automatic SizeT min(SizeT a, SizeT b);
+        return (a < b) ? a : b;
+    endfunction
+
+    function automatic SizeT max(SizeT a, SizeT b);
+        return (a > b) ? a : b;
+    endfunction
 
 endpackage

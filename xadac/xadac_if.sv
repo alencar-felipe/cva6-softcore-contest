@@ -1,99 +1,57 @@
-interface xadac_dec_if;
+interface xadac_if;
 
     import xadac_pkg::*;
 
-    typedef struct {
-        IdT    id;
-        InstrT instr;
-    } req_t;
+    DecReqT dec_req;
+    logic   dec_req_valid;
+    logic   dec_req_ready;
 
-    typedef struct {
-        IdT   id;
-        logic rd_clobber;
-        logic vd_clobber;
-        logic [NoRs-1:0] rs_read;
-        logic [NoVs-1:0] vs_read;
-        logic accept;
-    } rsp_t;
+    DecRspT dec_rsp;
+    logic   dec_rsp_valid;
+    logic   dec_rsp_ready;
 
-    req_t req;
-    logic req_valid;
-    logic req_ready;
+    ExeReqT exe_req;
+    logic   exe_req_valid;
+    logic   exe_req_ready;
 
-    rsp_t rsp;
-    logic rsp_valid;
-    logic rsp_ready;
+    ExeRspT exe_rsp;
+    logic   exe_rsp_valid;
+    logic   exe_rsp_ready;
 
     modport mst (
-        output req,
-        output rep_valid,
-        input  req_ready,
+        output dec_req,
+        output dec_req_valid,
+        input  dec_req_ready,
 
-        input  rsp,
-        input  rsp_valid,
-        output rsp_ready
+        input  dec_rsp,
+        input  dec_rsp_valid,
+        output dec_rsp_ready,
+
+        output exe_req,
+        output exe_req_valid,
+        input  exe_req_ready,
+
+        input  exe_rsp,
+        input  exe_rsp_valid,
+        output exe_rsp_ready
     );
 
     modport slv (
-        input  req,
-        input  req_valid,
-        output req_ready,
+        input  dec_req,
+        input  dec_req_valid,
+        output dec_req_ready,
 
-        output rsp,
-        output rsp_valid,
-        input  rsp_ready
-    );
+        output dec_rsp,
+        output dec_rsp_valid,
+        input  dec_rsp_ready,
 
-endinterface
+        input  exe_req,
+        input  exe_req_valid,
+        output exe_req_ready,
 
-interface xadac_exe_if;
-
-    import xadac_pkg::*;
-
-    typedef struct {
-        IdT     id;
-        InstrT  instr;
-        RegIdT  [NoRs-1:0] rs_addr;
-        XlenT   [NoRs-1:0] rs_data;
-        RegIdT  [NoVs-1:0] vs_addr;
-        VectorT [NoVs-1:0] vs_data;
-    } req_t;
-
-    typedef struct {
-        IdT     id;
-        RegIdT  rd_addr;
-        XlenT   rd_data;
-        logic   rd_write;
-        XlenT   vd_addr;
-        VectorT vd_data;
-        logic   vd_write;
-    } rsp_t;
-
-    req_t req;
-    logic req_valid;
-    logic req_ready;
-
-    rsp_t rsp;
-    logic rsp_valid;
-    logic rsp_ready;
-
-    modport mst (
-        output req,
-        output req_valid,
-        input  req_ready,
-
-        input  rsp,
-        input  rsp_valid,
-        output rsp_ready
-    );
-
-    modport slv (
-        input  req,
-        input  req_valid,
-        output req_ready,
-
-        output rsp,
-        input  rsp_ready
+        output exe_rsp,
+        output exe_rsp_valid,
+        input  exe_rsp_ready
     );
 
 endinterface
