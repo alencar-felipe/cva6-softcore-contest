@@ -24,17 +24,18 @@ package xadac_pkg;
     localparam SizeT VecElemWidth = 8;
     localparam SizeT VecLenWidth  = $clog(VecDataWidth/VecElemWidth);
     localparam SizeT VecSumWidth  = 32;
+    localparam SizeT VecStrbWidth = VecDataWidth/8;
 
     localparam type VecAddrT = logic [VecAddrWidth-1:0];
     localparam type VecDataT = logic [VecDataWidth-1:0];
     localparam type VecElemT = logic [VecElemWidth-1:0];
     localparam type VecLenT  = logic [VecLenWidth-1:0];
     localparam type VecSumT  = logic [VecSumWidth-1:0];
+    localparam type VecStrbT = logic [VecStrbWidth-1:0];
 
-    localparam SizeT NoReg      = 2**RegAddrWidth;
-    localparam SizeT NoVec      = 2**VecAddrWidth;
-    localparam SizeT SbLen      = 2**IdWidth;
-    localparam SizeT VecBeWidth = VecDataWidth/8;
+    localparam SizeT NoReg = 2**RegAddrWidth;
+    localparam SizeT NoVec = 2**VecAddrWidth;
+    localparam SizeT SbLen = 2**IdWidth;
 
     localparam type DecReqT = struct packed {
         IdT    id;
