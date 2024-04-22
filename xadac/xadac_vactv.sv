@@ -111,6 +111,8 @@ module xadac_vactv
         // axi aw =============================================================
 
         if (axi_aw_valid && axi_aw_ready) begin
+            axi_aw_id_d    = '0;
+            axi_aw_addr_d  = '0;
             axi_aw_valid_d = '0;
         end
 
@@ -130,6 +132,8 @@ module xadac_vactv
         // axi w ==============================================================
 
         if (axi_w_valid && axi_w_ready) begin
+            axi_w_data_d  = '0;
+            axi_w_strb_d  = '0;
             axi_w_valid_d = '0;
         end
 
@@ -159,6 +163,7 @@ module xadac_vactv
         id = slv.exe_rsp.id;
 
         if (slv.exe_rsp_valid && slv.exe_rsp_ready) begin
+            exe_rsp_d       = '0;
             exe_rsp_valid_d = '0;
         end
 

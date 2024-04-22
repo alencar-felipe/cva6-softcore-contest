@@ -1,10 +1,19 @@
 module xadac_vload
     import xadac_pkg::*;
 (
-    input logic     clk,
-    input logic     rstn,
-    xadac_if.slv    slv,
-    OBI_BUS.Manager obi
+    input logic  clk,
+    input logic  rstn,
+    xadac_if.slv slv,
+
+    output IdT   axi_ar_id,
+    output AddrT axi_ar_addr,
+    output logic axi_ar_valid,
+    input  logic axi_ar_ready,
+
+    input  IdT      axi_r_id,
+    input  VecDataT axi_r_data,
+    input  logic    axi_r_valid,
+    output logic    axi_r_ready
 );
 
     typedef struct packed {
@@ -14,8 +23,8 @@ module xadac_vload
         VecDataT rdata;
         logic    exe_req_done;
         logic    exe_rsp_done;
-        logic    obi_a_done;
-        logic    obi_r_done;
+        logic    axi_ar_done;
+        logic    axi_r_done;
     } entry_t;
 
     entry_t [SbLen-1:0] sb_d, sb_q;
@@ -23,14 +32,11 @@ module xadac_vload
     ExeRspT exe_rsp_d;
     logic   exe_rsp_valid_d;
 
-    logic obi_req_d;
-    AddrT obi_addr_d;
-    IdT   obi_aid_d;
+    IdT   axi_ar_id_d;
+    AddrT axi_ar_addr_d;
+    logic axi_ar_valid_d;
 
-    assign obi.we     = '0;
-    assign obi.be     = '0;
-    assign obi.wdata  = '0;
-    assign obi.rready = '1;
+    logic axi_r_ready_d;
 
     always_comb begin : comb
         automatic IdT id;
@@ -40,9 +46,11 @@ module xadac_vload
         exe_rsp_d       = slv.exe_rsp;
         exe_rsp_valid_d = slv.exe_rsp_valid;
 
-        obi_req_d  = obi.req;
-        obi_addr_d = obi.addr;
-        obi_aid_d  = obi.aid;
+        axi_ar_id_d    = axi_ar_id;
+        axi_ar_addr_d  = axi_ar_addr;
+        axi_ar_valid_d = axi_ar_valid;
+
+        axi_r_ready_d = axi_r_ready;
 
         // dec ================================================================
 
@@ -59,36 +67,6 @@ module xadac_vload
         slv.dec_rsp.vs_read[2] = '0;
         slv.dec_rsp.accept = '1;
 
-        // obi r channel - end ================================================
-
-        id = obi.rid;
-
-        if (obi.rvalid && obi.rready) begin
-            sb_d[id].data       = obi.rdata;
-            sb_d[id].obi_r_done = '1;
-        end
-
-        // obi a channel - end ================================================
-
-        id = obi.aid;
-
-        if (obi.req && obi.gnt) begin
-            obi_req_d           = '0;
-            obi_addr_d          = '0;
-            obi_aid_d           = '0;
-            sb_d[id].obi_a_done = '1;
-        end
-
-        // exe rsp channel - end ==============================================
-
-        id = slv.exe_rsq.id;
-
-        if (slv.exe_rsp_valid && obi.exe_rsp_ready) begin
-            exe_rsp_d             = '0;
-            exe_rsp_valid_d       = '0;
-            sb_d[id].exe_rsp_done = '1;
-        end
-
         // exe req channel ====================================================
 
         id = slv.exe_req.id;
@@ -99,25 +77,54 @@ module xadac_vload
             sb_d[id].addr     = AddrT'(slv.req_rs1);
             sb_d[id].vd_addr  = slv.exe_req.instr[11:7];
             sb_d[id].vlen     = slv.exe_req.instr[25 +: VecLenWidth];
-            sb_d[id].req_done = '1;
+            sb_d[id].exe_req_done = '1;
         end
 
-        // obi a channel - start ==============================================
+        // axi ar =============================================================
+
+        id = axi_ar_id;
+
+        if (axi_ar_valid && axi_ar_ready) begin
+            axi_ar_id_d    = '0;
+            axi_ar_addr_d  = '0;
+            axi_ar_valid_d = '0;
+        end
 
         for(id = 0; id < SbLen; id++) begin
-            if(!obi_req_d && sb_d[id].req_done && !sb_d[id].obi_a_done) begin
-                obi_req_d  = '1;
-                obi_addr_d = sb_d[id].addr;
-                obi_aid_d  = id;
+            if(
+                !axi_ar_valid_d &&
+                sb_d[id].req_done &&
+                !sb_d[id].axi_ar_done
+            ) begin
+                axi_ar_id_d    = id;
+                axi_ar_addr_d  = sb_d[id].addr;
+                axi_ar_valid_d = '1;
+                sb_d[id].axi_ar_done = '1;
             end
         end
 
-        // exe rsp channel - start ============================================
+        // axi r ==============================================================
+
+        id = axi_r_id;
+
+        if (axi_r_valid && axi_r_ready) begin
+            sb_d[id].data = axi_r_data;
+            sb_d[id].axi_r_done = '1;
+        end
+
+        // exe rsp ============================================================
+
+        id = slv.exe_rsq.id;
+
+        if (slv.exe_rsp_valid && obi.exe_rsp_ready) begin
+            exe_rsp_d        = '0;
+            exe_rsp_valid_d  = '0;
+        end
 
         for(id = 0; id < SbLen; id++) begin
             if(
                 !exe_rsp_valid_d &&
-                sb_d[id].obi_r_done &&
+                sb_d[id].axi_r_done &&
                 !sb_d[id].exe_rsp_done
             ) begin
 
@@ -133,8 +140,9 @@ module xadac_vload
                 exe_rsp_d.vd_addr  = sb_d[id].vd_addr;
                 exe_rsp_d.vd_data  = vd_data;
                 exe_rsp_d.vd_write = '1;
+                exe_rsp_valid_d    = '1;
 
-                exe_rsp_valid_d = '1;
+                sb_d[id].exe_rsp_done = '1;
             end
         end
 
@@ -144,8 +152,8 @@ module xadac_vload
             if (
                 sb_d[id].exe_req_done &&
                 sb_d[id].exe_rsp_done &&
-                sb_d[id].obi_a_done &&
-                sb_d[id].obi_r_done
+                sb_d[id].axi_ar_done &&
+                sb_d[id].axi_r_done
             ) begin
                 sb_d[id] = '0;
             end
@@ -159,9 +167,11 @@ module xadac_vload
             slv.exe_rsp       <= '0;
             slv.exe_rsp_valid <= '0;
 
-            obi.req  <= '0;
-            obi.addr <= '0;
-            obi.aid  <= '0;
+            axi_ar_id    <= '0;
+            axi_ar_addr  <= '0;
+            axi_ar_valid <= '0;
+
+            axi_r_valid <= '0;
         end
         else begin
             sb_q <= sb_q;
@@ -169,9 +179,11 @@ module xadac_vload
             slv.exe_rsp       <= exe_rsp_d;
             slv.exe_rsp_valid <= exe_rsp_valid_d;
 
-            obi.req  <= obi_req_d;
-            obi.addr <= obi_addr_d;
-            obi.aid  <= obi_aid_d;
+            axi_ar_id    <= axi_ar_id_d;
+            axi_ar_addr  <= axi_ar_addr_d;
+            axi_ar_valid <= axi_ar_valid_d;
+
+            axi_r_valid <= axi_r_ready_d;
         end
     end
 
