@@ -20,7 +20,7 @@ module xadac_vload
         AddrT    addr;
         VecAddrT vd_addr;
         VecLenT  vlen;
-        VecDataT rdata;
+        VecDataT data;
         logic    exe_req_done;
         logic    exe_rsp_done;
         logic    axi_ar_done;
@@ -93,7 +93,7 @@ module xadac_vload
         for(id = 0; id < SbLen; id++) begin
             if(
                 !axi_ar_valid_d &&
-                sb_d[id].req_done &&
+                sb_d[id].exe_req_done &&
                 !sb_d[id].axi_ar_done
             ) begin
                 axi_ar_id_d    = id;
@@ -132,7 +132,7 @@ module xadac_vload
                 for (VecLenT i = 0; i < VecDataWidth/VecElemWidth; i++) begin
                     automatic VecLenT j = (i % sb_d[id].vlen);
                     vd_data[VecElemWidth*i +: VecElemWidth] =
-                        sb_d[id].rdata[VecElemWidth*j +: VecElemWidth];
+                        sb_d[id].data[VecElemWidth*j +: VecElemWidth];
                 end
 
                 exe_rsp_d          = '0;
@@ -171,7 +171,7 @@ module xadac_vload
             axi_ar_addr  <= '0;
             axi_ar_valid <= '0;
 
-            axi_r_valid <= '0;
+            axi_r_ready <= '0;
         end
         else begin
             sb_q <= sb_q;
@@ -183,7 +183,7 @@ module xadac_vload
             axi_ar_addr  <= axi_ar_addr_d;
             axi_ar_valid <= axi_ar_valid_d;
 
-            axi_r_valid <= axi_r_ready_d;
+            axi_r_ready <= axi_r_ready_d;
         end
     end
 

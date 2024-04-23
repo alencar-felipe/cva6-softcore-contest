@@ -64,9 +64,7 @@ module xadac_vclobber
 
         if (mst.dec_rsp_valid && mst.dec_rsp_ready) begin
             sb_d[id].vd_clobber = mst.dec_rsp.vd_clobber;
-            sb_d[id].vs1_read   = mst.dec_rsp.vs1_read;
-            sb_d[id].vs2_read   = mst.dec_rsp.vs2_read;
-            sb_d[id].vs3_read   = mst.dec_rsp.vs3_read;
+            sb_d[id].vs_read    = mst.dec_rsp.vs_read;
             sb_d[id].dec_rsp_done = '1;
             if (!mst.dec_rsp.accept) sb_d[id] = '0;
         end
@@ -90,7 +88,7 @@ module xadac_vclobber
         end
 
         for (SizeT i = 0; i < NoVs; i++) begin
-            if (sb_d[id].rsp_vs_read[i] && clobber_d[vs_addr[i]]) begin
+            if (sb_d[id].vs_read[i] && clobber_d[vs_addr[i]]) begin
                 mst.exe_req_valid = '0;
             end
         end

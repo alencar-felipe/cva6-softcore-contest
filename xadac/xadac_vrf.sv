@@ -54,12 +54,12 @@ module xadac_vrf
 
     always_comb begin : comb_exe_rsp
         if (mst.exe_rsp_valid && mst.exe_rsp_ready) begin
-            phy_waddr   = mst.exe_rsp.vd_id;
-            phy_wdata = mst.exe_rsp.vd;
+            phy_waddr = mst.exe_rsp.vd_addr;
+            phy_wdata = mst.exe_rsp.vd_data;
             phy_we    = mst.exe_rsp.vd_write;
         end
         else begin
-            phy_waddr   = '0;
+            phy_waddr = '0;
             phy_wdata = '0;
             phy_we    = '0;
         end
