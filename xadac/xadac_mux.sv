@@ -66,7 +66,7 @@ module xadac_mux
 
         if (slv.dec_req_valid) begin
             for (idx = 0; idx < NoMst; idx++) begin
-                if (slv.instr & Mask[idx] == Match[idx]) break;
+                if (slv.dec_req.instr & Mask[idx] == Match[idx]) break;
             end
 
             mst_dec_req[idx]       = slv.dec_req;

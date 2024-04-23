@@ -104,6 +104,10 @@ module xadac
         .axi_w_strb  (axi_w_strb),
         .axi_w_valid (axi_w_valid),
         .axi_w_ready (axi_w_ready),
+
+        .axi_b_id    (axi_b_id),
+        .axi_b_valid (axi_b_valid),
+        .axi_b_ready (axi_b_ready)
     );
 
     // axi assign =============================================================

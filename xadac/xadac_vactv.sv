@@ -1,5 +1,5 @@
 module xadac_vactv
-    import xadac_if::*;
+    import xadac_pkg::*;
 (
     input logic     clk,
     input logic     rstn,
@@ -21,14 +21,14 @@ module xadac_vactv
 );
 
     typedef struct packed {
-        AddrT   addr;
-        VectorT data;
-        BeT     strb;
-        logic   exe_req_done;
-        logic   exe_rsp_done;
-        logic   axi_aw_done;
-        logic   axi_w_done;
-        logic   axi_b_done;
+        AddrT    addr;
+        VecDataT data;
+        VecStrbT strb;
+        logic    exe_req_done;
+        logic    exe_rsp_done;
+        logic    axi_aw_done;
+        logic    axi_w_done;
+        logic    axi_b_done;
     } entry_t;
 
     entry_t [SbLen-1:0] sb_d, sb_q;
@@ -82,7 +82,7 @@ module xadac_vactv
 
         id = slv.exe_req.id;
 
-        slv.req_ready = (slv.req_valid && !sb_d[id].exe_req_done);
+        slv.exe_req_ready = (slv.exe_req_valid && !sb_d[id].exe_req_done);
 
         if (slv.exe_req_valid && slv.exe_req_ready) begin
             automatic VecLenT   vlen;
@@ -96,13 +96,13 @@ module xadac_vactv
 
             wdata = '0;
             for (VecLenT i = 0; i < vlen; i++) begin
-                sum = slv.exe_req.vs_data[2][SumWidth*i +: SumWidth];
+                sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
                 elem = (sum > 0) ? (sum >> shift) : 0;
-                wdata[ElemWidth*i +: ElemWidth] = elem;
+                wdata[VecElemWidth*i +: VecElemWidth] = elem;
             end
 
             sb_d[id].addr  = AddrT'(slv.exe_req.rs_data[0]);
-            sb_d[id].be    = BeT'((1 << vlen) - 1);
+            sb_d[id].strb  = VecStrbT'((1 << vlen) - 1);
             sb_d[id].wdata = wdata;
 
             sb_d[id].exe_req_done = '1;

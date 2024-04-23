@@ -30,10 +30,10 @@ module xadac_vbias
         slv.exe_req_ready = (slv.exe_rsp_valid && slv.exe_rsp_ready);
 
         slv.exe_rsp    = '0;
-        slv.exe_rsp.id = slv.exe_req_id;
+        slv.exe_rsp.id = slv.exe_req.id;
         for (VecLenT i = 0; i < vlen; i++) begin
-            slv.exe_rsp.vd[SumWidth*i +: SumWidth] =
-                SumT'(slv.exe_req.rs_data[0]);
+            slv.exe_rsp.vd[VecSumWidth*i +: VecSumWidth] =
+                VecSumT'(slv.exe_req.rs_data[0]);
         end
     end
 

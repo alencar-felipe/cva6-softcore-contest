@@ -74,7 +74,7 @@ module xadac_vload
         slv.exe_req_ready = (slv.exe_req_valid && !sb_d[id].exe_req_done);
 
         if (slv.exe_req_valid && slv.exe_req_ready) begin
-            sb_d[id].addr     = AddrT'(slv.req_rs1);
+            sb_d[id].addr     = AddrT'(slv.exe_req.rs_data[0]);
             sb_d[id].vd_addr  = slv.exe_req.instr[11:7];
             sb_d[id].vlen     = slv.exe_req.instr[25 +: VecLenWidth];
             sb_d[id].exe_req_done = '1;
@@ -114,9 +114,9 @@ module xadac_vload
 
         // exe rsp ============================================================
 
-        id = slv.exe_rsq.id;
+        id = slv.exe_rsp.id;
 
-        if (slv.exe_rsp_valid && obi.exe_rsp_ready) begin
+        if (slv.exe_rsp_valid && slv.exe_rsp_ready) begin
             exe_rsp_d        = '0;
             exe_rsp_valid_d  = '0;
         end
@@ -129,7 +129,7 @@ module xadac_vload
             ) begin
 
                 automatic VecDataT vd_data = '0;
-                for (VecLenT i = 0; i < VectorWidth/ElemWidth; i++) begin
+                for (VecLenT i = 0; i < VecDataWidth/VecElemWidth; i++) begin
                     automatic VecLenT j = (i % sb_d[id].vlen);
                     vd_data[VecElemWidth*i +: VecElemWidth] =
                         sb_d[id].rdata[VecElemWidth*j +: VecElemWidth];
