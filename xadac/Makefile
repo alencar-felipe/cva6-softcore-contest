@@ -3,8 +3,8 @@ CXX        = g++
 CXXFLAGS   = -Wall -O3
 LDFLAGS    = -lverilated -lverilated_vcd_c
 
-AXI_DIR = ../vendor/pulp-platform/axi
-OBJ_DIR = ./obj
+AXI_DIR   = ../vendor/pulp-platform/axi
+BUILD_DIR = ./build
 
 TOP = xadac_verilator
 
@@ -20,32 +20,34 @@ SRC = \
 	xadac_vactv.sv \
 	xadac_vbias.sv \
 	xadac_vclobber.sv \
-	xadac_verilator.sv \
 	xadac_vload.sv \
 	xadac_vmacc.sv \
 	xadac_vrf_phy.sv \
 	xadac_vrf.sv \
-	xadac.sv
+	xadac.sv \
+	xadac_verilator.sv \
+	xadac_verilator.cpp
 
-INC_FLAGS = $(foreach dir, $(INC), -I$(dir))
-
-CPP_OUTPUT = $(OBJ_DIR)/$(TOP)_verilated.cpp
-OBJ_OUTPUT = $(OBJ_DIR)/$(TOP)_verilated.o
-EXE_OUTPUT = $(OBJ_DIR)/$(TOP)_sim
+VFLAGS = \
+	--exe --cc \
+	--Wno-fatal \
+	-Mdir $(BUILD_DIR) \
+	$(foreach dir, $(INC), -I$(dir)) \
+	--top $(TOP) \
+	--trace
 
 $(shell mkdir -p $(OBJ_DIR))
 
 verilate: $(SRC)
-	$(VERILATOR) --cc $(SRC) $(INC_FLAGS) --exe -o $(CPP_OUTPUT)
+	$(VERILATOR) $(SRC) $(VFLAGS)
 
-compile: verilate
-	$(CXX) $(CXXFLAGS) -c $(CPP_OUTPUT) -o $(OBJ_OUTPUT)
-	$(CXX) $(CXXFLAGS) $(OBJ_DIR)/$(TOP).o -o $(EXE_OUTPUT) $(LDFLAGS)
+compile:
+	$(VERILATOR) $(SRC) $(VFLAGS) --build
 
 run: compile
-	./$(EXE_OUTPUT)
+	$(BUILD_DIR)/V$(TOP)
 
 clean:
-	rm -rf $(OBJ_DIR)
+	rm -rf $(BUILD_DIR)
 
 .PHONY: verilate compile run clean

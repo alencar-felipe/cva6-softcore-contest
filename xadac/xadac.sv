@@ -9,6 +9,20 @@ module xadac
 
     localparam SizeT NoUnits = 4;
 
+    localparam InstrT [NoUnits-1:0] Mask = '{
+        32'h0000_707f,
+        32'h01f0_707f,
+        32'h01f0_707f,
+        32'h0000_707f
+    };
+
+    localparam InstrT [NoUnits-1:0] Match = '{
+        32'h0000_3077,
+        32'h0000_1077,
+        32'h0000_0077,
+        32'h0000_2077
+    };
+
     xadac_if slv_vrf ();
     xadac_if slv_mux ();
     xadac_if slv_unit [NoUnits] ();
@@ -53,8 +67,8 @@ module xadac
 
     xadac_mux #(
         .NoMst (NoUnits),
-        .Mask  ('0),
-        .Match ('0)
+        .Mask  (Mask),
+        .Match (Match)
     ) i_mux (
         .clk  (clk),
         .rstn (rstn),
@@ -112,7 +126,7 @@ module xadac
 
     // axi assign =============================================================
 
-    localparam int unsigned AxiSize = axi_pkg::size_t'(
+    localparam axi_pkg::size_t AxiSize = axi_pkg::size_t'(
         $unsigned($clog2(VecDataWidth/8))
     );
 

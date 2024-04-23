@@ -4,7 +4,7 @@ module xadac_verilator
     input logic clk,
     input logic rstn,
 
-    input  logic  dec_req_id,
+    input  IdT    dec_req_id,
     input  InstrT dec_req_instr,
     input  logic  dec_req_valid,
     output logic  dec_req_ready,
@@ -21,7 +21,7 @@ module xadac_verilator
     output logic dec_rsp_valid,
     input  logic dec_rsp_ready,
 
-    input  logic    exe_req_id,
+    input  IdT      exe_req_id,
     input  InstrT   exe_req_instr,
     input  RegAddrT exe_req_rs_addr_0,
     input  RegAddrT exe_req_rs_addr_1,
@@ -121,7 +121,7 @@ module xadac_verilator
         .AXI_ID_WIDTH   (IdWidth),
         .AXI_ADDR_WIDTH (AddrWidth),
         .AXI_DATA_WIDTH (VecDataWidth),
-        .AXI_USER_WIDTH ('0)
+        .AXI_USER_WIDTH (1)
     ) axi ();
 
     assign axi_aw_id    = axi.aw_id;

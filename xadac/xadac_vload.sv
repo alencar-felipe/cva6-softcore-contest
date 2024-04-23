@@ -39,7 +39,10 @@ module xadac_vload
     logic axi_r_ready_d;
 
     always_comb begin : comb
-        automatic IdT id;
+        automatic IdT      id      = '0;
+        automatic SizeT    i       = '0;
+        automatic SizeT    j       = '0;
+        automatic VecDataT vd_data = '0;
 
         sb_d    = sb_q;
 
@@ -90,7 +93,8 @@ module xadac_vload
             axi_ar_valid_d = '0;
         end
 
-        for(id = 0; id < SbLen; id++) begin
+        for(i = 0; i < SbLen; i++) begin
+            id = IdT'(i);
             if(
                 !axi_ar_valid_d &&
                 sb_d[id].exe_req_done &&
@@ -121,16 +125,16 @@ module xadac_vload
             exe_rsp_valid_d  = '0;
         end
 
-        for(id = 0; id < SbLen; id++) begin
+        for(i = 0; i < SbLen; i++) begin
+            id = IdT'(i);
             if(
                 !exe_rsp_valid_d &&
                 sb_d[id].axi_r_done &&
                 !sb_d[id].exe_rsp_done
             ) begin
-
-                automatic VecDataT vd_data = '0;
-                for (VecLenT i = 0; i < VecDataWidth/VecElemWidth; i++) begin
-                    automatic VecLenT j = (i % sb_d[id].vlen);
+                vd_data = '0;
+                for (i = 0; i < VecDataWidth/VecElemWidth; i++) begin
+                    j = i % SizeT'(sb_d[id].vlen);
                     vd_data[VecElemWidth*i +: VecElemWidth] =
                         sb_d[id].data[VecElemWidth*j +: VecElemWidth];
                 end
@@ -148,7 +152,8 @@ module xadac_vload
 
         // end ================================================================
 
-        for (id = 0; id < SbLen; id++) begin
+        for (i = 0; i < SbLen; i++) begin
+            id = IdT'(i);
             if (
                 sb_d[id].exe_req_done &&
                 sb_d[id].exe_rsp_done &&

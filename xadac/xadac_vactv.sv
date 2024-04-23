@@ -47,7 +47,13 @@ module xadac_vactv
     logic axi_b_ready_d;
 
     always_comb begin
-        automatic IdT id;
+        automatic SizeT     i     = '0;
+        automatic IdT       id    = '0;
+        automatic VecLenT   vlen  = '0;
+        automatic RegDataT  shift = '0;
+        automatic VecDataT  data  = '0;
+        automatic VecSumT   sum   = '0;
+        automatic VecElemT  elem  = '0;
 
         sb_d    = sb_q;
 
@@ -85,19 +91,13 @@ module xadac_vactv
         slv.exe_req_ready = (slv.exe_req_valid && !sb_d[id].exe_req_done);
 
         if (slv.exe_req_valid && slv.exe_req_ready) begin
-            automatic VecLenT   vlen;
-            automatic RegDataT  shift;
-            automatic VecDataT  data;
-            automatic VecSumT   sum;
-            automatic VecElemT  elem;
-
             shift = RegDataT'(slv.exe_req.rs_data[1]);
             vlen  = slv.exe_req.instr[25 +: VecLenWidth];
 
             data = '0;
             for (VecLenT i = 0; i < vlen; i++) begin
                 sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
-                elem = (sum > 0) ? (sum >> shift) : 0;
+                elem = VecElemT'((sum > 0) ? (sum >> shift) : 0);
                 data[VecElemWidth*i +: VecElemWidth] = elem;
             end
 
@@ -116,13 +116,14 @@ module xadac_vactv
             axi_aw_valid_d = '0;
         end
 
-        for(id = 0; id < SbLen; id++) begin
+        for(i = 0; i < SbLen; i++) begin
+            id = IdT'(i);
             if(
                 !axi_aw_valid_d &&
                 sb_d[id].exe_req_done &&
                 !sb_d[id].axi_aw_done
             ) begin
-                axi_aw_id_d    = id;
+                axi_aw_id_d    = IdT'(id);
                 axi_aw_addr_d  = sb_d[id].addr;
                 axi_aw_valid_d = '1;
                 sb_d[id].axi_aw_done = '1;
@@ -137,7 +138,8 @@ module xadac_vactv
             axi_w_valid_d = '0;
         end
 
-        for(id = 0; id < SbLen; id++) begin
+        for(i = 0; i < SbLen; i++) begin
+            id = IdT'(i);
             if(
                 !axi_w_valid_d &&
                 sb_d[id].exe_req_done &&
@@ -167,14 +169,15 @@ module xadac_vactv
             exe_rsp_valid_d = '0;
         end
 
-        for(id = 0; id < SbLen; id++) begin
+        for(i = 0; i < SbLen; i++) begin
+            id = IdT'(i);
             if(
                 !exe_rsp_valid_d &&
                 sb_d[id].axi_b_done &&
                 !sb_d[id].exe_rsp_done
             ) begin
                 exe_rsp_d       = '0;
-                exe_rsp_d.id    = id;
+                exe_rsp_d.id    = IdT'(id);
                 exe_rsp_valid_d = '1;
                 sb_d[id].exe_rsp_done = '1;
             end
@@ -182,7 +185,8 @@ module xadac_vactv
 
         // clean sb ===========================================================
 
-        for (id = 0; id < SbLen; id++) begin
+        for (i = 0; i < SbLen; i++) begin
+            id = IdT'(i);
             if (
                 sb_d[id].exe_req_done &&
                 sb_d[id].exe_rsp_done &&

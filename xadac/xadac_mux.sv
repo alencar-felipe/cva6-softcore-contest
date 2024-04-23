@@ -60,20 +60,20 @@ module xadac_mux
 
         // dec req ============================================================
 
-        mst_dec_req         = '0;
-        mst_dec_req_valid   = '0;
-        slv.dec_req_ready   = '0;
+        mst_dec_req       = '0;
+        mst_dec_req_valid = '0;
+        slv.dec_req_ready = '0;
 
         if (slv.dec_req_valid) begin
             for (idx = 0; idx < NoMst; idx++) begin
-                if (slv.dec_req.instr & Mask[idx] == Match[idx]) break;
+                if ((slv.dec_req.instr & Mask[idx]) == Match[idx]) break;
             end
 
             mst_dec_req[idx]       = slv.dec_req;
             mst_dec_req_valid[idx] = slv.dec_req_valid;
             slv.dec_req_ready      = mst_dec_req_valid[idx];
 
-            sb_d[slv.dec_req.id] = idx;
+            sb_d[slv.dec_req.id] = idx_t'(idx);
         end
 
         // dec rsp ============================================================
@@ -91,7 +91,7 @@ module xadac_mux
         slv.dec_rsp_valid      = mst_dec_rsp_valid[idx];
         mst_dec_rsp_ready[idx] = slv.dec_rsp_ready;
 
-        dec_rsp_idx_d = idx;
+        dec_rsp_idx_d = idx_t'(idx);
 
         // exe req ============================================================
 
@@ -100,7 +100,7 @@ module xadac_mux
         slv.exe_req_ready = '0;
 
         if (slv.exe_req_valid) begin
-            idx = sb_d[slv.exe_req.id];
+            idx = SizeT'(sb_d[slv.exe_req.id]);
 
             mst_exe_req[idx]       = slv.exe_req;
             mst_exe_req_valid[idx] = slv.exe_req_valid;
@@ -109,9 +109,9 @@ module xadac_mux
 
         // exe rsp ============================================================
 
-        slv.exe_rsp            = '0;
-        slv.exe_rsp_valid      = '0;
-        mst_exe_rsp_ready[idx] = '0;
+        slv.exe_rsp       = '0;
+        slv.exe_rsp_valid = '0;
+        mst_exe_rsp_ready = '0;
 
         for (idx = 0; idx < NoMst; idx++) begin
             if (mst_exe_rsp_valid[exe_rsp_idx_d]) break;
@@ -122,7 +122,7 @@ module xadac_mux
         slv.exe_rsp_valid      = mst_exe_rsp_valid[idx];
         mst_exe_rsp_ready[idx] = slv.exe_rsp_ready;
 
-        exe_rsp_idx_d = idx;
+        exe_rsp_idx_d = idx_t'(idx);
     end
 
     always_ff @(posedge clk, negedge rstn) begin
