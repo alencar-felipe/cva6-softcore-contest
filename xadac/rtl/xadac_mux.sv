@@ -71,7 +71,7 @@ module xadac_mux
 
             mst_dec_req[idx]       = slv.dec_req;
             mst_dec_req_valid[idx] = slv.dec_req_valid;
-            slv.dec_req_ready      = mst_dec_req_valid[idx];
+            slv.dec_req_ready      = mst_dec_req_ready[idx];
 
             sb_d[slv.dec_req.id] = idx_t'(idx);
         end

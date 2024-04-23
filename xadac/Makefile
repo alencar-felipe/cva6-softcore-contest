@@ -3,46 +3,58 @@ CXX        = g++
 CXXFLAGS   = -Wall -O3
 LDFLAGS    = -lverilated -lverilated_vcd_c
 
-AXI_DIR   = ../vendor/pulp-platform/axi
 BUILD_DIR = ./build
+
+AXI_DIR   = ../vendor/pulp-platform/axi
+BHV_DIR   = ./bhv
+RTL_DIR   = ./rtl
 
 TOP = xadac_verilator
 
-INC = \
+SV_INC = \
 	$(AXI_DIR)/include
 
-SRC = \
+SV_SRC = \
 	$(AXI_DIR)/src/axi_pkg.sv \
 	$(AXI_DIR)/src/axi_intf.sv \
-	xadac_pkg.sv \
-	xadac_if.sv \
-	xadac_mux.sv \
-	xadac_vactv.sv \
-	xadac_vbias.sv \
-	xadac_vclobber.sv \
-	xadac_vload.sv \
-	xadac_vmacc.sv \
-	xadac_vrf_phy.sv \
-	xadac_vrf.sv \
-	xadac.sv \
-	xadac_verilator.sv \
-	xadac_verilator.cpp
+	$(RTL_DIR)/xadac_pkg.sv \
+	$(RTL_DIR)/xadac_if.sv \
+	$(RTL_DIR)/xadac_mux.sv \
+	$(RTL_DIR)/xadac_vactv.sv \
+	$(RTL_DIR)/xadac_vbias.sv \
+	$(RTL_DIR)/xadac_vclobber.sv \
+	$(RTL_DIR)/xadac_vload.sv \
+	$(RTL_DIR)/xadac_vmacc.sv \
+	$(RTL_DIR)/xadac_vrf_phy.sv \
+	$(RTL_DIR)/xadac_vrf.sv \
+	$(RTL_DIR)/xadac.sv \
+	$(RTL_DIR)/xadac_verilator.sv
+
+C_INC = \
+	$(BHV_DIR)
+
+C_SRC = \
+	$(BHV_DIR)/main.cpp
+
+CFLAGS = \
+	$(foreach dir, $(C_INC), -I../$(dir))
 
 VFLAGS = \
 	--exe --cc \
 	--Wno-fatal \
 	-Mdir $(BUILD_DIR) \
-	$(foreach dir, $(INC), -I$(dir)) \
+	-CFLAGS "$(CFLAGS)" \
+	$(foreach dir, $(SV_INC), -I$(dir)) \
 	--top $(TOP) \
 	--trace
 
 $(shell mkdir -p $(OBJ_DIR))
 
 verilate: $(SRC)
-	$(VERILATOR) $(SRC) $(VFLAGS)
+	$(VERILATOR) $(SV_SRC) $(VFLAGS)
 
-compile:
-	$(VERILATOR) $(SRC) $(VFLAGS) --build
+compile: $(SRC)
+	$(VERILATOR) $(SV_SRC) $(C_SRC) $(VFLAGS) --build
 
 run: compile
 	$(BUILD_DIR)/V$(TOP)
