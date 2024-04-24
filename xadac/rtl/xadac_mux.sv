@@ -52,7 +52,7 @@ module xadac_mux
     end
 
     always_comb begin
-        automatic SizeT idx;
+        automatic idx_t idx = '0;
 
         sb_d          = sb_q;
         dec_rsp_idx_d = dec_rsp_idx_q;
@@ -64,16 +64,20 @@ module xadac_mux
         mst_dec_req_valid = '0;
         slv.dec_req_ready = '0;
 
-        if (slv.dec_req_valid) begin
-            for (idx = 0; idx < NoMst; idx++) begin
-                if ((slv.dec_req.instr & Mask[idx]) == Match[idx]) break;
+        for (SizeT i = 0; i < NoMst; i++) begin
+            idx = idx_t'(i);
+            if (
+                slv.dec_req_valid &&
+                ((slv.dec_req.instr & Mask[idx]) == Match[idx])
+            ) begin
+                mst_dec_req[idx]       = slv.dec_req;
+                mst_dec_req_valid[idx] = slv.dec_req_valid;
+                slv.dec_req_ready      = mst_dec_req_ready[idx];
+
+                sb_d[slv.dec_req.id] = idx;
+
+                break;
             end
-
-            mst_dec_req[idx]       = slv.dec_req;
-            mst_dec_req_valid[idx] = slv.dec_req_valid;
-            slv.dec_req_ready      = mst_dec_req_ready[idx];
-
-            sb_d[slv.dec_req.id] = idx_t'(idx);
         end
 
         // dec rsp ============================================================
@@ -82,16 +86,21 @@ module xadac_mux
         slv.dec_rsp_valid = '0;
         mst_dec_rsp_ready = '0;
 
-        for (idx = 0; idx < NoMst; idx++) begin
-            if (mst_dec_rsp_valid[dec_rsp_idx_d]) break;
-            if (mst_dec_rsp_valid[idx]) break;
+        for (SizeT i = 0; i < NoMst; i++) begin
+            idx = idx_t'(i);
+            if (
+                mst_dec_rsp_valid[dec_rsp_idx_d] ||
+                mst_dec_rsp_valid[idx]
+            ) begin
+                slv.dec_rsp            = mst_dec_rsp[idx];
+                slv.dec_rsp_valid      = mst_dec_rsp_valid[idx];
+                mst_dec_rsp_ready[idx] = slv.dec_rsp_ready;
+
+                dec_rsp_idx_d = idx;
+
+                break;
+            end
         end
-
-        slv.dec_rsp            = mst_dec_rsp[idx];
-        slv.dec_rsp_valid      = mst_dec_rsp_valid[idx];
-        mst_dec_rsp_ready[idx] = slv.dec_rsp_ready;
-
-        dec_rsp_idx_d = idx_t'(idx);
 
         // exe req ============================================================
 
@@ -100,7 +109,7 @@ module xadac_mux
         slv.exe_req_ready = '0;
 
         if (slv.exe_req_valid) begin
-            idx = SizeT'(sb_d[slv.exe_req.id]);
+            idx = sb_d[slv.exe_req.id];
 
             mst_exe_req[idx]       = slv.exe_req;
             mst_exe_req_valid[idx] = slv.exe_req_valid;
@@ -113,16 +122,21 @@ module xadac_mux
         slv.exe_rsp_valid = '0;
         mst_exe_rsp_ready = '0;
 
-        for (idx = 0; idx < NoMst; idx++) begin
-            if (mst_exe_rsp_valid[exe_rsp_idx_d]) break;
-            if (mst_exe_rsp_valid[idx]) break;
+        for (SizeT i = 0; i < NoMst; i++) begin
+            idx = idx_t'(i);
+            if (
+                mst_exe_rsp_valid[exe_rsp_idx_d] ||
+                mst_exe_rsp_valid[idx]
+            ) begin
+                slv.exe_rsp            = mst_exe_rsp[idx];
+                slv.exe_rsp_valid      = mst_exe_rsp_valid[idx];
+                mst_exe_rsp_ready[idx] = slv.exe_rsp_ready;
+
+                exe_rsp_idx_d = idx;
+
+                break;
+            end
         end
-
-        slv.exe_rsp            = mst_exe_rsp[idx];
-        slv.exe_rsp_valid      = mst_exe_rsp_valid[idx];
-        mst_exe_rsp_ready[idx] = slv.exe_rsp_ready;
-
-        exe_rsp_idx_d = idx_t'(idx);
     end
 
     always_ff @(posedge clk, negedge rstn) begin

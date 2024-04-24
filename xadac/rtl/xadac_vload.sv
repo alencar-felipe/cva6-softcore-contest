@@ -36,8 +36,6 @@ module xadac_vload
     AddrT axi_ar_addr_d;
     logic axi_ar_valid_d;
 
-    logic axi_r_ready_d;
-
     always_comb begin : comb
         automatic IdT      id      = '0;
         automatic SizeT    i       = '0;
@@ -52,8 +50,6 @@ module xadac_vload
         axi_ar_id_d    = axi_ar_id;
         axi_ar_addr_d  = axi_ar_addr;
         axi_ar_valid_d = axi_ar_valid;
-
-        axi_r_ready_d = axi_r_ready;
 
         // dec ================================================================
 
@@ -110,6 +106,8 @@ module xadac_vload
         // axi r ==============================================================
 
         id = axi_r_id;
+
+        axi_r_ready = '1;
 
         if (axi_r_valid && axi_r_ready) begin
             sb_d[id].data = axi_r_data;
@@ -175,8 +173,6 @@ module xadac_vload
             axi_ar_id    <= '0;
             axi_ar_addr  <= '0;
             axi_ar_valid <= '0;
-
-            axi_r_ready <= '0;
         end
         else begin
             sb_q <= sb_q;
@@ -187,8 +183,6 @@ module xadac_vload
             axi_ar_id    <= axi_ar_id_d;
             axi_ar_addr  <= axi_ar_addr_d;
             axi_ar_valid <= axi_ar_valid_d;
-
-            axi_r_ready <= axi_r_ready_d;
         end
     end
 

@@ -19,13 +19,14 @@ SV_SRC = \
 	$(AXI_DIR)/src/axi_intf.sv \
 	$(RTL_DIR)/xadac_pkg.sv \
 	$(RTL_DIR)/xadac_if.sv \
+	$(RTL_DIR)/xadac_vrf_phy.sv \
 	$(RTL_DIR)/xadac_mux.sv \
+	$(RTL_DIR)/xadac_sink.sv \
 	$(RTL_DIR)/xadac_vactv.sv \
 	$(RTL_DIR)/xadac_vbias.sv \
 	$(RTL_DIR)/xadac_vclobber.sv \
 	$(RTL_DIR)/xadac_vload.sv \
 	$(RTL_DIR)/xadac_vmacc.sv \
-	$(RTL_DIR)/xadac_vrf_phy.sv \
 	$(RTL_DIR)/xadac_vrf.sv \
 	$(RTL_DIR)/xadac.sv \
 	$(RTL_DIR)/xadac_verilator.sv

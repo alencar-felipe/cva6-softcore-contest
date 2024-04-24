@@ -7,7 +7,8 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 
-#include "xadac.h"
+#include "types.hpp"
+#include "format.hpp"
 
 using namespace std;
 
@@ -81,6 +82,7 @@ dec_rsp_t get_dec_rsp(dut_t *dut)
     dec_rsp.vs_read[0] = dut->dec_rsp_vs_read_0;
     dec_rsp.vs_read[1] = dut->dec_rsp_vs_read_1;
     dec_rsp.vs_read[2] = dut->dec_rsp_vs_read_2;
+    dec_rsp.accept     = dut->dec_rsp_accept;
     return dec_rsp;
 }
 
@@ -156,46 +158,59 @@ void set_axi_r(dut_t *dut, axi_r_t axi_r)
 
 void handle_streams(dut_t *dut)
 {
+
     /* dec req */
 
+    static dec_req_t dec_req;
+
     if (dut->dec_req_valid && dut->dec_req_ready) {
-        VL_PRINTF("dec req\n");
         dut->dec_req_valid = 0;
+
+        VL_PRINTF("dec req %s\n", format_dec_req(dec_req).c_str());
     }
 
     if (!dut->dec_req_valid && !dec_req_list.empty()) {
-        set_dec_req(dut, dec_req_list.front());
+        dec_req = dec_req_list.front();
         dec_req_list.pop_front();
+        set_dec_req(dut, dec_req);
         dut->dec_req_valid = 1;
     }
 
     /* dec rsp */
 
     if (dut->dec_rsp_valid && dut->dec_rsp_ready) {
-        VL_PRINTF("dec rsp\n");
-        dec_rsp_list.push_back(get_dec_rsp(dut));
+        dec_rsp_t dec_rsp = get_dec_rsp(dut);
+        dec_rsp_list.push_back(dec_rsp);
+
+        VL_PRINTF("dec rsp %s\n", format_dec_rsp(dec_rsp).c_str());
     }
 
     dut->dec_rsp_ready = (dec_req_list.size() < 10);
 
     /* exe req */
 
+    static exe_req_t exe_req;
+
     if (dut->exe_req_valid && dut->exe_req_ready) {
-        VL_PRINTF("exe req\n");
         dut->exe_req_valid = 0;
+
+        VL_PRINTF("exe rep %s\n", format_exe_req(exe_req).c_str());
     }
 
     if (!dut->exe_req_valid && !exe_req_list.empty()) {
-        set_exe_req(dut, exe_req_list.front());
+        exe_req = exe_req_list.front();
         exe_req_list.pop_front();
+        set_exe_req(dut, exe_req);
         dut->exe_req_valid = 1;
     }
 
     /* exe rsp */
 
     if (dut->exe_rsp_valid && dut->exe_rsp_ready) {
-        VL_PRINTF("exe rsp\n");
-        exe_rsp_list.push_back(get_exe_rsp(dut));
+        exe_rsp_t exe_rsp = get_exe_rsp(dut);
+        exe_rsp_list.push_back(exe_rsp);
+
+        VL_PRINTF("exe rsp %s\n", format_exe_rsp(exe_rsp).c_str());
     }
 
     dut->exe_rsp_ready = (exe_rsp_list.size() < 10);
@@ -203,7 +218,10 @@ void handle_streams(dut_t *dut)
     /* axi aw */
 
     if (dut->axi_aw_valid && dut->axi_aw_ready) {
-        axi_aw_list.push_back(get_axi_aw(dut));
+        axi_aw_t axi_aw = get_axi_aw(dut);
+        axi_aw_list.push_back(axi_aw);
+
+        VL_PRINTF("axi aw %s\n", format_axi_aw(axi_aw).c_str());
     }
 
     dut->axi_aw_ready = (axi_aw_list.size() < 10);
@@ -211,44 +229,56 @@ void handle_streams(dut_t *dut)
     /* axi w */
 
     if (dut->axi_w_valid && dut->axi_w_ready) {
-        VL_PRINTF("axi w\n");
-        axi_w_list.push_back(get_axi_w(dut));
+        axi_w_t axi_w = get_axi_w(dut);
+        axi_w_list.push_back(axi_w);
+
+        VL_PRINTF("axi w %s\n", format_axi_w(axi_w).c_str());
     }
 
     dut->axi_w_ready = (axi_w_list.size() < 10);
 
     /* axi b */
 
+    static axi_b_t axi_b;
+
     if (dut->axi_b_valid && dut->axi_b_ready) {
-        VL_PRINTF("axi b\n");
         dut->axi_b_valid = 0;
+
+        VL_PRINTF("axi b %s\n", format_axi_b(axi_b).c_str());
     }
 
     if (!dut->axi_b_valid && !axi_b_list.empty()) {
-        set_axi_b(dut, axi_b_list.front());
+        axi_b = axi_b_list.front();
         axi_b_list.pop_front();
+        set_axi_b(dut, axi_b);
         dut->axi_b_valid = 1;
     }
 
     /* axi ar */
 
     if (dut->axi_ar_valid && dut->axi_ar_ready) {
-        VL_PRINTF("axi ar\n");
-        axi_ar_list.push_back(get_axi_ar(dut));
+        axi_ar_t axi_ar = get_axi_ar(dut);
+        axi_ar_list.push_back(axi_ar);
+
+        VL_PRINTF("axi ar %s\n", format_axi_ar(axi_ar).c_str());
     }
 
     dut->axi_ar_ready = (axi_ar_list.size() < 10);
 
     /* axi r */
 
+    static axi_r_t axi_r;
+
     if (dut->axi_r_valid && dut->axi_r_ready) {
-        VL_PRINTF("axi r\n");
         dut->axi_r_valid = 0;
+
+        VL_PRINTF("axi r %s\n", format_axi_r(axi_r).c_str());
     }
 
     if (!dut->axi_r_valid && !axi_r_list.empty()) {
-        set_axi_r(dut, axi_r_list.front());
+        axi_r = axi_r_list.front();
         axi_r_list.pop_front();
+        set_axi_r(dut, axi_r);
         dut->axi_r_valid = 1;
     }
 }
@@ -271,32 +301,42 @@ int main(int argc, char** argv, char** env) {
 
     dec_req_list.push_back({
         .id = 0,
-        .instr = 0
+        .instr = 0x0221a0f7
+    });
+
+    exe_req_list.push_back({
+        .id = 0,
+        .instr = 0x0221a0f7,
+        .rs_addr = {0},
+        .rs_data = {0},
+        .vs_addr = {0},
+        .vs_data = {0}
+    });
+
+    axi_r_list.push_back({
+        .id = 0,
+        .data = 0
     });
 
     while (!Verilated::gotFinish()) {
-        Verilated::timeInc(1);
-
         dut->clk = !dut->clk;
+        dut->eval();
 
-        if (Verilated::time() < 10) {
-            dut->rstn = 0;
-        } else {
-            dut->rstn = 1;
+        if (dut->clk && Verilated::time() > 20) {
             handle_streams(dut);
         }
 
-        dut->eval();
+        // for (int i = 0; i < 10; i++) dut->eval();
+
         vcd->dump(Verilated::time());
+        Verilated::timeInc(1);
     }
 
-    dut->final();
-
-    vcd->close();
-    delete vcd;
-    delete dut;
-    dut = nullptr;
-
     VL_PRINTF("Simulation end\n");
+
+    dut->final();
+    vcd->close();
+    delete dut;
+    delete vcd;
     exit(0);
 }

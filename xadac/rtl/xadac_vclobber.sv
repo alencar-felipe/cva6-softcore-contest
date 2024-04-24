@@ -56,7 +56,7 @@ module xadac_vclobber
 
         slv.dec_rsp_valid = (
             mst.dec_rsp_valid &&
-            sb_d[id].dec_req_done &&
+            // sb_d[id].dec_req_done &&
             !sb_d[id].dec_rsp_done
         );
 

@@ -3,6 +3,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <sstream>
+#include <iomanip>
+#include <vector>
+#include <string>
+
 #include "Vxadac_verilator.h"
 
 #define NO_RS (2)
@@ -33,6 +38,7 @@ typedef struct {
     logic_t vd_clobber;
     logic_t rs_read[NO_RS];
     logic_t vs_read[NO_VS];
+    logic_t accept;
 } dec_rsp_t;
 
 typedef struct {
