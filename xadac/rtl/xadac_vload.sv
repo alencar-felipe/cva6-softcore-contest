@@ -107,7 +107,7 @@ module xadac_vload
 
         id = axi_r_id;
 
-        axi_r_ready = '1;
+        axi_r_ready = (axi_r_valid && sb_d[id].axi_ar_done);
 
         if (axi_r_valid && axi_r_ready) begin
             sb_d[id].data = axi_r_data;

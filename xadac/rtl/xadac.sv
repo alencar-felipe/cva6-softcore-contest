@@ -27,7 +27,8 @@ module xadac
 
     xadac_if slv_vrf ();
     xadac_if slv_mux ();
-    xadac_if slv_unit [NoUnits] ();
+    xadac_if slv_unit_skid  [NoUnits] ();
+    xadac_if slv_unit       [NoUnits] ();
 
     IdT   axi_aw_id;
     AddrT axi_aw_addr;
@@ -85,8 +86,19 @@ module xadac
         .clk  (clk),
         .rstn (rstn),
         .slv  (slv_mux),
-        .mst  (slv_unit)
+        .mst  (slv_unit_skid)
     );
+
+    for (genvar i = 0; i < NoUnits; i++) begin : gen_skid
+        xadac_if_skid #(
+            .ExeRspSkid (1)
+        ) i_unit_skid (
+            .clk  (clk),
+            .rstn (rstn),
+            .slv  (slv_unit_skid[i]),
+            .mst  (slv_unit[i])
+        );
+    end
 
     xadac_vload i_vload (
         .clk  (clk),

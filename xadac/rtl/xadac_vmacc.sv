@@ -33,10 +33,11 @@ module xadac_vmacc
         slv.exe_rsp_valid = slv.exe_req_valid;
         slv.exe_req_ready = (slv.exe_rsp_valid && slv.exe_rsp_ready);
 
-        slv.exe_rsp         = '0;
-        slv.exe_rsp.id      = slv.exe_req.id;
-        slv.exe_rsp.vd_addr = slv.exe_req.instr[11:7];
-        slv.exe_rsp.vd_data = slv.exe_req.vs_data[2];
+        slv.exe_rsp          = '0;
+        slv.exe_rsp.id       = slv.exe_req.id;
+        slv.exe_rsp.vd_addr  = slv.exe_req.instr[11:7];
+        slv.exe_rsp.vd_data  = slv.exe_req.vs_data[2];
+        slv.exe_rsp.vd_write = '1;
         for (SizeT i = 0; i < ilen; i++) begin
             for (SizeT j = 0; j < jlen; j++) begin
                 slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] += VecSumT'(

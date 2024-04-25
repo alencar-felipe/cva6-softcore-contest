@@ -31,6 +31,9 @@ module xadac_vbias
 
         slv.exe_rsp    = '0;
         slv.exe_rsp.id = slv.exe_req.id;
+        slv.exe_rsp.vd_addr  = slv.exe_req.instr[11:7];
+        slv.exe_rsp.vd_data  = '0;
+        slv.exe_rsp.vd_write = '1;
         for (VecLenT i = 0; i < vlen; i++) begin
             slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] =
                 VecSumT'(slv.exe_req.rs_data[0]);

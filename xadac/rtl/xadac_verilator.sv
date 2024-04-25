@@ -80,6 +80,12 @@ module xadac_verilator
     assign mst.dec_req_valid = dec_req_valid;
     assign dec_req_ready     = mst.dec_req_ready;
 
+    always_ff @(posedge clk) begin
+        if (mst.dec_req_valid && mst.dec_req_ready) begin
+            $display("sv time: %t", $time);
+        end
+    end
+
     assign dec_rsp_id         = mst.dec_rsp.id;
     assign dec_rsp_rd_clobber = mst.dec_rsp.rd_clobber;
     assign dec_rsp_vd_clobber = mst.dec_rsp.vd_clobber;

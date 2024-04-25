@@ -12,19 +12,26 @@
 
 using namespace std;
 
-list<dec_req_t> dec_req_list;
-list<dec_rsp_t> dec_rsp_list;
-list<exe_req_t> exe_req_list;
-list<exe_rsp_t> exe_rsp_list;
-list<axi_aw_t>  axi_aw_list;
-list<axi_w_t>   axi_w_list;
-list<axi_b_t>   axi_b_list;
-list<axi_ar_t>  axi_ar_list;
-list<axi_r_t>   axi_r_list;
+static list<dec_req_t> dec_req_list;
+static list<dec_rsp_t> dec_rsp_list;
+static list<exe_req_t> exe_req_list;
+static list<exe_rsp_t> exe_rsp_list;
+static list<axi_aw_t>  axi_aw_list;
+static list<axi_w_t>   axi_w_list;
+static list<axi_b_t>   axi_b_list;
+static list<axi_ar_t>  axi_ar_list;
+static list<axi_r_t>   axi_r_list;
+
+static dec_req_t dec_req_d;
+static logic_t   dec_req_valid_d;
+static logic_t   dec_rsp_ready_d;
+static exe_req_t exe_req_d;
+static logic_t   exe_req_valid_d;
+static logic_t   exe_rsp_ready_d;
 
 double sc_time_stamp() { return 0; }
 
-void init_io(dut_t *dut)
+void init_signals(dut_t *dut)
 {
     dut->clk  = 0;
     dut->rstn = 0;
@@ -33,7 +40,7 @@ void init_io(dut_t *dut)
     dut->dec_req_instr = 0;
     dut->dec_req_valid = 0;
 
-    dut->dec_rsp_ready = 0;
+    dut->dec_rsp_ready = 1;
 
     dut->exe_req_id = 0;
     dut->exe_req_instr = 0;
@@ -71,6 +78,14 @@ void set_dec_req(dut_t *dut, dec_req_t dec_req)
     dut->dec_req_instr = dec_req.instr;
 }
 
+dec_req_t get_dec_req(dut_t *dut)
+{
+    dec_req_t dec_req;
+    dec_req.id    = dut->dec_req_id;
+    dec_req.instr = dut->dec_req_instr;
+    return dec_req;
+}
+
 dec_rsp_t get_dec_rsp(dut_t *dut)
 {
     dec_rsp_t dec_rsp;
@@ -103,6 +118,27 @@ void set_exe_req(dut_t *dut, exe_req_t exe_req)
         sizeof(vec_data_t));
     memcpy(dut->exe_req_vs_data_2.data(), &exe_req.vs_data[2],
         sizeof(vec_data_t));
+}
+
+exe_req_t get_exe_req(const dut_t *dut)
+{
+    exe_req_t exe_req;
+    exe_req.id         = dut->exe_req_id;
+    exe_req.instr      = dut->exe_req_instr;
+    exe_req.rs_addr[0] = dut->exe_req_rs_addr_0;
+    exe_req.rs_addr[1] = dut->exe_req_rs_addr_1;
+    exe_req.rs_data[0] = dut->exe_req_rs_data_0;
+    exe_req.rs_data[1] = dut->exe_req_rs_data_1;
+    exe_req.vs_addr[0] = dut->exe_req_vs_addr_0;
+    exe_req.vs_addr[1] = dut->exe_req_vs_addr_1;
+    exe_req.vs_addr[2] = dut->exe_req_vs_addr_2;
+    memcpy(&exe_req.vs_data[0], dut->exe_req_vs_data_0.data(),
+        sizeof(vec_data_t));
+    memcpy(&exe_req.vs_data[1], dut->exe_req_vs_data_1.data(),
+        sizeof(vec_data_t));
+    memcpy(&exe_req.vs_data[2], dut->exe_req_vs_data_2.data(),
+        sizeof(vec_data_t));
+    return exe_req;
 }
 
 exe_rsp_t get_exe_rsp(dut_t *dut)
@@ -161,20 +197,7 @@ void handle_streams(dut_t *dut)
 
     /* dec req */
 
-    static dec_req_t dec_req;
 
-    if (dut->dec_req_valid && dut->dec_req_ready) {
-        dut->dec_req_valid = 0;
-
-        VL_PRINTF("dec req %s\n", format_dec_req(dec_req).c_str());
-    }
-
-    if (!dut->dec_req_valid && !dec_req_list.empty()) {
-        dec_req = dec_req_list.front();
-        dec_req_list.pop_front();
-        set_dec_req(dut, dec_req);
-        dut->dec_req_valid = 1;
-    }
 
     /* dec rsp */
 
@@ -194,7 +217,7 @@ void handle_streams(dut_t *dut)
     if (dut->exe_req_valid && dut->exe_req_ready) {
         dut->exe_req_valid = 0;
 
-        VL_PRINTF("exe rep %s\n", format_exe_req(exe_req).c_str());
+        VL_PRINTF("exe req %s\n", format_exe_req(exe_req).c_str());
     }
 
     if (!dut->exe_req_valid && !exe_req_list.empty()) {
@@ -283,6 +306,95 @@ void handle_streams(dut_t *dut)
     }
 }
 
+void read_phase(dut_t *dut)
+{
+    // dec req
+
+    if (dut->dec_req_valid && dut->dec_req_ready) {
+        memset(&dec_req_d, 0, sizeof(dec_req_d));
+        dec_req_valid_d = 0;
+        VL_PRINTF("dec req %s\n", format_dec_req(get_dec_req(dut)).c_str());
+    }
+
+    if (dec_req_list.size() > 0 && dec_req_valid_d == 0) {
+        dec_req_d = dec_req_list.front();
+        dec_req_valid_d = 1;
+        dec_req_list.pop_front();
+    }
+
+    // deq rsp
+
+    if (dut->dec_rsp_valid && dut->dec_rsp_ready) {
+        dec_rsp_t dec_rsp = get_dec_rsp(dut);
+        dec_rsp_list.push_back(dec_rsp);
+        VL_PRINTF("dec rsp %s\n", format_dec_rsp(dec_rsp).c_str());
+    }
+
+    dec_rsp_ready_d = (dec_rsp_list.size() < 10);
+
+    // exe req
+
+    exe_req_valid_d = dut->exe_req_valid;
+
+    if (dut->exe_req_valid && dut->exe_req_ready) {
+        memset(&exe_req_d, 0, sizeof(exe_req_d));
+        exe_req_valid_d = 0;
+        VL_PRINTF("exe req %s\n", format_exe_req(get_exe_req(dut)).c_str());
+    }
+
+    if (exe_req_list.size() > 0 && exe_req_valid_d == 0) {
+        exe_req_d = exe_req_list.front();
+        exe_req_valid_d = 1;
+        exe_req_list.pop_front();
+    }
+
+    // exe rsp
+
+    if (dut->exe_rsp_valid && dut->exe_rsp_ready) {
+        exe_rsp_t exe_rsp = get_exe_rsp(dut);
+        exe_rsp_list.push_back(exe_rsp);
+        VL_PRINTF("exe rsp %s\n", format_exe_rsp(exe_rsp).c_str());
+    };
+
+    exe_rsp_ready_d = (exe_rsp_list.size() < 10);
+}
+
+void write_phase(dut_t *dut)
+{
+    // reset
+    dut->rstn = 1;
+
+    // dec req
+    set_dec_req(dut, dec_req_d);
+    dut->dec_req_valid = dec_req_valid_d;
+
+    // dec rsp
+    dut->dec_rsp_ready = dec_rsp_ready_d;
+
+    // exe req
+    set_exe_req(dut, exe_req_d);
+    dut->exe_req_valid = exe_req_valid_d;
+
+    // exe rsp
+    dut->exe_rsp_ready = exe_rsp_ready_d;
+}
+
+void run_instr(instr_t instr)
+{
+    dec_req_list.push_back({
+        .id = 0,
+        .instr = instr
+    });
+    exe_req_list.push_back({
+        .id = 0,
+        .instr = instr,
+        .rs_addr = {0},
+        .rs_data = {0},
+        .vs_addr = {0},
+        .vs_data = {0}
+    });
+}
+
 int main(int argc, char** argv, char** env) {
     Verilated::debug(0);
     Verilated::randReset(2);
@@ -295,41 +407,35 @@ int main(int argc, char** argv, char** env) {
     dut->trace(vcd, 99);
     vcd->open("output.vcd");
 
+    // vbias
+    run_instr(0x200010f7);
+    run_instr(0x20001177);
+    run_instr(0x200011f7);
+
+    // vmacc
+    run_instr(0x2021a0f7);
+
     VL_PRINTF("Simulation start\n");
 
-    init_io(dut);
-
-    dec_req_list.push_back({
-        .id = 0,
-        .instr = 0x0221a0f7
-    });
-
-    exe_req_list.push_back({
-        .id = 0,
-        .instr = 0x0221a0f7,
-        .rs_addr = {0},
-        .rs_data = {0},
-        .vs_addr = {0},
-        .vs_data = {0}
-    });
-
-    axi_r_list.push_back({
-        .id = 0,
-        .data = 0
-    });
+    init_signals(dut);
+    vcd->dump(Verilated::time());
 
     while (!Verilated::gotFinish()) {
-        dut->clk = !dut->clk;
         dut->eval();
 
-        if (dut->clk && Verilated::time() > 20) {
-            handle_streams(dut);
-        }
+        if (Verilated::time() > 10) read_phase(dut);
 
-        // for (int i = 0; i < 10; i++) dut->eval();
-
-        vcd->dump(Verilated::time());
         Verilated::timeInc(1);
+        dut->clk = 1;
+        dut->eval();
+        vcd->dump(Verilated::time());
+
+        if (Verilated::time() > 10) write_phase(dut);
+
+        Verilated::timeInc(1);
+        dut->clk = 0;
+        dut->eval();
+        vcd->dump(Verilated::time());
     }
 
     VL_PRINTF("Simulation end\n");

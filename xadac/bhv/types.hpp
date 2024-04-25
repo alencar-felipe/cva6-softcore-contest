@@ -3,11 +3,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <sstream>
-#include <iomanip>
-#include <vector>
-#include <string>
-
 #include "Vxadac_verilator.h"
 
 #define NO_RS (2)
