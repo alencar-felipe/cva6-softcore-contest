@@ -11,7 +11,7 @@ static int8_t *vrf_i8 = (int8_t *) vrf;
 void vload(size_t vd, const void *rs1, int32_t imm)
 {
 
-#ifdef VALIDATION_RUN
+#ifdef VALIDATE
     ASSERT(imm <= V8LEN);
 #endif
 
@@ -25,7 +25,7 @@ void vload(size_t vd, const void *rs1, int32_t imm)
 void vbias(size_t vd, int32_t rs1, int32_t imm)
 {
 
-#ifdef VALIDATION_RUN
+#ifdef VALIDATE
     ASSERT(imm <= V32LEN);
 #endif
 
@@ -41,7 +41,7 @@ void vbias(size_t vd, int32_t rs1, int32_t imm)
 void vmacc(size_t vd, size_t vs1, size_t vs2, int32_t imm)
 {
 
-#ifdef VALIDATION_RUN
+#ifdef VALIDATE
     ASSERT(imm <= 4);
 #endif
 
@@ -56,7 +56,7 @@ void vmacc(size_t vd, size_t vs1, size_t vs2, int32_t imm)
 void vactv(size_t vs3, void *rs1, int32_t rs2, int32_t imm)
 {
 
-#ifdef VALIDATION_RUN
+#ifdef VALIDATE
     ASSERT(imm <= V32LEN);
 #endif
 

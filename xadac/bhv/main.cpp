@@ -33,6 +33,10 @@ typedef struct {
     exe_req_t exe_req;
     logic_t   exe_req_valid;
     logic_t   exe_rsp_ready;
+    logic_t   axi_aw_ready;
+    logic_t   axi_w_ready;
+    axi_b_t   axi_b;
+    logic_t   axi_b_valid;
     logic_t   axi_ar_ready;
     axi_r_t   axi_r;
     logic_t   axi_r_valid;
@@ -184,6 +188,13 @@ axi_w_t get_axi_w(dut_t *dut)
 void set_axi_b(dut_t *dut, axi_b_t axi_b)
 {
     dut->axi_b_id = axi_b.id;
+}
+
+axi_b_t get_axi_b(dut_t *dut)
+{
+    axi_b_t axi_b;
+    axi_b.id = dut->axi_b_id;
+    return axi_b;
 }
 
 axi_ar_t get_axi_ar(dut_t *dut)
@@ -345,6 +356,43 @@ next_t read_phase(dut_t *dut)
 
     next.exe_rsp_ready = (exe_rsp_list.size() < 10);
 
+    /* axi aw */
+
+    if (dut->axi_aw_valid && dut->axi_aw_ready) {
+        axi_aw_t axi_aw = get_axi_aw(dut);
+        axi_aw_list.push_back(axi_aw);
+        VL_PRINTF("axi aw %s\n", format_axi_aw(axi_aw).c_str());
+    }
+
+    next.axi_aw_ready = (axi_aw_list.size() < 10);
+
+    /* axi w */
+
+    if (dut->axi_w_valid && dut->axi_w_ready) {
+        axi_w_t axi_w = get_axi_w(dut);
+        axi_w_list.push_back(axi_w);
+        VL_PRINTF("axi w %s\n", format_axi_w(axi_w).c_str());
+    }
+
+    next.axi_w_ready = (axi_w_list.size() < 10);
+
+    /* awi b */
+
+    next.axi_b = get_axi_b(dut);
+    next.axi_b_valid = dut->axi_b_valid;
+
+    if (dut->axi_b_valid && dut->axi_b_ready) {
+        VL_PRINTF("axi b %s\n", format_axi_b(next.axi_b).c_str());
+        memset(&next.axi_b, 0, sizeof(axi_b_t));
+        next.axi_b_valid = 0;
+    }
+
+    if (axi_b_list.size() > 0 && next.axi_b_valid == 0 && Verilated::time() > 1000) {
+        next.axi_b = axi_b_list.front();
+        next.axi_b_valid = 1;
+        axi_b_list.pop_front();
+    }
+
     /* axi ar */
 
     if (dut->axi_ar_valid && dut->axi_ar_ready) {
@@ -384,6 +432,10 @@ void write_phase(dut_t *dut, next_t next)
     set_exe_req(dut, next.exe_req);
     dut->exe_req_valid = next.exe_req_valid;
     dut->exe_rsp_ready = next.exe_rsp_ready;
+    dut->axi_aw_ready = next.axi_aw_ready;
+    dut->axi_w_ready = next.axi_w_ready;
+    set_axi_b(dut, next.axi_b);
+    dut->axi_b_valid = next.axi_b_valid;
     dut->axi_ar_ready = next.axi_ar_ready;
     set_axi_r(dut, next.axi_r);
     dut->axi_r_valid = next.axi_r_valid;
@@ -495,6 +547,7 @@ int main(int argc, char** argv, char** env) {
     issue(0x200000f7); // vload
     issue(0x20000177); // vload
     issue(0x200001f7); // vload
+    issue(0x200031f7); // vactv
     issue(0x200010f7);
     issue(0x20001177);
     issue(0x200011f7);
@@ -516,6 +569,15 @@ int main(int argc, char** argv, char** env) {
             axi_r_list.push_back({
                 .id   = axi_ar.id,
                 .data = {0xDE, 0xAD, 0xBE, 0xEF, 0, 0, 0 ,0, 0, 0, 0, 0, 0, 0, 0, 0}
+            });
+        }
+
+        if (!axi_aw_list.empty() && !axi_w_list.empty() ) {
+            axi_ar_t axi_aw = axi_ar_list.front();
+            axi_aw_list.pop_front();
+            axi_w_list.pop_front();
+            axi_b_list.push_back({
+                .id = axi_aw.id
             });
         }
 
