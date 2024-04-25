@@ -22,12 +22,21 @@ static list<axi_b_t>   axi_b_list;
 static list<axi_ar_t>  axi_ar_list;
 static list<axi_r_t>   axi_r_list;
 
-static dec_req_t dec_req_d;
-static logic_t   dec_req_valid_d;
-static logic_t   dec_rsp_ready_d;
-static exe_req_t exe_req_d;
-static logic_t   exe_req_valid_d;
-static logic_t   exe_rsp_ready_d;
+static list<dec_req_t> in_flight_dec;
+static list<exe_req_t> in_flight_exe;
+
+typedef struct {
+    logic_t   rstn;
+    dec_req_t dec_req;
+    logic_t   dec_req_valid;
+    logic_t   dec_rsp_ready;
+    exe_req_t exe_req;
+    logic_t   exe_req_valid;
+    logic_t   exe_rsp_ready;
+    logic_t   axi_ar_ready;
+    axi_r_t   axi_r;
+    logic_t   axi_r_valid;
+} next_t;
 
 double sc_time_stamp() { return 0; }
 
@@ -192,51 +201,17 @@ void set_axi_r(dut_t *dut, axi_r_t axi_r)
         sizeof(vec_data_t));
 }
 
+axi_r_t get_axi_r(dut_t *dut)
+{
+    axi_r_t axi_r;
+    axi_r.id = dut->axi_r_id;
+    memcpy(&axi_r.data, dut->axi_r_data.data(),
+        sizeof(vec_data_t));
+    return axi_r;
+}
+
 void handle_streams(dut_t *dut)
 {
-
-    /* dec req */
-
-
-
-    /* dec rsp */
-
-    if (dut->dec_rsp_valid && dut->dec_rsp_ready) {
-        dec_rsp_t dec_rsp = get_dec_rsp(dut);
-        dec_rsp_list.push_back(dec_rsp);
-
-        VL_PRINTF("dec rsp %s\n", format_dec_rsp(dec_rsp).c_str());
-    }
-
-    dut->dec_rsp_ready = (dec_req_list.size() < 10);
-
-    /* exe req */
-
-    static exe_req_t exe_req;
-
-    if (dut->exe_req_valid && dut->exe_req_ready) {
-        dut->exe_req_valid = 0;
-
-        VL_PRINTF("exe req %s\n", format_exe_req(exe_req).c_str());
-    }
-
-    if (!dut->exe_req_valid && !exe_req_list.empty()) {
-        exe_req = exe_req_list.front();
-        exe_req_list.pop_front();
-        set_exe_req(dut, exe_req);
-        dut->exe_req_valid = 1;
-    }
-
-    /* exe rsp */
-
-    if (dut->exe_rsp_valid && dut->exe_rsp_ready) {
-        exe_rsp_t exe_rsp = get_exe_rsp(dut);
-        exe_rsp_list.push_back(exe_rsp);
-
-        VL_PRINTF("exe rsp %s\n", format_exe_rsp(exe_rsp).c_str());
-    }
-
-    dut->exe_rsp_ready = (exe_rsp_list.size() < 10);
 
     /* axi aw */
 
@@ -306,23 +281,34 @@ void handle_streams(dut_t *dut)
     }
 }
 
-void read_phase(dut_t *dut)
+next_t read_phase(dut_t *dut)
 {
-    // dec req
+    next_t next = {0};
+
+    if (Verilated::time() < 10) return next;
+
+    /* rstn */
+
+    next.rstn = 1;
+
+    /* dec req */
+
+    next.dec_req = get_dec_req(dut);
+    next.dec_req_valid = dut->dec_req_valid;
 
     if (dut->dec_req_valid && dut->dec_req_ready) {
-        memset(&dec_req_d, 0, sizeof(dec_req_d));
-        dec_req_valid_d = 0;
-        VL_PRINTF("dec req %s\n", format_dec_req(get_dec_req(dut)).c_str());
+        VL_PRINTF("dec req %s\n", format_dec_req(next.dec_req).c_str());
+        memset(&next.dec_req, 0, sizeof(dec_req_t));
+        next.dec_req_valid = 0;
     }
 
-    if (dec_req_list.size() > 0 && dec_req_valid_d == 0) {
-        dec_req_d = dec_req_list.front();
-        dec_req_valid_d = 1;
+    if (dec_req_list.size() > 0 && next.dec_req_valid == 0) {
+        next.dec_req = dec_req_list.front();
+        next.dec_req_valid = 1;
         dec_req_list.pop_front();
     }
 
-    // deq rsp
+    /* deq rsp */
 
     if (dut->dec_rsp_valid && dut->dec_rsp_ready) {
         dec_rsp_t dec_rsp = get_dec_rsp(dut);
@@ -330,25 +316,26 @@ void read_phase(dut_t *dut)
         VL_PRINTF("dec rsp %s\n", format_dec_rsp(dec_rsp).c_str());
     }
 
-    dec_rsp_ready_d = (dec_rsp_list.size() < 10);
+    next.dec_rsp_ready = (dec_rsp_list.size() < 10);
 
-    // exe req
+    /* exe req */
 
-    exe_req_valid_d = dut->exe_req_valid;
+    next.exe_req = get_exe_req(dut);
+    next.exe_req_valid = dut->exe_req_valid;
 
     if (dut->exe_req_valid && dut->exe_req_ready) {
-        memset(&exe_req_d, 0, sizeof(exe_req_d));
-        exe_req_valid_d = 0;
-        VL_PRINTF("exe req %s\n", format_exe_req(get_exe_req(dut)).c_str());
+        VL_PRINTF("exe req %s\n", format_exe_req(next.exe_req).c_str());
+        memset(&next.exe_req, 0, sizeof(exe_req_t));
+        next.exe_req_valid = 0;
     }
 
-    if (exe_req_list.size() > 0 && exe_req_valid_d == 0) {
-        exe_req_d = exe_req_list.front();
-        exe_req_valid_d = 1;
+    if (exe_req_list.size() > 0 && next.exe_req_valid == 0) {
+        next.exe_req = exe_req_list.front();
+        next.exe_req_valid = 1;
         exe_req_list.pop_front();
     }
 
-    // exe rsp
+    /* exe rsp */
 
     if (dut->exe_rsp_valid && dut->exe_rsp_ready) {
         exe_rsp_t exe_rsp = get_exe_rsp(dut);
@@ -356,44 +343,140 @@ void read_phase(dut_t *dut)
         VL_PRINTF("exe rsp %s\n", format_exe_rsp(exe_rsp).c_str());
     };
 
-    exe_rsp_ready_d = (exe_rsp_list.size() < 10);
+    next.exe_rsp_ready = (exe_rsp_list.size() < 10);
+
+    /* axi ar */
+
+    if (dut->axi_ar_valid && dut->axi_ar_ready) {
+        axi_ar_t axi_ar = get_axi_ar(dut);
+        axi_ar_list.push_back(axi_ar);
+        VL_PRINTF("axi ar %s\n", format_axi_ar(axi_ar).c_str());
+    }
+
+    next.axi_ar_ready = (axi_ar_list.size() < 10);
+
+    /* axi r */
+
+    next.axi_r = get_axi_r(dut);
+    next.axi_r_valid = dut->axi_r_valid;
+
+    if (dut->axi_r_valid && dut->axi_r_ready) {
+        VL_PRINTF("axi r %s\n", format_axi_r(next.axi_r).c_str());
+        memset(&next.axi_r, 0, sizeof(axi_r_t));
+        next.axi_r_valid = 0;
+    }
+
+    if (axi_r_list.size() > 0 && next.axi_r_valid == 0 && Verilated::time() > 1000) {
+        next.axi_r = axi_r_list.front();
+        next.axi_r_valid = 1;
+        axi_r_list.pop_front();
+    }
+
+    return next;
 }
 
-void write_phase(dut_t *dut)
+void write_phase(dut_t *dut, next_t next)
 {
-    // reset
-    dut->rstn = 1;
-
-    // dec req
-    set_dec_req(dut, dec_req_d);
-    dut->dec_req_valid = dec_req_valid_d;
-
-    // dec rsp
-    dut->dec_rsp_ready = dec_rsp_ready_d;
-
-    // exe req
-    set_exe_req(dut, exe_req_d);
-    dut->exe_req_valid = exe_req_valid_d;
-
-    // exe rsp
-    dut->exe_rsp_ready = exe_rsp_ready_d;
+    dut->rstn = next.rstn;
+    set_dec_req(dut, next.dec_req);
+    dut->dec_req_valid = next.dec_req_valid;
+    dut->dec_rsp_ready = next.dec_rsp_ready;
+    set_exe_req(dut, next.exe_req);
+    dut->exe_req_valid = next.exe_req_valid;
+    dut->exe_rsp_ready = next.exe_rsp_ready;
+    dut->axi_ar_ready = next.axi_ar_ready;
+    set_axi_r(dut, next.axi_r);
+    dut->axi_r_valid = next.axi_r_valid;
 }
 
-void run_instr(instr_t instr)
+void verilator_step(dut_t *dut, VerilatedVcdC* vcd)
 {
-    dec_req_list.push_back({
-        .id = 0,
+    dut->eval();
+
+    next_t next = read_phase(dut);
+
+    Verilated::timeInc(1);
+    dut->clk = 1;
+    dut->eval();
+    vcd->dump(Verilated::time());
+
+    write_phase(dut, next);
+
+    Verilated::timeInc(1);
+    dut->clk = 0;
+    dut->eval();
+    vcd->dump(Verilated::time());
+}
+
+static int counter = 0;
+
+void issue(instr_t instr)
+{
+    dec_req_t dec_req = {
+        .id = counter,
         .instr = instr
-    });
-    exe_req_list.push_back({
-        .id = 0,
+    };
+
+    exe_req_t exe_req = {
+        .id = counter,
         .instr = instr,
         .rs_addr = {0},
-        .rs_data = {0},
+        .rs_data = {1,0},
         .vs_addr = {0},
         .vs_data = {0}
-    });
+    };
+
+    dec_req_list.push_back(dec_req);
+    in_flight_dec.push_back(dec_req);
+    exe_req_list.push_back(exe_req);
+    in_flight_exe.push_back(exe_req);
+
+    counter = (counter + 1) % 4;
 }
+
+void retire()
+{
+    while (!dec_rsp_list.empty()) {
+        dec_rsp_t rsp = dec_rsp_list.front();
+        dec_rsp_list.pop_front();
+
+        auto it = find_if(in_flight_dec.begin(), in_flight_dec.end(),
+            [rsp](const dec_req_t& req) { return req.id == rsp.id; });
+
+        if (it != in_flight_dec.end()) {
+            in_flight_dec.erase(it);
+        } else {
+            printf("panic!\n");
+            exit(-1);
+        }
+    }
+
+    while (!exe_rsp_list.empty()) {
+        exe_rsp_t rsp = exe_rsp_list.front();
+        exe_rsp_list.pop_front();
+
+        auto it = find_if(in_flight_exe.begin(), in_flight_exe.end(),
+            [rsp](const exe_req_t& req) { return req.id == rsp.id; });
+
+        if (it != in_flight_exe.end()) {
+            in_flight_exe.erase(it);
+        } else {
+            printf("panic!\n");
+            exit(-1);
+        }
+    }
+
+    if (
+        dec_req_list.empty() &&
+        dec_rsp_list.empty() &&
+        in_flight_dec.empty() &&
+        in_flight_exe.empty()
+    ) {
+        printf("All instructions retired.\n");
+        Verilated::gotFinish(true);
+    }
+}
+
 
 int main(int argc, char** argv, char** env) {
     Verilated::debug(0);
@@ -408,12 +491,16 @@ int main(int argc, char** argv, char** env) {
     vcd->open("output.vcd");
 
     // vbias
-    run_instr(0x200010f7);
-    run_instr(0x20001177);
-    run_instr(0x200011f7);
+    issue(0x20000077); // vload
+    issue(0x200000f7); // vload
+    issue(0x20000177); // vload
+    issue(0x200001f7); // vload
+    issue(0x200010f7);
+    issue(0x20001177);
+    issue(0x200011f7);
 
     // vmacc
-    run_instr(0x2021a0f7);
+    issue(0x2021a0f7);
 
     VL_PRINTF("Simulation start\n");
 
@@ -421,21 +508,18 @@ int main(int argc, char** argv, char** env) {
     vcd->dump(Verilated::time());
 
     while (!Verilated::gotFinish()) {
-        dut->eval();
+        verilator_step(dut, vcd);
 
-        if (Verilated::time() > 10) read_phase(dut);
+        if (axi_ar_list.size() > 0) {
+            axi_ar_t axi_ar = axi_ar_list.front();
+            axi_ar_list.pop_front();
+            axi_r_list.push_back({
+                .id   = axi_ar.id,
+                .data = {0xDE, 0xAD, 0xBE, 0xEF, 0, 0, 0 ,0, 0, 0, 0, 0, 0, 0, 0, 0}
+            });
+        }
 
-        Verilated::timeInc(1);
-        dut->clk = 1;
-        dut->eval();
-        vcd->dump(Verilated::time());
-
-        if (Verilated::time() > 10) write_phase(dut);
-
-        Verilated::timeInc(1);
-        dut->clk = 0;
-        dut->eval();
-        vcd->dump(Verilated::time());
+        retire();
     }
 
     VL_PRINTF("Simulation end\n");

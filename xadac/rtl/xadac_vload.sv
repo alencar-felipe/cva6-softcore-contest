@@ -66,7 +66,7 @@ module xadac_vload
         slv.dec_rsp.vs_read[2] = '0;
         slv.dec_rsp.accept = '1;
 
-        // exe req channel ====================================================
+        // exe req ============================================================
 
         id = slv.exe_req.id;
 
@@ -107,7 +107,11 @@ module xadac_vload
 
         id = axi_r_id;
 
-        axi_r_ready = (axi_r_valid && sb_d[id].axi_ar_done);
+        axi_r_ready = (
+            axi_r_valid &&
+            sb_d[id].axi_ar_done &&
+            !sb_d[id].axi_r_done
+        );
 
         if (axi_r_valid && axi_r_ready) begin
             sb_d[id].data = axi_r_data;
@@ -175,7 +179,7 @@ module xadac_vload
             axi_ar_valid <= '0;
         end
         else begin
-            sb_q <= sb_q;
+            sb_q <= sb_d;
 
             slv.exe_rsp       <= exe_rsp_d;
             slv.exe_rsp_valid <= exe_rsp_valid_d;

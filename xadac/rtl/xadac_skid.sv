@@ -35,10 +35,6 @@ module xadac_skid #(
                 slv_ready <= '0;
             end
             else begin
-                if (slv_valid && slv_ready) begin
-                    $display(mst_ready);
-                end
-
                 slv_ready <= !stall || mst_ready;
 
                 if (slv_valid && slv_ready && mst_valid && !mst_ready) begin
