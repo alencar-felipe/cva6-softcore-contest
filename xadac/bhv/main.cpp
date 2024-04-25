@@ -6,24 +6,19 @@
 
 #include <verilated.h>
 #include <verilated_vcd_c.h>
+#include "Vxadac_verilator.h"
+
+#define MEM_SIZE (0x2FF00)
+#define MINI_RV32_RAM_SIZE (MEM_SIZE)
+#define MINIRV32_IMPLEMENTATION
+#include "mini-rv32ima.h"
 
 #include "types.hpp"
-#include "format.hpp"
 
 using namespace std;
 
-static list<dec_req_t> dec_req_list;
-static list<dec_rsp_t> dec_rsp_list;
-static list<exe_req_t> exe_req_list;
-static list<exe_rsp_t> exe_rsp_list;
-static list<axi_aw_t>  axi_aw_list;
-static list<axi_w_t>   axi_w_list;
-static list<axi_b_t>   axi_b_list;
-static list<axi_ar_t>  axi_ar_list;
-static list<axi_r_t>   axi_r_list;
-
-static list<dec_req_t> in_flight_dec;
-static list<exe_req_t> in_flight_exe;
+typedef Vxadac_verilator dut_t;
+typedef VerilatedVcdC vcd_t;
 
 typedef struct {
     logic_t   rstn;
@@ -41,6 +36,21 @@ typedef struct {
     axi_r_t   axi_r;
     logic_t   axi_r_valid;
 } next_t;
+
+typedef struct {
+    list<dec_req_t> dec_req_list;
+    list<dec_rsp_t> dec_rsp_list;
+    list<exe_req_t> exe_req_list;
+    list<exe_rsp_t> exe_rsp_list;
+    list<axi_aw_t>  axi_aw_list;
+    list<axi_w_t>   axi_w_list;
+    list<axi_b_t>   axi_b_list;
+    list<axi_ar_t>  axi_ar_list;
+    list<axi_r_t>   axi_r_list;
+
+    list<dec_req_t> in_flight_dec;
+    list<exe_req_t> in_flight_exe;
+} bhv_t;
 
 double sc_time_stamp() { return 0; }
 
@@ -221,78 +231,7 @@ axi_r_t get_axi_r(dut_t *dut)
     return axi_r;
 }
 
-void handle_streams(dut_t *dut)
-{
-
-    /* axi aw */
-
-    if (dut->axi_aw_valid && dut->axi_aw_ready) {
-        axi_aw_t axi_aw = get_axi_aw(dut);
-        axi_aw_list.push_back(axi_aw);
-
-        VL_PRINTF("axi aw %s\n", format_axi_aw(axi_aw).c_str());
-    }
-
-    dut->axi_aw_ready = (axi_aw_list.size() < 10);
-
-    /* axi w */
-
-    if (dut->axi_w_valid && dut->axi_w_ready) {
-        axi_w_t axi_w = get_axi_w(dut);
-        axi_w_list.push_back(axi_w);
-
-        VL_PRINTF("axi w %s\n", format_axi_w(axi_w).c_str());
-    }
-
-    dut->axi_w_ready = (axi_w_list.size() < 10);
-
-    /* axi b */
-
-    static axi_b_t axi_b;
-
-    if (dut->axi_b_valid && dut->axi_b_ready) {
-        dut->axi_b_valid = 0;
-
-        VL_PRINTF("axi b %s\n", format_axi_b(axi_b).c_str());
-    }
-
-    if (!dut->axi_b_valid && !axi_b_list.empty()) {
-        axi_b = axi_b_list.front();
-        axi_b_list.pop_front();
-        set_axi_b(dut, axi_b);
-        dut->axi_b_valid = 1;
-    }
-
-    /* axi ar */
-
-    if (dut->axi_ar_valid && dut->axi_ar_ready) {
-        axi_ar_t axi_ar = get_axi_ar(dut);
-        axi_ar_list.push_back(axi_ar);
-
-        VL_PRINTF("axi ar %s\n", format_axi_ar(axi_ar).c_str());
-    }
-
-    dut->axi_ar_ready = (axi_ar_list.size() < 10);
-
-    /* axi r */
-
-    static axi_r_t axi_r;
-
-    if (dut->axi_r_valid && dut->axi_r_ready) {
-        dut->axi_r_valid = 0;
-
-        VL_PRINTF("axi r %s\n", format_axi_r(axi_r).c_str());
-    }
-
-    if (!dut->axi_r_valid && !axi_r_list.empty()) {
-        axi_r = axi_r_list.front();
-        axi_r_list.pop_front();
-        set_axi_r(dut, axi_r);
-        dut->axi_r_valid = 1;
-    }
-}
-
-next_t read_phase(dut_t *dut)
+next_t read_phase(dut_t *dut, bhv_t *bhv)
 {
     next_t next = {0};
 
@@ -313,21 +252,21 @@ next_t read_phase(dut_t *dut)
         next.dec_req_valid = 0;
     }
 
-    if (dec_req_list.size() > 0 && next.dec_req_valid == 0) {
-        next.dec_req = dec_req_list.front();
+    if (bhv->dec_req_list.size() > 0 && next.dec_req_valid == 0) {
+        next.dec_req = bhv->dec_req_list.front();
         next.dec_req_valid = 1;
-        dec_req_list.pop_front();
+        bhv->dec_req_list.pop_front();
     }
 
     /* deq rsp */
 
     if (dut->dec_rsp_valid && dut->dec_rsp_ready) {
         dec_rsp_t dec_rsp = get_dec_rsp(dut);
-        dec_rsp_list.push_back(dec_rsp);
+        bhv->dec_rsp_list.push_back(dec_rsp);
         VL_PRINTF("dec rsp %s\n", format_dec_rsp(dec_rsp).c_str());
     }
 
-    next.dec_rsp_ready = (dec_rsp_list.size() < 10);
+    next.dec_rsp_ready = (bhv->dec_rsp_list.size() < 10);
 
     /* exe req */
 
@@ -340,41 +279,41 @@ next_t read_phase(dut_t *dut)
         next.exe_req_valid = 0;
     }
 
-    if (exe_req_list.size() > 0 && next.exe_req_valid == 0) {
-        next.exe_req = exe_req_list.front();
+    if (bhv->exe_req_list.size() > 0 && next.exe_req_valid == 0) {
+        next.exe_req = bhv->exe_req_list.front();
         next.exe_req_valid = 1;
-        exe_req_list.pop_front();
+        bhv->exe_req_list.pop_front();
     }
 
     /* exe rsp */
 
     if (dut->exe_rsp_valid && dut->exe_rsp_ready) {
         exe_rsp_t exe_rsp = get_exe_rsp(dut);
-        exe_rsp_list.push_back(exe_rsp);
+        bhv->exe_rsp_list.push_back(exe_rsp);
         VL_PRINTF("exe rsp %s\n", format_exe_rsp(exe_rsp).c_str());
     };
 
-    next.exe_rsp_ready = (exe_rsp_list.size() < 10);
+    next.exe_rsp_ready = (bhv->exe_rsp_list.size() < 10);
 
     /* axi aw */
 
     if (dut->axi_aw_valid && dut->axi_aw_ready) {
         axi_aw_t axi_aw = get_axi_aw(dut);
-        axi_aw_list.push_back(axi_aw);
+        bhv->axi_aw_list.push_back(axi_aw);
         VL_PRINTF("axi aw %s\n", format_axi_aw(axi_aw).c_str());
     }
 
-    next.axi_aw_ready = (axi_aw_list.size() < 10);
+    next.axi_aw_ready = (bhv->axi_aw_list.size() < 10);
 
     /* axi w */
 
     if (dut->axi_w_valid && dut->axi_w_ready) {
         axi_w_t axi_w = get_axi_w(dut);
-        axi_w_list.push_back(axi_w);
+        bhv->axi_w_list.push_back(axi_w);
         VL_PRINTF("axi w %s\n", format_axi_w(axi_w).c_str());
     }
 
-    next.axi_w_ready = (axi_w_list.size() < 10);
+    next.axi_w_ready = (bhv->axi_w_list.size() < 10);
 
     /* awi b */
 
@@ -387,21 +326,21 @@ next_t read_phase(dut_t *dut)
         next.axi_b_valid = 0;
     }
 
-    if (axi_b_list.size() > 0 && next.axi_b_valid == 0 && Verilated::time() > 1000) {
-        next.axi_b = axi_b_list.front();
+    if (bhv->axi_b_list.size() > 0 && next.axi_b_valid == 0) {
+        next.axi_b = bhv->axi_b_list.front();
         next.axi_b_valid = 1;
-        axi_b_list.pop_front();
+        bhv->axi_b_list.pop_front();
     }
 
     /* axi ar */
 
     if (dut->axi_ar_valid && dut->axi_ar_ready) {
         axi_ar_t axi_ar = get_axi_ar(dut);
-        axi_ar_list.push_back(axi_ar);
+        bhv->axi_ar_list.push_back(axi_ar);
         VL_PRINTF("axi ar %s\n", format_axi_ar(axi_ar).c_str());
     }
 
-    next.axi_ar_ready = (axi_ar_list.size() < 10);
+    next.axi_ar_ready = (bhv->axi_ar_list.size() < 10);
 
     /* axi r */
 
@@ -414,10 +353,10 @@ next_t read_phase(dut_t *dut)
         next.axi_r_valid = 0;
     }
 
-    if (axi_r_list.size() > 0 && next.axi_r_valid == 0 && Verilated::time() > 1000) {
-        next.axi_r = axi_r_list.front();
+    if (bhv->axi_r_list.size() > 0 && next.axi_r_valid == 0) {
+        next.axi_r = bhv->axi_r_list.front();
         next.axi_r_valid = 1;
-        axi_r_list.pop_front();
+        bhv->axi_r_list.pop_front();
     }
 
     return next;
@@ -441,11 +380,11 @@ void write_phase(dut_t *dut, next_t next)
     dut->axi_r_valid = next.axi_r_valid;
 }
 
-void verilator_step(dut_t *dut, VerilatedVcdC* vcd)
+void verilator_step(dut_t *dut, vcd_t *vcd, bhv_t *bhv)
 {
     dut->eval();
 
-    next_t next = read_phase(dut);
+    next_t next = read_phase(dut, bhv);
 
     Verilated::timeInc(1);
     dut->clk = 1;
@@ -462,7 +401,7 @@ void verilator_step(dut_t *dut, VerilatedVcdC* vcd)
 
 static int counter = 0;
 
-void issue(instr_t instr)
+void issue(instr_t instr, bhv_t *bhv)
 {
     dec_req_t dec_req = {
         .id = counter,
@@ -478,40 +417,40 @@ void issue(instr_t instr)
         .vs_data = {0}
     };
 
-    dec_req_list.push_back(dec_req);
-    in_flight_dec.push_back(dec_req);
-    exe_req_list.push_back(exe_req);
-    in_flight_exe.push_back(exe_req);
+    bhv->dec_req_list.push_back(dec_req);
+    bhv->in_flight_dec.push_back(dec_req);
+    bhv->exe_req_list.push_back(exe_req);
+    bhv->in_flight_exe.push_back(exe_req);
 
     counter = (counter + 1) % 4;
 }
 
-void retire()
+void retire(bhv_t *bhv)
 {
-    while (!dec_rsp_list.empty()) {
-        dec_rsp_t rsp = dec_rsp_list.front();
-        dec_rsp_list.pop_front();
+    while (!bhv->dec_rsp_list.empty()) {
+        dec_rsp_t rsp = bhv->dec_rsp_list.front();
+        bhv->dec_rsp_list.pop_front();
 
-        auto it = find_if(in_flight_dec.begin(), in_flight_dec.end(),
+        auto it = find_if(bhv->in_flight_dec.begin(), bhv->in_flight_dec.end(),
             [rsp](const dec_req_t& req) { return req.id == rsp.id; });
 
-        if (it != in_flight_dec.end()) {
-            in_flight_dec.erase(it);
+        if (it != bhv->in_flight_dec.end()) {
+            bhv->in_flight_dec.erase(it);
         } else {
             printf("panic!\n");
             exit(-1);
         }
     }
 
-    while (!exe_rsp_list.empty()) {
-        exe_rsp_t rsp = exe_rsp_list.front();
-        exe_rsp_list.pop_front();
+    while (!bhv->exe_rsp_list.empty()) {
+        exe_rsp_t rsp = bhv->exe_rsp_list.front();
+        bhv->exe_rsp_list.pop_front();
 
-        auto it = find_if(in_flight_exe.begin(), in_flight_exe.end(),
+        auto it = find_if(bhv->in_flight_exe.begin(), bhv->in_flight_exe.end(),
             [rsp](const exe_req_t& req) { return req.id == rsp.id; });
 
-        if (it != in_flight_exe.end()) {
-            in_flight_exe.erase(it);
+        if (it != bhv->in_flight_exe.end()) {
+            bhv->in_flight_exe.erase(it);
         } else {
             printf("panic!\n");
             exit(-1);
@@ -519,10 +458,10 @@ void retire()
     }
 
     if (
-        dec_req_list.empty() &&
-        dec_rsp_list.empty() &&
-        in_flight_dec.empty() &&
-        in_flight_exe.empty()
+        bhv->dec_req_list.empty() &&
+        bhv->dec_rsp_list.empty() &&
+        bhv->in_flight_dec.empty() &&
+        bhv->in_flight_exe.empty()
     ) {
         printf("All instructions retired.\n");
         Verilated::gotFinish(true);
@@ -537,23 +476,24 @@ int main(int argc, char** argv, char** env) {
     Verilated::commandArgs(argc, argv);
 
     dut_t* dut = new dut_t;
+    vcd_t* vcd = new vcd_t;
+    bhv_t* bhv = new bhv_t;
 
-    VerilatedVcdC* vcd = new VerilatedVcdC;
     dut->trace(vcd, 99);
     vcd->open("output.vcd");
 
     // vbias
-    issue(0x20000077); // vload
-    issue(0x200000f7); // vload
-    issue(0x20000177); // vload
-    issue(0x200001f7); // vload
-    issue(0x200031f7); // vactv
-    issue(0x200010f7);
-    issue(0x20001177);
-    issue(0x200011f7);
+    issue(0x20000077, bhv); // vload
+    issue(0x200000f7, bhv); // vload
+    issue(0x20000177, bhv); // vload
+    issue(0x200001f7, bhv); // vload
+    issue(0x200031f7, bhv); // vactv
+    issue(0x200010f7, bhv);
+    issue(0x20001177, bhv);
+    issue(0x200011f7, bhv);
 
     // vmacc
-    issue(0x2021a0f7);
+    issue(0x2021a0f7, bhv);
 
     VL_PRINTF("Simulation start\n");
 
@@ -561,33 +501,34 @@ int main(int argc, char** argv, char** env) {
     vcd->dump(Verilated::time());
 
     while (!Verilated::gotFinish()) {
-        verilator_step(dut, vcd);
+        verilator_step(dut, vcd, bhv);
 
-        if (axi_ar_list.size() > 0) {
-            axi_ar_t axi_ar = axi_ar_list.front();
-            axi_ar_list.pop_front();
-            axi_r_list.push_back({
+        if (bhv->axi_ar_list.size() > 0) {
+            axi_ar_t axi_ar = bhv->axi_ar_list.front();
+            bhv->axi_ar_list.pop_front();
+            bhv->axi_r_list.push_back({
                 .id   = axi_ar.id,
                 .data = {0xDE, 0xAD, 0xBE, 0xEF, 0, 0, 0 ,0, 0, 0, 0, 0, 0, 0, 0, 0}
             });
         }
 
-        if (!axi_aw_list.empty() && !axi_w_list.empty() ) {
-            axi_ar_t axi_aw = axi_ar_list.front();
-            axi_aw_list.pop_front();
-            axi_w_list.pop_front();
-            axi_b_list.push_back({
+        if (!bhv->axi_aw_list.empty() && !bhv->axi_w_list.empty() ) {
+            axi_ar_t axi_aw = bhv->axi_ar_list.front();
+            bhv->axi_aw_list.pop_front();
+            bhv->axi_w_list.pop_front();
+            bhv->axi_b_list.push_back({
                 .id = axi_aw.id
             });
         }
 
-        retire();
+        retire(bhv);
     }
 
     VL_PRINTF("Simulation end\n");
 
     dut->final();
     vcd->close();
+    delete bhv;
     delete dut;
     delete vcd;
     exit(0);
