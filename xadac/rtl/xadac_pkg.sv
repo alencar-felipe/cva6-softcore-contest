@@ -20,7 +20,7 @@ package xadac_pkg;
     localparam SizeT VecAddrWidth = 5;
     localparam SizeT VecDataWidth = 128;
     localparam SizeT VecElemWidth = 8;
-    localparam SizeT VecLenWidth  = $clog2(VecDataWidth/VecElemWidth);
+    localparam SizeT VecLenWidth  = $clog2(VecDataWidth/VecElemWidth+1);
     localparam SizeT VecSumWidth  = 32;
     localparam SizeT VecStrbWidth = VecDataWidth/8;
 
