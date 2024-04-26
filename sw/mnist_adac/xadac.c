@@ -15,8 +15,6 @@ void vload(size_t vd, const void *rs1, int32_t imm)
     ASSERT(imm <= V8LEN);
 #endif
 
-    if (imm == 16) printf("%ld\n", imm);
-
     uint8_t *ptr = (uint8_t *) rs1;
 
     for (size_t i = 0; i < V8LEN; i++) {
@@ -48,20 +46,13 @@ void vmacc(size_t vd, size_t vs1, size_t vs2, int32_t imm)
 #ifdef VALIDATE
     ASSERT(imm <= 4);
 #endif
-    if(imm == 4) PRINT128(&vrf_i32[vd*V32LEN]);
-    if(imm == 4) printf(" + ");
+
     for (size_t i = 0; i < V32LEN; i++) {
         for (size_t j = 0; j < imm; j++) {
             vrf_i32[vd*V32LEN + i] +=
                 vrf_i8[vs1*V8LEN + i*imm + j] * vrf_u8[vs2*V8LEN + i*imm + j];
         }
     }
-    if(imm == 4) PRINT128(&vrf_i32[vs1*V32LEN]);
-    if(imm == 4) printf(" * ");
-    if(imm == 4) PRINT128(&vrf_i32[vs2*V32LEN]);
-    if(imm == 4) printf(" => ");
-    if(imm == 4) PRINT128(&vrf_i32[vd*V32LEN]);
-    if(imm == 4) printf("\n");
 }
 
 void vactv(size_t vs3, void *rs1, int32_t rs2, int32_t imm)

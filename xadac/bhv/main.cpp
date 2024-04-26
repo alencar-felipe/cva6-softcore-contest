@@ -439,6 +439,8 @@ void bhv_init(bhv_t *bhv)
 
 void issue(bhv_t *bhv)
 {
+    _id_t id = rand() % 4;
+
     instr_t instr = *(instr_t *) (bhv->memory +
         bhv->core->pc - MINIRV32_RAM_IMAGE_OFFSET);
 
@@ -450,12 +452,12 @@ void issue(bhv_t *bhv)
     reg_data_t rs2_data = bhv->core->regs[rs2_addr];
 
     dec_req_t dec_req = {
-        .id = 0,
+        .id = id,
         .instr = instr
     };
 
     exe_req_t exe_req = {
-        .id = 0,
+        .id = id,
         .instr = instr,
         .rs_addr = {rs1_addr, rs2_addr},
         .rs_data = {rs1_data, rs2_data},
@@ -552,9 +554,6 @@ void bhv_step(bhv_t *bhv)
         });
     }
 }
-
-
-
 
 int main(int argc, char** argv, char** env) {
     Verilated::debug(0);

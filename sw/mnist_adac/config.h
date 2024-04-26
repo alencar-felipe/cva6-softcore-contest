@@ -3,7 +3,7 @@
 #define GLOBAL_PERF
 // #define LAYER_PERF
 // #define ADAC_HPM
-#define VALIDATE
+// #define VALIDATE
 #define VECTOR
 // #define MODEL
 

@@ -102,7 +102,6 @@ static uint8_t l3_out[L3_O_SIZE];
 
 #define CONV_LOOP_ON(L, O, I, W, ON_STEP) \
 while(on + ON_STEP <= L##_ON) { \
-    /* if (L##_IB == 4) { on = 10; ox = 5; oy = 5; } */ \
     VBIAS(S_VI32, L##_BIAS, ON_STEP); \
     size_t o = (oy*L##_OX + ox)*L##_ON + on; \
     for (size_t wy = 0; wy < L##_WY; wy++) { \
@@ -119,7 +118,6 @@ while(on + ON_STEP <= L##_ON) { \
         } \
     } \
     VACTV(S_VI32, &O[o], L##_SHIFT, ON_STEP); \
-    /* if (L##_IB == 4) { printf("halt\n"); while(1); } */ \
     on += ON_STEP; \
 }
 
@@ -207,8 +205,6 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 
     CONV(L0, l0_out, input, l0_weight);
 
-    hexdump(l0_out, L0_O_SIZE);
-
 #ifdef LAYER_PERF
     perf_toc();
 #endif
@@ -225,8 +221,6 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 #endif
 
     CONV(L1, l1_out, l0_out, l1_weight);
-
-    hexdump(l1_out, L1_O_SIZE);
 
 #ifdef LAYER_PERF
     perf_toc();
@@ -245,8 +239,6 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 
     CONV(L2, l2_out, l1_out, l2_weight);
 
-    hexdump(l2_out, L2_O_SIZE);
-
 #ifdef LAYER_PERF
     perf_toc();
 #endif
@@ -263,8 +255,6 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 #endif
 
     CONV(L3, l3_out, l2_out, l3_weight);
-
-    hexdump(l3_out, L3_O_SIZE);
 
 #ifdef LAYER_PERF
     perf_toc();
