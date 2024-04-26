@@ -11,6 +11,12 @@
 #define MEM_SIZE (0x2FF00)
 #define MINI_RV32_RAM_SIZE (MEM_SIZE)
 #define MINIRV32_IMPLEMENTATION
+#define MINIRV32_HANDLE_MEM_STORE_CONTROL(addr, val) \
+    { if (addr == 0x10000000) printf("%c", val); }
+#define MINIRV32_HANDLE_MEM_LOAD_CONTROL(addr, val) \
+    { val = ~0; }
+#define MINIRV32_OTHERCSR_READ(addr, val) \
+    { if (addr == 0xB00) val = Verilated::time(); }
 #include "mini-rv32ima.h"
 
 #include "types.hpp"
@@ -18,7 +24,8 @@
 using namespace std;
 
 typedef Vxadac_verilator dut_t;
-typedef VerilatedVcdC vcd_t;
+typedef VerilatedVcdC    vcd_t;
+typedef MiniRV32IMAState core_t;
 
 typedef struct {
     logic_t   rstn;
@@ -50,9 +57,18 @@ typedef struct {
 
     list<dec_req_t> in_flight_dec;
     list<exe_req_t> in_flight_exe;
+
+    core_t *core;
+    uint8_t *memory;
 } bhv_t;
 
 double sc_time_stamp() { return 0; }
+
+void panic()
+{
+    printf("panic!\n");
+    exit(-1);
+}
 
 void init_signals(dut_t *dut)
 {
@@ -247,7 +263,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     next.dec_req_valid = dut->dec_req_valid;
 
     if (dut->dec_req_valid && dut->dec_req_ready) {
-        VL_PRINTF("dec req %s\n", format_dec_req(next.dec_req).c_str());
+        // VL_PRINTF("dec req %s\n", format_dec_req(next.dec_req).c_str());
         memset(&next.dec_req, 0, sizeof(dec_req_t));
         next.dec_req_valid = 0;
     }
@@ -263,7 +279,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     if (dut->dec_rsp_valid && dut->dec_rsp_ready) {
         dec_rsp_t dec_rsp = get_dec_rsp(dut);
         bhv->dec_rsp_list.push_back(dec_rsp);
-        VL_PRINTF("dec rsp %s\n", format_dec_rsp(dec_rsp).c_str());
+        // VL_PRINTF("dec rsp %s\n", format_dec_rsp(dec_rsp).c_str());
     }
 
     next.dec_rsp_ready = (bhv->dec_rsp_list.size() < 10);
@@ -274,7 +290,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     next.exe_req_valid = dut->exe_req_valid;
 
     if (dut->exe_req_valid && dut->exe_req_ready) {
-        VL_PRINTF("exe req %s\n", format_exe_req(next.exe_req).c_str());
+        // VL_PRINTF("exe req %s\n", format_exe_req(next.exe_req).c_str());
         memset(&next.exe_req, 0, sizeof(exe_req_t));
         next.exe_req_valid = 0;
     }
@@ -290,7 +306,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     if (dut->exe_rsp_valid && dut->exe_rsp_ready) {
         exe_rsp_t exe_rsp = get_exe_rsp(dut);
         bhv->exe_rsp_list.push_back(exe_rsp);
-        VL_PRINTF("exe rsp %s\n", format_exe_rsp(exe_rsp).c_str());
+        // VL_PRINTF("exe rsp %s\n", format_exe_rsp(exe_rsp).c_str());
     };
 
     next.exe_rsp_ready = (bhv->exe_rsp_list.size() < 10);
@@ -300,7 +316,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     if (dut->axi_aw_valid && dut->axi_aw_ready) {
         axi_aw_t axi_aw = get_axi_aw(dut);
         bhv->axi_aw_list.push_back(axi_aw);
-        VL_PRINTF("axi aw %s\n", format_axi_aw(axi_aw).c_str());
+        // VL_PRINTF("axi aw %s\n", format_axi_aw(axi_aw).c_str());
     }
 
     next.axi_aw_ready = (bhv->axi_aw_list.size() < 10);
@@ -310,7 +326,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     if (dut->axi_w_valid && dut->axi_w_ready) {
         axi_w_t axi_w = get_axi_w(dut);
         bhv->axi_w_list.push_back(axi_w);
-        VL_PRINTF("axi w %s\n", format_axi_w(axi_w).c_str());
+        // VL_PRINTF("axi w %s\n", format_axi_w(axi_w).c_str());
     }
 
     next.axi_w_ready = (bhv->axi_w_list.size() < 10);
@@ -321,7 +337,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     next.axi_b_valid = dut->axi_b_valid;
 
     if (dut->axi_b_valid && dut->axi_b_ready) {
-        VL_PRINTF("axi b %s\n", format_axi_b(next.axi_b).c_str());
+        // VL_PRINTF("axi b %s\n", format_axi_b(next.axi_b).c_str());
         memset(&next.axi_b, 0, sizeof(axi_b_t));
         next.axi_b_valid = 0;
     }
@@ -337,7 +353,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     if (dut->axi_ar_valid && dut->axi_ar_ready) {
         axi_ar_t axi_ar = get_axi_ar(dut);
         bhv->axi_ar_list.push_back(axi_ar);
-        VL_PRINTF("axi ar %s\n", format_axi_ar(axi_ar).c_str());
+        // VL_PRINTF("axi ar %s\n", format_axi_ar(axi_ar).c_str());
     }
 
     next.axi_ar_ready = (bhv->axi_ar_list.size() < 10);
@@ -348,7 +364,7 @@ next_t read_phase(dut_t *dut, bhv_t *bhv)
     next.axi_r_valid = dut->axi_r_valid;
 
     if (dut->axi_r_valid && dut->axi_r_ready) {
-        VL_PRINTF("axi r %s\n", format_axi_r(next.axi_r).c_str());
+        // VL_PRINTF("axi r %s\n", format_axi_r(next.axi_r).c_str());
         memset(&next.axi_r, 0, sizeof(axi_r_t));
         next.axi_r_valid = 0;
     }
@@ -380,7 +396,7 @@ void write_phase(dut_t *dut, next_t next)
     dut->axi_r_valid = next.axi_r_valid;
 }
 
-void verilator_step(dut_t *dut, vcd_t *vcd, bhv_t *bhv)
+void rtl_step(dut_t *dut, vcd_t *vcd, bhv_t *bhv)
 {
     dut->eval();
 
@@ -399,20 +415,49 @@ void verilator_step(dut_t *dut, vcd_t *vcd, bhv_t *bhv)
     vcd->dump(Verilated::time());
 }
 
-static int counter = 0;
-
-void issue(instr_t instr, bhv_t *bhv)
+void bhv_load_memory(const char *path, uint8_t *memory)
 {
+    FILE* file = fopen(path, "rb");
+    if (!file) panic();
+    if (fread(memory, 1, MEM_SIZE, file) == 0) panic();
+    fclose(file);
+}
+
+void bhv_init(bhv_t *bhv)
+{
+    bhv->core = new core_t;
+    bhv->memory = new uint8_t[MEM_SIZE];
+
+    bhv_load_memory("../sw/build/mnist_adac.bin", bhv->memory);
+
+    memset(bhv->core, 0, sizeof(core_t));
+    bhv->core->pc = 0x80000080;
+	bhv->core->regs[10] = 0x00; // hart id
+	bhv->core->regs[11] = 0; // dtbpa
+	bhv->core->extraflags = 3; // machine-mode.
+}
+
+void issue(bhv_t *bhv)
+{
+    instr_t instr = *(instr_t *) (bhv->memory +
+        bhv->core->pc - MINIRV32_RAM_IMAGE_OFFSET);
+
+    reg_addr_t rs1_addr = (instr >> 15) & 0x1f;
+    reg_addr_t rs2_addr = (instr >> 20) & 0x1f;
+
+    reg_data_t rs1_data = bhv->core->regs[rs1_addr];
+    reg_data_t rs2_data = bhv->core->regs[rs2_addr];
+
     dec_req_t dec_req = {
-        .id = counter,
+        .id = 0,
         .instr = instr
     };
 
     exe_req_t exe_req = {
-        .id = counter,
+        .id = 0,
         .instr = instr,
-        .rs_addr = {0},
-        .rs_data = {1,0},
+        .rs_addr = {rs1_addr, rs2_addr},
+        .rs_data = {rs1_data, rs2_data},
         .vs_addr = {0},
         .vs_data = {0}
     };
@@ -422,7 +467,7 @@ void issue(instr_t instr, bhv_t *bhv)
     bhv->exe_req_list.push_back(exe_req);
     bhv->in_flight_exe.push_back(exe_req);
 
-    counter = (counter + 1) % 4;
+    bhv->core->pc += 4;
 }
 
 void retire(bhv_t *bhv)
@@ -437,8 +482,7 @@ void retire(bhv_t *bhv)
         if (it != bhv->in_flight_dec.end()) {
             bhv->in_flight_dec.erase(it);
         } else {
-            printf("panic!\n");
-            exit(-1);
+            panic();
         }
     }
 
@@ -452,21 +496,63 @@ void retire(bhv_t *bhv)
         if (it != bhv->in_flight_exe.end()) {
             bhv->in_flight_exe.erase(it);
         } else {
-            printf("panic!\n");
-            exit(-1);
+            panic();
         }
     }
+}
 
-    if (
-        bhv->dec_req_list.empty() &&
-        bhv->dec_rsp_list.empty() &&
-        bhv->in_flight_dec.empty() &&
-        bhv->in_flight_exe.empty()
-    ) {
-        printf("All instructions retired.\n");
-        Verilated::gotFinish(true);
+void bhv_step(bhv_t *bhv)
+{
+    uint32_t instr = *(uint32_t *) (bhv->memory +
+        bhv->core->pc - MINIRV32_RAM_IMAGE_OFFSET);
+
+    // printf("%08x: %08x\n", bhv->core->pc, instr);
+
+    if (instr == 0x6f3ad000) panic();
+
+    if ((instr & 0x7F) == 0x77) {
+        issue(bhv);
+    } else {
+        if(MiniRV32IMAStep(bhv->core, bhv->memory, 0, 0, 1)) panic();
+    }
+
+    retire(bhv);
+
+    if (!bhv->axi_ar_list.empty()) {
+        axi_ar_t axi_ar = bhv->axi_ar_list.front();
+        bhv->axi_ar_list.pop_front();
+
+        axi_r_t axi_r;
+        axi_r.id = axi_ar.id;
+        memcpy(
+            &axi_r.data,
+            &bhv->memory[axi_ar.addr - MINIRV32_RAM_IMAGE_OFFSET],
+            sizeof(vec_data_t)
+        );
+
+        bhv->axi_r_list.push_back(axi_r);
+    }
+
+    if (!bhv->axi_aw_list.empty() && !bhv->axi_w_list.empty() ) {
+        axi_aw_t axi_aw = bhv->axi_aw_list.front();
+        axi_w_t axi_w = bhv->axi_w_list.front();
+        bhv->axi_aw_list.pop_front();
+        bhv->axi_w_list.pop_front();
+
+        for (size_t i = 0; i < 16; i++) {
+            if ((axi_w.strb >> i) & 1) {
+                bhv->memory[axi_aw.addr - MINIRV32_RAM_IMAGE_OFFSET + i] =
+                axi_w.data.x[i];
+            }
+        }
+
+        bhv->axi_b_list.push_back({
+            .id = axi_aw.id
+        });
     }
 }
+
+
 
 
 int main(int argc, char** argv, char** env) {
@@ -475,25 +561,14 @@ int main(int argc, char** argv, char** env) {
     Verilated::traceEverOn(true);
     Verilated::commandArgs(argc, argv);
 
-    dut_t* dut = new dut_t;
-    vcd_t* vcd = new vcd_t;
-    bhv_t* bhv = new bhv_t;
+    dut_t *dut = new dut_t;
+    vcd_t *vcd = new vcd_t;
+    bhv_t *bhv = new bhv_t;
+
+    bhv_init(bhv);
 
     dut->trace(vcd, 99);
     vcd->open("output.vcd");
-
-    // vbias
-    issue(0x20000077, bhv); // vload
-    issue(0x200000f7, bhv); // vload
-    issue(0x20000177, bhv); // vload
-    issue(0x200001f7, bhv); // vload
-    issue(0x200031f7, bhv); // vactv
-    issue(0x200010f7, bhv);
-    issue(0x20001177, bhv);
-    issue(0x200011f7, bhv);
-
-    // vmacc
-    issue(0x2021a0f7, bhv);
 
     VL_PRINTF("Simulation start\n");
 
@@ -501,33 +576,16 @@ int main(int argc, char** argv, char** env) {
     vcd->dump(Verilated::time());
 
     while (!Verilated::gotFinish()) {
-        verilator_step(dut, vcd, bhv);
-
-        if (bhv->axi_ar_list.size() > 0) {
-            axi_ar_t axi_ar = bhv->axi_ar_list.front();
-            bhv->axi_ar_list.pop_front();
-            bhv->axi_r_list.push_back({
-                .id   = axi_ar.id,
-                .data = {0xDE, 0xAD, 0xBE, 0xEF, 0, 0, 0 ,0, 0, 0, 0, 0, 0, 0, 0, 0}
-            });
-        }
-
-        if (!bhv->axi_aw_list.empty() && !bhv->axi_w_list.empty() ) {
-            axi_ar_t axi_aw = bhv->axi_ar_list.front();
-            bhv->axi_aw_list.pop_front();
-            bhv->axi_w_list.pop_front();
-            bhv->axi_b_list.push_back({
-                .id = axi_aw.id
-            });
-        }
-
-        retire(bhv);
+        bhv_step(bhv);
+        rtl_step(dut, vcd, bhv);
     }
 
     VL_PRINTF("Simulation end\n");
 
     dut->final();
     vcd->close();
+    delete[] bhv->memory;
+    delete bhv->core;
     delete bhv;
     delete dut;
     delete vcd;

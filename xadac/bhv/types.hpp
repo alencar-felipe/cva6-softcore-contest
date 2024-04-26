@@ -87,7 +87,7 @@ inline std::string format_hex(const void* ptr, size_t size) {
 
     const std::string hex_digits = "0123456789abcdef";
 
-    for (size_t i = size - 1; i < size; i++) {
+    for (size_t i = size - 1; i < size; i--) {
         uint8_t byte = byte_ptr[i];
         result += hex_digits[(byte >> 4) & 0x0F];
         result += hex_digits[byte & 0x0F];
