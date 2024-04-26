@@ -51,7 +51,7 @@ VFLAGS = \
 	--top $(TOP) \
 	--trace
 
-$(shell mkdir -p $(OBJ_DIR))
+$(shell mkdir -p $(BUILD_DIR))
 
 verilate: $(SRC)
 	$(VERILATOR) $(SV_SRC) $(VFLAGS)
