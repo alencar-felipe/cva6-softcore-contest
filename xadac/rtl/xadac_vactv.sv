@@ -97,7 +97,7 @@ module xadac_vactv
             data = '0;
             for (VecLenT i = 0; i < vlen; i++) begin
                 sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
-                elem = VecElemT'((sum > 0) ? (sum >> shift) : 0);
+                elem = VecElemT'((signed'(sum) > 0) ? (sum >> shift) : 0);
                 data[VecElemWidth*i +: VecElemWidth] = elem;
             end
 

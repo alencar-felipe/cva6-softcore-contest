@@ -16,6 +16,7 @@ module xadac_vrf_phy
     always_ff @(posedge clk) begin
         if (we) begin
             vrf[waddr] <= wdata;
+            // $display("vrf[%x] <= %x\n", waddr, wdata);
         end
     end
 

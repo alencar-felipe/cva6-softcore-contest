@@ -40,9 +40,9 @@ module xadac_vmacc
         slv.exe_rsp.vd_write = '1;
         for (SizeT i = 0; i < ilen; i++) begin
             for (SizeT j = 0; j < jlen; j++) begin
-                slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] += VecSumT'(
-                    signed'(slv.exe_req.vs_data[0][jlen*i + j +: 8]) *
-                    unsigned'(slv.exe_req.vs_data[1][jlen*i + j +: 8])
+                slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] += signed'(
+                    signed'(slv.exe_req.vs_data[0][(jlen*i + j)*8 +: 8]) *
+                    unsigned'(slv.exe_req.vs_data[1][(jlen*i + j)*8 +: 8])
                 );
             end
         end

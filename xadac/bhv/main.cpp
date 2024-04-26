@@ -442,6 +442,7 @@ void issue(bhv_t *bhv)
     instr_t instr = *(instr_t *) (bhv->memory +
         bhv->core->pc - MINIRV32_RAM_IMAGE_OFFSET);
 
+    reg_addr_t rd_addr  = (instr >> 7) & 0x1f;
     reg_addr_t rs1_addr = (instr >> 15) & 0x1f;
     reg_addr_t rs2_addr = (instr >> 20) & 0x1f;
 
@@ -458,7 +459,7 @@ void issue(bhv_t *bhv)
         .instr = instr,
         .rs_addr = {rs1_addr, rs2_addr},
         .rs_data = {rs1_data, rs2_data},
-        .vs_addr = {0},
+        .vs_addr = {rs1_addr, rs2_addr, rd_addr},
         .vs_data = {0}
     };
 
