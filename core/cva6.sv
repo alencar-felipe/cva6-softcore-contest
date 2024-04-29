@@ -133,7 +133,10 @@ module cva6
     xadac_if.mst xadac,
     // memory side
     output noc_req_t noc_req_o,
-    input noc_resp_t noc_resp_i
+    input noc_resp_t noc_resp_i,
+    // external dcache master port
+    input  dcache_req_t ext_dcache_req_i,
+    output dcache_rsp_t ext_dcache_rsp_o
 );
 
   // ------------------------------------------
@@ -161,7 +164,7 @@ module cva6
 
   localparam int unsigned NrWbPorts = (CVA6Cfg.CvxifEn || EnableAccelerator) ? 5 : 4;
   localparam int unsigned NrRgprPorts = 2;
-  localparam int unsigned NrDcachePorts = 2 + CVA6Cfg.CvxifEn;
+  localparam int unsigned NrDcachePorts = 3;
 
   localparam config_pkg::cva6_cfg_t CVA6ExtendCfg = {
     CVA6Cfg.NrCommitPorts,
@@ -738,8 +741,8 @@ module cva6
       .icache_areq_o          (icache_areq_ex_cache),
       .icache_arsp_i          (icache_arsp_cache_ex),
       // DCACHE interfaces
-      .dcache_req_o           (dcache_req),
-      .dcache_rsp_i           (dcache_rsp),
+      .dcache_req_o           ('{dcache_req[0]}),
+      .dcache_rsp_i           ('{dcache_rsp[0]}),
       .dcache_wbuffer_empty_i (dcache_commit_wbuffer_empty),
       .dcache_wbuffer_not_ni_i(dcache_commit_wbuffer_not_ni),
       // PMP
@@ -962,30 +965,10 @@ module cva6
   // Cache Subsystem
   // -------------------
 
-  // Acc dispatcher and store buffer share a dcache request port.
-  // Store buffer always has priority access over acc dipsatcher.
+  assign dcache_req[1] = ext_dcache_req_i;
+  assign ext_dcache_rsp_o = dcache_rsp[1];
 
-
-
-  // D$ request
-  // assign dcache_req[0] = dcache_req_ports_ex_cache[0];
-  // assign dcache_req[1] = dcache_req_ports_ex_cache[1];
-  // assign dcache_req[2] = dcache_req_ports_acc_cache[0];
-  // assign dcache_req[3] = dcache_req_ports_ex_cache[2].data_req ? dcache_req_ports_ex_cache [2] :
-  //                                                                         dcache_req_ports_acc_cache[1];
-
-  // D$ response
-  // assign dcache_req_ports_cache_ex[0] = dcache_rsp[0];
-  // assign dcache_req_ports_cache_ex[1] = dcache_rsp[1];
-  // assign dcache_req_ports_cache_acc[0] = dcache_rsp[2];
-  // always_comb begin : gen_dcache_req_store_data_gnt
-  //   dcache_req_ports_cache_ex[2]  = dcache_rsp[3];
-  //   dcache_req_ports_cache_acc[1] = dcache_rsp[3];
-
-  //   // Set gnt signal
-  //   dcache_req_ports_cache_ex[2].data_gnt &= dcache_req_ports_ex_cache[2].data_req;
-  //   dcache_req_ports_cache_acc[1].data_gnt &= !dcache_req_ports_ex_cache[2].data_req;
-  // end
+  assign dcache_req[2] = '0;
 
   if (DCACHE_TYPE == int'(config_pkg::WT)) begin : gen_cache_wt
     // this is a cache subsystem that is compatible with OpenPiton

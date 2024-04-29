@@ -70,7 +70,7 @@ module ariane
     .time_irq_i  (time_irq_i),
     .debug_req_i (debug_req_i),
     .rvfi_o      (rvfi_o),
-    .xadac        (xadac),
+    .xadac       (xadac),
     .noc_req_o   (noc_req_o),
     .noc_resp_i  (noc_resp_i)
   );
@@ -84,36 +84,26 @@ module ariane
         .AXI_USER_WIDTH (1)
     ) axi ();
 
-    // assign = axi.aw_id;
-    // assign = axi.aw_addr;
-    // assign = axi.aw_valid;
-    assign axi.aw_ready = '0;
-
-    // assign = axi.w_data;
-    // assign = axi.w_strb;
-    // assign = axi.w_valid;
-    assign axi.w_ready = '0;
-
-    assign axi.b_id    = '0;
-    assign axi.b_valid = '0;
-    // assign axi_b_ready = '0;
-
-    // assign = axi.ar_id;
-    // assign = axi.ar_addr;
-    // assign = axi.ar_valid;
-    assign axi.ar_ready = '0;
-
-    assign axi.r_id    = '0;
-    assign axi.r_data  = '0;
-    assign axi.r_valid = '0;
-    // assign axi_r_ready = '0;
-
     xadac i_xadac (
         .clk  (clk_i),
         .rstn (rst_ni),
         .slv  (xadac),
         .axi  (axi)
     );
+
+    dcache_axi_adapter i_dcache_axi_adapter (
+        .clk_i  (clk_i),
+        .rst_ni (rst_ni),
+
+        .axi (axi),
+
+        .write_dcache_req_o (dcache_req[0]),
+        .write_dcache_rsp_i (dcache_rsp[0]),
+
+        .read_dcache_req_o (dcache_req[1]),
+        .read_dcache_rsp_i (dcache_rsp[1])
+    );
+
   end
 
 endmodule // ariane
