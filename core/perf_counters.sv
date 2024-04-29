@@ -16,9 +16,9 @@
 module perf_counters
   import ariane_pkg::*;
 #(
-    parameter config_pkg::cva6_cfg_t CVA6Cfg  = config_pkg::cva6_cfg_empty,
-    parameter int unsigned           NumPorts = 3,                            // number of miss ports
-    parameter int unsigned           MHPMCounterNum = 6
+    parameter config_pkg::cva6_cfg_t CVA6Cfg = config_pkg::cva6_cfg_empty,
+    parameter int unsigned NrDcachePorts = 3,
+    parameter int unsigned MHPMCounterNum = 6
 ) (
     input logic clk_i,
     input logic rst_ni,
@@ -48,9 +48,9 @@ module perf_counters
     // for newly added events
     input exception_t branch_exceptions_i,  //Branch exceptions->execute unit-> branch_exception_o
     input icache_dreq_t l1_icache_access_i,
-    input dcache_req_i_t [2:0] l1_dcache_req_i_i,
-    input dcache_req_o_t [2:0] l1_dcache_req_o_i,
-    input logic [NumPorts-1:0][DCACHE_SET_ASSOC-1:0]miss_vld_bits_i,  //For Cache eviction (3ports-LOAD,STORE,PTW)
+    input dcache_req_t [NrDcachePorts-1:0] l1_dcache_req_i,
+    input dcache_rsp_t [NrDcachePorts-1:0] l1_dcache_rsp_i,
+    input logic [NrDcachePorts-1:0][DCACHE_SET_ASSOC-1:0]miss_vld_bits_i,  //For Cache eviction (3ports-LOAD,STORE,PTW)
     input logic i_tlb_flush_i,
     input logic stall_issue_i,  //stall-read operands
     input logic [31:0] mcountinhibit_i,

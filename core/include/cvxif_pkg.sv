@@ -52,14 +52,16 @@ package cvxif_pkg;
   } x_commit_t;
 
   typedef struct packed {
-    logic [X_ID_WIDTH-1:0]  id;
-    logic [31:0]            addr;
-    logic [1:0]             mode;
-    logic                   we;
-    logic [1:0]             size;
-    logic [X_MEM_WIDTH-1:0] wdata;
-    logic                   last;
-    logic                   spec;
+    logic [X_ID_WIDTH-1:0]    id;
+    logic [31:0]              addr;
+    logic [1:0]               mode;
+    logic                     we;
+    logic [2:0]               size;
+    logic [X_MEM_WIDTH/8-1:0] be;
+    logic [1:0]               attr;
+    logic [X_MEM_WIDTH-1:0]   wdata;
+    logic                     last;
+    logic                     spec;
   } x_mem_req_t;
 
   typedef struct packed {

@@ -34,7 +34,7 @@ package ariane_pkg;
       NR_SB_ENTRIES
   );  // depending on the number of scoreboard entries we need that many bits
       // to uniquely identify the entry in the scoreboard
-  localparam ASID_WIDTH = (riscv::XLEN == 64) ? 16 : 1;
+  localparam int unsigned AsidWidth = (riscv::XLEN == 64) ? 16 : 1;
   localparam BITS_SATURATION_COUNTER = 2;
 
   localparam ISSUE_WIDTH = 1;
@@ -752,12 +752,12 @@ package ariane_pkg;
   } amo_t;
 
   typedef struct packed {
-    logic                  valid;    // valid flag
-    logic                  is_2M;    //
-    logic                  is_1G;    //
-    logic [27-1:0]         vpn;      // VPN (39bits) = 27bits + 12bits offset
-    logic [ASID_WIDTH-1:0] asid;
-    riscv::pte_t           content;
+    logic                 valid;    // valid flag
+    logic                 is_2M;    //
+    logic                 is_1G;    //
+    logic [27-1:0]        vpn;      // VPN (39bits) = 27bits + 12bits offset
+    logic [AsidWidth-1:0] asid;
+    riscv::pte_t          content;
   } tlb_update_t;
 
   // Bits required for representation of physical address space as 4K pages
@@ -842,7 +842,7 @@ package ariane_pkg;
     logic [DCACHE_TID_WIDTH-1:0]   data_id;
     logic                          kill_req;
     logic                          tag_valid;
-  } dcache_req_i_t;
+  } dcache_req_t;
 
   typedef struct packed {
     logic                         data_gnt;
@@ -850,7 +850,7 @@ package ariane_pkg;
     logic [DCACHE_TID_WIDTH-1:0]  data_rid;
     riscv::xlen_t                 data_rdata;
     logic [DCACHE_USER_WIDTH-1:0] data_ruser;
-  } dcache_req_o_t;
+  } dcache_rsp_t;
 
   // ----------------------
   // Arithmetic Functions

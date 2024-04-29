@@ -28,20 +28,20 @@ module wt_axi_adapter
     input logic rst_ni,
 
     // icache
-    input  logic         icache_data_req_i,
-    output logic         icache_data_ack_o,
-    input  icache_req_t  icache_data_i,
+    input  logic                       icache_data_req_i,
+    output logic                       icache_data_ack_o,
+    input  wt_cache_pkg::icache_req_t  icache_data_i,
     // returning packets must be consumed immediately
-    output logic         icache_rtrn_vld_o,
-    output icache_rtrn_t icache_rtrn_o,
+    output logic                       icache_rtrn_vld_o,
+    output wt_cache_pkg::icache_rtrn_t icache_rtrn_o,
 
     // dcache
-    input  logic         dcache_data_req_i,
-    output logic         dcache_data_ack_o,
-    input  dcache_req_t  dcache_data_i,
+    input  logic                       dcache_data_req_i,
+    output logic                       dcache_data_ack_o,
+    input  wt_cache_pkg::dcache_req_t  dcache_data_i,
     // returning packets must be consumed immediately
-    output logic         dcache_rtrn_vld_o,
-    output dcache_rtrn_t dcache_rtrn_o,
+    output logic                       dcache_rtrn_vld_o,
+    output wt_cache_pkg::dcache_rtrn_t dcache_rtrn_o,
 
     // AXI port
     output axi_req_t axi_req_o,
@@ -62,9 +62,9 @@ module wt_axi_adapter
   // request path
   ///////////////////////////////////////////////////////
 
-  icache_req_t icache_data;
+  wt_cache_pkg::icache_req_t icache_data;
   logic icache_data_full, icache_data_empty;
-  dcache_req_t dcache_data;
+  wt_cache_pkg::dcache_req_t dcache_data;
   logic dcache_data_full, dcache_data_empty;
 
   logic [1:0] arb_req, arb_ack;
@@ -271,7 +271,7 @@ module wt_axi_adapter
   end
 
   fifo_v3 #(
-      .dtype(icache_req_t),
+      .dtype(wt_cache_pkg::icache_req_t),
       .DEPTH(ReqFifoDepth)
   ) i_icache_data_fifo (
       .clk_i     (clk_i),
@@ -288,7 +288,7 @@ module wt_axi_adapter
   );
 
   fifo_v3 #(
-      .dtype(dcache_req_t),
+      .dtype(wt_cache_pkg::dcache_req_t),
       .DEPTH(ReqFifoDepth)
   ) i_dcache_data_fifo (
       .clk_i     (clk_i),

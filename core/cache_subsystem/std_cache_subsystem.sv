@@ -51,8 +51,8 @@ module std_cache_subsystem
     output logic dcache_miss_o,  // we missed on a ld/st
     output logic                           wbuffer_empty_o,        // statically set to 1, as there is no wbuffer in this cache system
     // Request ports
-    input dcache_req_i_t [NumPorts-1:0] dcache_req_ports_i,  // to/from LSU
-    output dcache_req_o_t [NumPorts-1:0] dcache_req_ports_o,  // to/from LSU
+    input  dcache_req_t [NumPorts-1:0] dcache_req_ports_i,  // to/from LSU
+    output dcache_rsp_t [NumPorts-1:0] dcache_rsp_ports_o,  // to/from LSU
     // memory side
     output axi_req_t axi_req_o,
     input axi_rsp_t axi_resp_i
@@ -108,7 +108,7 @@ module std_cache_subsystem
       .axi_data_o  (axi_req_data),
       .axi_data_i  (axi_resp_data),
       .req_ports_i (dcache_req_ports_i),
-      .req_ports_o (dcache_req_ports_o),
+      .req_ports_o (dcache_rsp_ports_o),
       .amo_req_i,
       .amo_resp_o
   );
@@ -299,13 +299,13 @@ module std_cache_subsystem
     for (genvar j = 0; j < NumPorts - 1; j++) begin
       a_invalid_read_data :
       assert property (
-          @(posedge clk_i) disable iff (~rst_ni) dcache_req_ports_o[j].data_rvalid |-> (|dcache_req_ports_o[j].data_rdata) !== 1'hX)
+          @(posedge clk_i) disable iff (~rst_ni) dcache_rsp_ports_o[j].data_rvalid |-> (|dcache_rsp_ports_o[j].data_rdata) !== 1'hX)
       else
         $warning(
             1,
             "[l1 dcache] reading invalid data on port %01d: data=%016X",
             j,
-            dcache_req_ports_o[j].data_rdata
+            dcache_rsp_ports_o[j].data_rdata
         );
     end
   endgenerate

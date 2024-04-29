@@ -66,11 +66,11 @@ module wt_dcache_missunit
     output logic [DCACHE_LINE_WIDTH/8-1:0] wr_cl_data_be_o,
     output logic [DCACHE_SET_ASSOC-1:0] wr_vld_bits_o,
     // memory interface
-    input logic mem_rtrn_vld_i,
-    input dcache_rtrn_t mem_rtrn_i,
-    output logic mem_data_req_o,
-    input logic mem_data_ack_i,
-    output dcache_req_t mem_data_o
+    input  logic                       mem_rtrn_vld_i,
+    input  wt_cache_pkg::dcache_rtrn_t mem_rtrn_i,
+    output logic                       mem_data_req_o,
+    input  logic                       mem_data_ack_i,
+    output wt_cache_pkg::dcache_req_t  mem_data_o
 );
 
   // functions
