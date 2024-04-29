@@ -25,10 +25,11 @@ module xadac
         32'h0000_0077  // vload
     };
 
-    xadac_if slv_vrf ();
-    xadac_if slv_mux ();
-    xadac_if slv_unit_skid  [NoUnits] ();
-    xadac_if slv_unit       [NoUnits] ();
+    xadac_if vclobber_to_vrf ();
+    xadac_if vrf_to_mux_skid ();
+    xadac_if mux_skid_to_mux ();
+    xadac_if mux_to_unit_skid  [NoUnits] ();
+    xadac_if unit_skid_to_unit [NoUnits] ();
 
     IdT   axi_aw_id;
     AddrT axi_aw_addr;
@@ -62,20 +63,34 @@ module xadac
 
     always_ff @(posedge clk) begin
         test_q <= test_d;
+
+        if (axi_ar_valid) $display("ok");
     end
 
     xadac_vclobber i_vclobber (
         .clk  (clk),
         .rstn (rstn),
         .slv  (slv),
-        .mst  (slv_vrf)
+        .mst  (vclobber_to_vrf)
     );
 
     xadac_vrf i_vrf (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (slv_vrf),
-        .mst  (slv_mux)
+        .slv  (vclobber_to_vrf),
+        .mst  (vrf_to_mux_skid)
+    );
+
+    xadac_if_skid #(
+        .DecReqSkid (1),
+        .DecRspSkid (1),
+        .ExeReqSkid (1),
+        .ExeRspSkid (1)
+    ) i_mux_skid (
+        .clk  (clk),
+        .rstn (rstn),
+        .slv  (vrf_to_mux_skid),
+        .mst  (mux_skid_to_mux)
     );
 
     xadac_mux #(
@@ -85,25 +100,28 @@ module xadac
     ) i_mux (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (slv_mux),
-        .mst  (slv_unit_skid)
+        .slv  (mux_skid_to_mux),
+        .mst  (mux_to_unit_skid)
     );
 
     for (genvar i = 0; i < NoUnits; i++) begin : gen_skid
         xadac_if_skid #(
+            .DecReqSkid (1),
+            .DecRspSkid (1),
+            .ExeReqSkid (1),
             .ExeRspSkid (1)
         ) i_unit_skid (
             .clk  (clk),
             .rstn (rstn),
-            .slv  (slv_unit_skid[i]),
-            .mst  (slv_unit[i])
+            .slv  (mux_to_unit_skid[i]),
+            .mst  (unit_skid_to_unit[i])
         );
     end
 
     xadac_vload i_vload (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (slv_unit[0]),
+        .slv  (unit_skid_to_unit[0]),
 
         .axi_ar_id    (axi_ar_id),
         .axi_ar_addr  (axi_ar_addr),
@@ -119,19 +137,19 @@ module xadac
     xadac_vbias i_vbias (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (slv_unit[1])
+        .slv  (unit_skid_to_unit[1])
     );
 
     xadac_vmacc i_vmacc (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (slv_unit[2])
+        .slv  (unit_skid_to_unit[2])
     );
 
     xadac_vactv i_vactv (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (slv_unit[3]),
+        .slv  (unit_skid_to_unit[3]),
 
         .axi_aw_id    (axi_aw_id),
         .axi_aw_addr  (axi_aw_addr),
@@ -151,7 +169,7 @@ module xadac
     xadac_sink i_sink (
         .clk  (clk),
         .rstn (rstn),
-        .slv  (slv_unit[4])
+        .slv  (unit_skid_to_unit[4])
     );
 
     // axi assign =============================================================

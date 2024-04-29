@@ -130,8 +130,7 @@ module cva6
     // RISC-V formal interface port (`rvfi`):
     // Can be left open when formal tracing is not needed.
     output rvfi_instr_t [CVA6Cfg.NrCommitPorts-1:0] rvfi_o,
-    output cvxif_req_t cvxif_req_o,
-    input cvxif_resp_t cvxif_resp_i,
+    xadac_if.mst xadac,
     // memory side
     output noc_req_t noc_req_o,
     input noc_resp_t noc_resp_i
@@ -721,8 +720,7 @@ module cva6
       .x_result_o             (x_result_ex_id),
       .x_valid_o              (x_valid_ex_id),
       .x_we_o                 (x_we_ex_id),
-      .cvxif_req_o            (cvxif_req),
-      .cvxif_resp_i           (cvxif_resp),
+      .xadac                  (xadac),
       // Accelerator
       .acc_valid_i            (acc_valid_acc_ex),
       // Performance counters
@@ -914,11 +912,11 @@ module cva6
         .is_ex_mult_valid_i  (mult_valid_id_ex),
         .is_ex_mult_ready_i  (flu_ready_ex_id),
         .is_ex_lsu_valid_i   (lsu_valid_id_ex),
-        .is_ex_lsu_ready_i   (lsu_ready_ex_id), 
+        .is_ex_lsu_ready_i   (lsu_ready_ex_id),
         .is_ex_fpu_valid_i   (fpu_valid_id_ex),
         .is_ex_fpu_ready_i   (fpu_ready_ex_id),
         .is_ex_cvxif_valid_i (x_issue_valid_id_ex),
-        .is_ex_cvxif_ready_i (x_issue_ready_ex_id)  
+        .is_ex_cvxif_ready_i (x_issue_ready_ex_id)
     );
   end : gen_perf_counter
   else begin : gen_no_perf_counter
@@ -1171,9 +1169,9 @@ module cva6
         .acc_dcache_req_ports_i(dcache_req_ports_cache_acc),
         .inval_ready_i         (inval_ready),
         .inval_valid_o         (inval_valid),
-        .inval_addr_o          (inval_addr),
-        .acc_req_o             (cvxif_req_o),
-        .acc_resp_i            (cvxif_resp_i)
+        .inval_addr_o          (inval_addr)
+        // .acc_req_o             (cvxif_req_o),
+        // .acc_resp_i            (cvxif_resp_i)
     );
   end : gen_accelerator
   else begin : gen_no_accelerator
@@ -1198,8 +1196,8 @@ module cva6
     assign inval_addr                 = '0;
 
     // Feed through cvxif
-    assign cvxif_req_o                = cvxif_req;
-    assign cvxif_resp                 = cvxif_resp_i;
+    // assign cvxif_req_o                = cvxif_req;
+    // assign cvxif_resp                 = cvxif_resp_i;
   end : gen_no_accelerator
 
   // -------------------

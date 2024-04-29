@@ -42,7 +42,7 @@ module xadac_vload
         automatic SizeT    j       = '0;
         automatic VecDataT vd_data = '0;
 
-        sb_d    = sb_q;
+        sb_d = sb_q;
 
         exe_rsp_d       = slv.exe_rsp;
         exe_rsp_valid_d = slv.exe_rsp_valid;

@@ -13,7 +13,10 @@
 // Description: Ariane Top-level module
 
 
-module ariane import ariane_pkg::*; #(
+module ariane
+  import ariane_pkg::*;
+  import xadac_pkg::*;
+#(
   parameter config_pkg::cva6_cfg_t CVA6Cfg = config_pkg::cva6_cfg_empty,
   parameter bit IsRVFI = bit'(0),
   parameter type rvfi_instr_t = logic,
@@ -46,40 +49,70 @@ module ariane import ariane_pkg::*; #(
   input  noc_resp_t                    noc_resp_i
 );
 
-  cvxif_pkg::cvxif_req_t  cvxif_req;
-  cvxif_pkg::cvxif_resp_t cvxif_resp;
+  xadac_if xadac ();
 
   cva6 #(
-    .CVA6Cfg ( CVA6Cfg ),
-    .IsRVFI ( IsRVFI ),
-    .rvfi_instr_t ( rvfi_instr_t ),
+    .CVA6Cfg       (CVA6Cfg),
+    .IsRVFI        (IsRVFI),
+    .rvfi_instr_t  (rvfi_instr_t ),
     .axi_ar_chan_t (axi_ar_chan_t),
     .axi_aw_chan_t (axi_aw_chan_t),
-    .axi_w_chan_t (axi_w_chan_t),
-    .noc_req_t (noc_req_t),
-    .noc_resp_t (noc_resp_t)
+    .axi_w_chan_t  (axi_w_chan_t),
+    .noc_req_t     (noc_req_t),
+    .noc_resp_t    (noc_resp_t)
   ) i_cva6 (
-    .clk_i                ( clk_i                     ),
-    .rst_ni               ( rst_ni                    ),
-    .boot_addr_i          ( boot_addr_i               ),
-    .hart_id_i            ( hart_id_i                 ),
-    .irq_i                ( irq_i                     ),
-    .ipi_i                ( ipi_i                     ),
-    .time_irq_i           ( time_irq_i                ),
-    .debug_req_i          ( debug_req_i               ),
-    .rvfi_o               ( rvfi_o                    ),
-    .cvxif_req_o          ( cvxif_req                 ),
-    .cvxif_resp_i         ( cvxif_resp                ),
-    .noc_req_o            ( noc_req_o                 ),
-    .noc_resp_i           ( noc_resp_i                )
+    .clk_i       (clk_i),
+    .rst_ni      (rst_ni),
+    .boot_addr_i (boot_addr_i),
+    .hart_id_i   (hart_id_i),
+    .irq_i       (irq_i),
+    .ipi_i       (ipi_i),
+    .time_irq_i  (time_irq_i),
+    .debug_req_i (debug_req_i),
+    .rvfi_o      (rvfi_o),
+    .xadac        (xadac),
+    .noc_req_o   (noc_req_o),
+    .noc_resp_i  (noc_resp_i)
   );
 
-  if (CVA6Cfg.CvxifEn) begin : gen_example_coprocessor
-    cvxif_example_coprocessor i_cvxif_coprocessor (
-      .clk_i                ( clk_i                          ),
-      .rst_ni               ( rst_ni                         ),
-      .cvxif_req_i          ( cvxif_req                      ),
-      .cvxif_resp_o         ( cvxif_resp                     )
+  if (CVA6Cfg.CvxifEn) begin : gen_xadac
+
+    AXI_BUS #(
+        .AXI_ID_WIDTH   (IdWidth),
+        .AXI_ADDR_WIDTH (AddrWidth),
+        .AXI_DATA_WIDTH (VecDataWidth),
+        .AXI_USER_WIDTH (1)
+    ) axi ();
+
+    // assign = axi.aw_id;
+    // assign = axi.aw_addr;
+    // assign = axi.aw_valid;
+    assign axi.aw_ready = '0;
+
+    // assign = axi.w_data;
+    // assign = axi.w_strb;
+    // assign = axi.w_valid;
+    assign axi.w_ready = '0;
+
+    assign axi.b_id    = '0;
+    assign axi.b_valid = '0;
+    // assign axi_b_ready = '0;
+
+    // assign = axi.ar_id;
+    // assign = axi.ar_addr;
+    // assign = axi.ar_valid;
+    assign axi.ar_ready = '0;
+
+    assign axi.r_id    = '0;
+    assign axi.r_data  = '0;
+    assign axi.r_valid = '0;
+    // assign axi_r_ready = '0;
+
+    xadac i_xadac (
+        .clk  (clk_i),
+        .rstn (rst_ni),
+        .slv  (xadac),
+        .axi  (axi)
     );
   end
 

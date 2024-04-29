@@ -20,36 +20,50 @@ module xadac_skid #(
         assign slv_ready = mst_ready;
     end
     else begin : gen_skid
-        logic stall;
-        DataT buffer;
+        // logic stall;
+        // DataT buffer;
 
-        always_comb begin
-            mst_data  = (stall) ? buffer : slv_data;
-            mst_valid = slv_valid || stall;
-        end
+        // always_comb begin
+        //     mst_data  = (stall) ? buffer : slv_data;
+        //     mst_valid = slv_valid || stall;
+        // end
 
-        always_ff @(posedge clk, negedge rstn) begin
-            if (!rstn) begin
-                stall     <= '0;
-                buffer    <= '0;
-                slv_ready <= '0;
-            end
-            else begin
-                slv_ready <= !stall || mst_ready;
+        // always_ff @(posedge clk, negedge rstn) begin
+        //     if (!rstn) begin
+        //         stall     <= '0;
+        //         buffer    <= '0;
+        //         slv_ready <= '0;
+        //     end
+        //     else begin
+        //         slv_ready <= !stall || mst_ready;
 
-                if (slv_valid && slv_ready && mst_valid && !mst_ready) begin
-                    stall     <= '1;
-                    buffer    <= slv_data;
-                    slv_ready <= '0;
-                end
+        //         if (slv_valid && slv_ready && mst_valid && !mst_ready) begin
+        //             stall     <= '1;
+        //             buffer    <= slv_data;
+        //             slv_ready <= '0;
+        //         end
 
-                if (stall && mst_valid && mst_ready) begin
-                    stall     <= '0;
-                    buffer    <= '0;
-                    slv_ready <= '1;
-                end
-            end
-        end
+        //         if (stall && mst_valid && mst_ready) begin
+        //             stall     <= '0;
+        //             buffer    <= '0;
+        //             slv_ready <= '1;
+        //         end
+        //     end
+        // end
+
+        spill_register #(
+            .T       (DataT),
+            .Bypass  (0)
+        ) i_w_spill_reg (
+            .clk_i   ( clk             ),
+            .rst_ni  ( rstn             ),
+            .valid_i ( slv_valid   ),
+            .ready_o ( slv_ready    ),
+            .data_i  ( slv_data        ),
+            .valid_o ( mst_valid  ),
+            .ready_i ( mst_ready ),
+            .data_o  ( mst_data     )
+        );
     end
 
 endmodule

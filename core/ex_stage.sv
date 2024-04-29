@@ -90,8 +90,7 @@ module ex_stage
     output riscv::xlen_t x_result_o,
     output logic x_valid_o,
     output logic x_we_o,
-    output cvxif_pkg::cvxif_req_t cvxif_req_o,
-    input cvxif_pkg::cvxif_resp_t cvxif_resp_i,
+    xadac_if.mst xadac,
     input logic acc_valid_i,  // Output is valid
     // Memory Management
     input logic enable_translation_i,
@@ -375,8 +374,7 @@ module ex_stage
         .x_result_o,
         .x_valid_o,
         .x_we_o,
-        .cvxif_req_o,
-        .cvxif_resp_i
+        .xadac (xadac)
     );
   end else begin : gen_no_cvxif
     assign cvxif_req_o   = '0;
