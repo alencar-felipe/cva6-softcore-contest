@@ -169,6 +169,7 @@ endif
 src := \
 	core/include/$(target)_config_pkg.sv \
 	corev_apu/src/ariane.sv \
+	corev_apu/src/axi_dcache_adapter.sv \
 	$(wildcard corev_apu/bootrom/*.sv) \
 	$(wildcard corev_apu/clint/*.sv) \
 	$(wildcard corev_apu/fpga/src/axi2apb/src/*.sv) \
@@ -193,8 +194,14 @@ src := \
 	vendor/pulp-platform/common_cells/src/rstgen_bypass.sv \
 	vendor/pulp-platform/common_cells/src/rstgen.sv \
 	vendor/pulp-platform/common_cells/src/addr_decode.sv \
+	vendor/pulp-platform/common_cells/src/id_queue.sv \
+	vendor/pulp-platform/common_cells/src/onehot_to_bin.sv \
 	vendor/pulp-platform/common_cells/src/stream_register.sv \
+	vendor/pulp-platform/axi/src/axi_burst_splitter.sv \
 	vendor/pulp-platform/axi/src/axi_cut.sv \
+	vendor/pulp-platform/axi/src/axi_dw_converter.sv \
+	vendor/pulp-platform/axi/src/axi_dw_downsizer.sv \
+	vendor/pulp-platform/axi/src/axi_dw_upsizer.sv \
 	vendor/pulp-platform/axi/src/axi_join.sv \
 	vendor/pulp-platform/axi/src/axi_delayer.sv \
 	vendor/pulp-platform/axi/src/axi_to_axi_lite.sv \
