@@ -35,8 +35,10 @@ module xadac_vbias
         slv.exe_rsp.vd_data  = '0;
         slv.exe_rsp.vd_write = '1;
         for (VecLenT i = 0; i < vlen; i++) begin
-            slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] =
-                VecSumT'(slv.exe_req.rs_data[0]);
+            if ((VecSumWidth * i + VecSumWidth - 1) < VecDataWidth) begin
+                slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] = 
+                    VecSumT'(slv.exe_req.rs_data[0]);
+            end
         end
     end
 

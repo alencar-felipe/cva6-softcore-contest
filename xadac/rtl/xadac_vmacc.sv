@@ -45,11 +45,12 @@ module xadac_vmacc
     always_comb begin : comb_exe
         automatic SizeT ilen, jlen;
 
-        ilen = VecDataWidth/VecSumWidth;
-        jlen = min(
-            SizeT'(slv.exe_req.instr[25 +: VecLenWidth]),
-            VecSumWidth/VecElemWidth
-        );
+        ilen = VecDataWidth/VecSumWidth; // 4
+        jlen = VecSumWidth/VecElemWidth; 
+//        jlen = min(
+//            SizeT'(slv.exe_req.instr[25 +: VecLenWidth]),
+//            VecSumWidth/VecElemWidth  
+//        );
 
         // if (jlen != slv.exe_req.instr[25 +: VecLenWidth])
         //     $display("%d %d\n", jlen, slv.exe_req.instr[25 +: VecLenWidth]);
@@ -64,11 +65,13 @@ module xadac_vmacc
         slv.exe_rsp.vd_write = '1;
         for (SizeT i = 0; i < ilen; i++) begin
             for (SizeT j = 0; j < jlen; j++) begin
+                //if ( ((jlen*i + j ) * 8) + 7 < VecDataWidth ) begin 
                 slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] = macc(
                     slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth],
                     slv.exe_req.vs_data[0][(jlen*i + j)*8 +: 8],
                     slv.exe_req.vs_data[1][(jlen*i + j)*8 +: 8]
                 );
+                //end
             end
         end
     end

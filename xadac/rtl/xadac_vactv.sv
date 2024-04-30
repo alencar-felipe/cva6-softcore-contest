@@ -96,9 +96,14 @@ module xadac_vactv
 
             data = '0;
             for (VecLenT i = 0; i < vlen; i++) begin
-                sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
-                elem = VecElemT'((signed'(sum) > 0) ? (sum >> shift) : 0);
-                data[VecElemWidth*i +: VecElemWidth] = elem;
+                if ((VecSumWidth*i + VecSumWidth - 1) < 128) begin
+                    sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
+                    elem = VecElemT'((signed'(sum) > 0) ? (sum >> shift) : 0);
+                    data[VecElemWidth*i +: VecElemWidth] = elem;
+                end
+                //sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
+//                elem = VecElemT'((signed'(sum) > 0) ? (sum >> shift) : 0);
+//                data[VecElemWidth*i +: VecElemWidth] = elem;
             end
 
             sb_d[id].addr = AddrT'(slv.exe_req.rs_data[0]);
