@@ -108,13 +108,14 @@ module axi_dcache_adapter
 
         // tag ================================================================
 
-        dcache_req_o.address_tag = '0;
-        dcache_req_o.tag_valid   = '0;
-
         if (state_d.tag_valid) begin
             dcache_req_o.address_tag = state_d.addr[AddrWidth-1:IndexWidth];
             dcache_req_o.tag_valid   = '1;
             state_d.tag_valid = '0;
+        end
+        else begin
+            dcache_req_o.address_tag = '0;
+            dcache_req_o.tag_valid   = '0;
         end
 
         // req ================================================================
@@ -122,38 +123,43 @@ module axi_dcache_adapter
         dcache_req_o.address_index = '0;
         dcache_req_o.data_wdata    = '0;
         dcache_req_o.data_wuser    = '0;
+        dcache_req_o.data_req      = '0;
         dcache_req_o.data_we       = '0;
         dcache_req_o.data_be       = '0;
         dcache_req_o.data_size     = '0;
         dcache_req_o.data_id       = '0;
         dcache_req_o.kill_req      = '0;
 
-        dcache_req_o.data_req = ((
+        if ((
             (state_d.ar_done) ||
             (state_d.aw_done && state_d.w_done && !state_q.tag_valid)
         ) && (
             (state_d.req_count < 4)
-        ));
-
-        if (dcache_req_o.data_req && dcache_rsp_i.data_gnt) begin
+        )) begin
             dcache_req_o.address_index = state_d.addr[IndexWidth-1:0];
             dcache_req_o.data_wdata    = state_d.data[TransWidth-1:0];
             dcache_req_o.data_wuser    = '0;
+            dcache_req_o.data_req      = '1;
             dcache_req_o.data_we       = state_d.aw_done;
             dcache_req_o.data_be       = state_d.strb[TransWidth/8-1:0];
             dcache_req_o.data_size     = dsize(state_d.strb[TransWidth/8-1:0]);
             dcache_req_o.data_id       = state_d.id;
             dcache_req_o.kill_req      = '0;
 
+            if(state_d.aw_done) begin
+                dcache_req_o.address_tag = state_d.addr[AddrWidth-1:IndexWidth];
+            end
+        end
+
+        if (dcache_req_o.data_req && dcache_rsp_i.data_gnt) begin
             state_d.tag_valid = state_d.ar_done;
 
+            state_d.addr      += DataWidth/TransWidth;
             state_d.req_count += 1;
 
             if(state_d.aw_done) begin
-                dcache_req_o.address_tag = state_d.addr[AddrWidth-1:IndexWidth];
-
-                state_d.data = data_t'(state_d.data >> TransWidth);
-                state_d.strb = strb_t'(state_d.strb >> TransWidth/8);
+                state_d.data >>= TransWidth;
+                state_d.strb >>= TransWidth/8;
 
                 state_d.rsp_count += 1;
             end
@@ -162,43 +168,58 @@ module axi_dcache_adapter
         // rsp ================================================================
 
         if (dcache_rsp_i.data_rvalid) begin
-            state_d.data <<= TransWidth;
-            state_d.data[TransWidth-1:0] = dcache_rsp_i.data_rdata;
+            state_d.data >>= TransWidth;
+            state_d.data[DataWidth-1:DataWidth-TransWidth] =
+                dcache_rsp_i.data_rdata;
 
             state_d.rsp_count += 1;
         end
 
         // b ==================================================================
 
-        axi_skid.b_id   = '0;
-        axi_skid.b_resp = '0;
-        axi_skid.b_user = '0;
+        axi_skid.b_id    = '0;
+        axi_skid.b_resp  = '0;
+        axi_skid.b_user  = '0;
+        axi_skid.b_valid = '0;
 
-        axi_skid.b_valid = (state_d.aw_done && state_d.rsp_count >= 4);
+        if(
+            !state_d.b_done &&
+            state_d.aw_done &&
+            state_d.rsp_count >= 4
+        ) begin
+            axi_skid.b_id    = state_d.id;
+            axi_skid.b_resp  = '0;
+            axi_skid.b_user  = '0;
+            axi_skid.b_valid = '1;
+        end
 
         if (axi_skid.b_valid && axi_skid.b_ready) begin
-            axi_skid.b_id   = state_d.id;
-            axi_skid.b_resp = '0;
-            axi_skid.b_user = '0;
             state_d.b_done = '1;
         end
 
         // r ==================================================================
 
-        axi_skid.r_id   = '0;
-        axi_skid.r_data = '0;
-        axi_skid.r_resp = '0;
-        axi_skid.r_last = '0;
-        axi_skid.r_user = '0;
+        axi_skid.r_id    = '0;
+        axi_skid.r_data  = '0;
+        axi_skid.r_resp  = '0;
+        axi_skid.r_last  = '0;
+        axi_skid.r_user  = '0;
+        axi_skid.r_valid = '0;
 
-        axi_skid.r_valid = (state_d.ar_done && state_d.rsp_count >= 4);
+        if (
+            !state_d.r_done &&
+            state_d.ar_done &&
+            state_d.rsp_count >= 4
+        ) begin
+            axi_skid.r_id    = state_d.id;
+            axi_skid.r_data  = state_d.data;
+            axi_skid.r_resp  = '0;
+            axi_skid.r_last  = '1;
+            axi_skid.r_user  = '0;
+            axi_skid.r_valid = '1;
+        end
 
         if (axi_skid.r_valid && axi_skid.r_ready) begin
-            axi_skid.r_id   = state_d.id;
-            axi_skid.r_data = state_d.data;
-            axi_skid.r_resp = '0;
-            axi_skid.r_last = '1;
-            axi_skid.r_user = '0;
             state_d.r_done = '1;
         end
 

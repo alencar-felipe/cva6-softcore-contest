@@ -1,9 +1,10 @@
 #pragma once
 
-#define GLOBAL_PERF
+// #define GLOBAL_PERF
 // #define LAYER_PERF
 // #define ADAC_HPM
-// #define VALIDATE
+#define DUMP
+#define VALIDATE
 #define VECTOR
 // #define MODEL
 

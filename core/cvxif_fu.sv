@@ -52,6 +52,11 @@ module cvxif_fu
     x_req_t x_req;
     logic   x_req_valid;
     logic   x_req_ready;
+
+    x_req_t x_req_mid;
+    logic   x_req_mid_valid;
+    logic   x_req_mid_ready;
+
     x_req_t x_req_spill;
     logic   x_req_spill_valid;
     logic   x_req_spill_ready;
@@ -68,13 +73,29 @@ module cvxif_fu
     spill_register #(
         .T      (x_req_t),
         .Bypass (0)
-    ) i_x_req_spill (
+    ) i_x_req_mid (
         .clk_i   (clk_i),
         .rst_ni  (rst_ni),
 
         .valid_i (x_req_valid),
         .ready_o (x_req_ready),
         .data_i  (x_req),
+
+        .valid_o (x_req_mid_valid),
+        .ready_i (x_req_mid_ready),
+        .data_o  (x_req_mid)
+    );
+
+    spill_register #(
+        .T      (x_req_t),
+        .Bypass (0)
+    ) i_x_req_spill (
+        .clk_i   (clk_i),
+        .rst_ni  (rst_ni),
+
+        .valid_i (x_req_mid_valid),
+        .ready_o (x_req_mid_ready),
+        .data_i  (x_req_mid),
 
         .valid_o (x_req_spill_valid),
         .ready_i (x_req_spill_ready),
@@ -84,11 +105,13 @@ module cvxif_fu
     assign xadac.dec_req.id    = x_req_spill.id;
     assign xadac.dec_req.instr = x_req_spill.instr;
 
-    assign xadac.exe_req.id      = x_req_spill.id;
-    assign xadac.exe_req.instr   = x_req_spill.instr;
-    assign xadac.exe_req.rs_addr = x_req_spill.rs_addr;
-    assign xadac.exe_req.rs_data = x_req_spill.rs_data;
-    assign xadac.exe_req.vs_addr = '0;
+    assign xadac.exe_req.id         = x_req_spill.id;
+    assign xadac.exe_req.instr      = x_req_spill.instr;
+    assign xadac.exe_req.rs_addr    = x_req_spill.rs_addr;
+    assign xadac.exe_req.rs_data    = x_req_spill.rs_data;
+    assign xadac.exe_req.vs_addr[0] = x_req_spill.instr[19:15];
+    assign xadac.exe_req.vs_addr[1] = x_req_spill.instr[24:20];
+    assign xadac.exe_req.vs_addr[2] = x_req_spill.instr[11: 7];
     assign xadac.exe_req.vs_data = '0;
 
     logic dec_req_done_d, dec_req_done_q;

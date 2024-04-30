@@ -44,8 +44,6 @@ module xadac_vactv
     VecStrbT axi_w_strb_d;
     logic    axi_w_valid_d;
 
-    logic axi_b_ready_d;
-
     always_comb begin
         automatic SizeT     i     = '0;
         automatic IdT       id    = '0;
@@ -55,7 +53,7 @@ module xadac_vactv
         automatic VecSumT   sum   = '0;
         automatic VecElemT  elem  = '0;
 
-        sb_d    = sb_q;
+        sb_d = sb_q;
 
         exe_rsp_d       = slv.exe_rsp;
         exe_rsp_valid_d = slv.exe_rsp_valid;
@@ -67,8 +65,6 @@ module xadac_vactv
         axi_w_data_d  = axi_w_data;
         axi_w_strb_d  = axi_w_strb;
         axi_w_valid_d = axi_w_valid;
-
-        axi_b_ready_d = axi_b_ready;
 
         // dec ================================================================
 
@@ -156,6 +152,13 @@ module xadac_vactv
 
         id = axi_b_id;
 
+        axi_b_ready = (
+            axi_b_valid &&
+            sb_d[id].axi_aw_done &&
+            sb_d[id].axi_w_done &&
+            !sb_d[id].axi_b_done
+        );
+
         if (axi_b_valid && axi_b_ready) begin
             sb_d[id].axi_b_done = '1;
         end
@@ -213,11 +216,9 @@ module xadac_vactv
             axi_w_data  <= '0;
             axi_w_strb  <= '0;
             axi_w_valid <= '0;
-
-            axi_b_ready <= '0;
         end
         else begin
-            sb_q <= sb_q;
+            sb_q <= sb_d;
 
             slv.exe_rsp       <= exe_rsp_d;
             slv.exe_rsp_valid <= exe_rsp_valid_d;
@@ -229,8 +230,6 @@ module xadac_vactv
             axi_w_data  <= axi_w_data_d;
             axi_w_strb  <= axi_w_strb_d;
             axi_w_valid <= axi_w_valid_d;
-
-            axi_b_ready <= axi_w_ready;
         end
     end
 endmodule

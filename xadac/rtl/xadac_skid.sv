@@ -20,36 +20,39 @@ module xadac_skid #(
         assign slv_ready = mst_ready;
     end
     else begin : gen_skid
-        // logic stall;
-        // DataT buffer;
 
-        // always_comb begin
-        //     mst_data  = (stall) ? buffer : slv_data;
-        //     mst_valid = slv_valid || stall;
-        // end
+`ifdef VERILATOR
+        logic stall;
+        DataT buffer;
 
-        // always_ff @(posedge clk, negedge rstn) begin
-        //     if (!rstn) begin
-        //         stall     <= '0;
-        //         buffer    <= '0;
-        //         slv_ready <= '0;
-        //     end
-        //     else begin
-        //         slv_ready <= !stall || mst_ready;
+        always_comb begin
+            mst_data  = (stall) ? buffer : slv_data;
+            mst_valid = slv_valid || stall;
+        end
 
-        //         if (slv_valid && slv_ready && mst_valid && !mst_ready) begin
-        //             stall     <= '1;
-        //             buffer    <= slv_data;
-        //             slv_ready <= '0;
-        //         end
+        always_ff @(posedge clk, negedge rstn) begin
+            if (!rstn) begin
+                stall     <= '0;
+                buffer    <= '0;
+                slv_ready <= '0;
+            end
+            else begin
+                slv_ready <= !stall || mst_ready;
 
-        //         if (stall && mst_valid && mst_ready) begin
-        //             stall     <= '0;
-        //             buffer    <= '0;
-        //             slv_ready <= '1;
-        //         end
-        //     end
-        // end
+                if (slv_valid && slv_ready && mst_valid && !mst_ready) begin
+                    stall     <= '1;
+                    buffer    <= slv_data;
+                    slv_ready <= '0;
+                end
+
+                if (stall && mst_valid && mst_ready) begin
+                    stall     <= '0;
+                    buffer    <= '0;
+                    slv_ready <= '1;
+                end
+            end
+        end
+`else
 
         spill_register #(
             .T       (DataT),
@@ -64,6 +67,9 @@ module xadac_skid #(
             .ready_i ( mst_ready ),
             .data_o  ( mst_data     )
         );
+
+`endif
+
     end
 
 endmodule

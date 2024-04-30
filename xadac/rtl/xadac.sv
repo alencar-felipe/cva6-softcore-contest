@@ -55,18 +55,6 @@ module xadac
     logic    axi_r_valid;
     logic    axi_r_ready;
 
-    logic test_d, test_q;
-
-    always_comb begin
-        test_d = axi_r_valid;
-    end
-
-    always_ff @(posedge clk) begin
-        test_q <= test_d;
-
-        if (axi_ar_valid) $display("ok");
-    end
-
     xadac_vclobber i_vclobber (
         .clk  (clk),
         .rstn (rstn),
