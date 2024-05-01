@@ -2,33 +2,65 @@ module axi_dcache_adapter
     import ariane_pkg::*;
     import riscv::*;
 (
-    input logic clk_i,
-    input logic rst_ni,
+    input logic clk,
+    input logic rstn,
 
     AXI_BUS.Slave axi_skid,
 
-    output dcache_req_t dcache_req_o,
-    input  dcache_rsp_t dcache_rsp_i
+    output dcache_req_t dcache_req,
+    input  dcache_rsp_t dcache_rsp
 );
 
+    // parameters =============================================================
+
+    localparam int unsigned LogMaxTrans = 3;
+    localparam int unsigned MaxTrans    = 2**LogMaxTrans;
+
     localparam int unsigned IdWidth    = TRANS_ID_BITS;
+    localparam int unsigned UserWidth  = DCACHE_USER_WIDTH;
+    localparam int unsigned AddrWidth  = VLEN;
+    localparam int unsigned DataWidth  = XLEN;
+    localparam int unsigned StrbWidth  = DataWidth/8;
+
     localparam int unsigned TagWidth   = DCACHE_TAG_WIDTH;
     localparam int unsigned IndexWidth = DCACHE_INDEX_WIDTH;
-    localparam int unsigned AddrWidth  = VLEN;
-    localparam int unsigned DataWidth  = 128;
-    localparam int unsigned TransWidth = 32;
-    localparam int unsigned StrbWidth  = DataWidth/8;
-    localparam int unsigned SizeWidth  = 8;
+    localparam int unsigned SizeWidth  = 2;
 
-    typedef logic [IdWidth-1:0]    id_t;
-    typedef logic [TagWidth-1:0]   tag_t;
+    // typedefs ===============================================================
+
+    typedef logic [IdWidth-1:0]   id_t;
+    typedef logic [AddrWidth-1:0] addr_t;
+    typedef logic [DataWidth-1:0] data_t;
+    typedef logic [StrbWidth-1:0] strb_t;
+    typedef logic [UserWidth-1:0] user_t;
+
     typedef logic [IndexWidth-1:0] index_t;
-    typedef logic [AddrWidth-1:0]  addr_t;
-    typedef logic [DataWidth-1:0]  data_t;
-    typedef logic [StrbWidth-1:0]  strb_t;
+    typedef logic [TagWidth-1:0]   tag_t;
     typedef logic [SizeWidth-1:0]  size_t;
 
-    function automatic logic [1:0] dsize(input logic [3:0] strb);
+    typedef logic  [LogMaxTrans-1:0] ptr_t;
+
+    typedef struct packed {
+        logic dir;
+    } send_t;
+
+    typedef struct {
+        id_t   id;
+        data_t data;
+        user_t user;
+    } recv_t;
+
+    // functions ==============================================================
+
+    function automatic index_t index(addr_t addr);
+        return addr[IndexWidth-1:0];
+    endfunction
+
+    function automatic tag_t tag(addr_t addr);
+        return addr[AddrWidth-1:IndexWidth];
+    endfunction
+
+    function automatic size_t size(input strb_t strb);
         case (strb)
             4'b0001, 4'b0010, 4'b0100, 4'b1000: return 2'b00;
             4'b0011, 4'b0110, 4'b1100:          return 2'b01;
@@ -37,204 +69,201 @@ module axi_dcache_adapter
         endcase
     endfunction
 
-    // AXI_BUS #(
-    //     .AXI_ADDR_WIDTH (AddrWidth),
-    //     .AXI_DATA_WIDTH (DataWidth),
-    //     .AXI_ID_WIDTH   (TRANS_ID_BITS),
-    //     .AXI_USER_WIDTH (1)
-    // ) axi_skid ();
+    // signals ================================================================
 
-    // write ==================================================================
+    dcache_req_t req;
+    dcache_rsp_t rsp;
 
-    typedef struct packed {
-        id_t   id;
-        addr_t addr;
-        data_t data;
-        strb_t strb;
+    ptr_t ptr_send_d, ptr_send_q;
+    ptr_t ptr_recv_d, ptr_recv_q;
+    ptr_t ptr_raxi_d, ptr_raxi_q;
 
-        logic tag_valid;
+    logic  [2**MaxTrans-1:0] send_d, send_q;
+    recv_t [2**MaxTrans-1:0] recv_d, recv_q;
 
-        size_t req_count;
-        size_t rsp_count;
+    tag_t tag_d;
+    logic tag_valid_d;
 
-        logic aw_done;
-        logic w_done;
-        logic b_done;
+    AXI_BUS #(
+        .AXI_ID_WIDTH   (IdWidth),
+        .AXI_ADDR_WIDTH (AddrWidth),
+        .AXI_DATA_WIDTH (VecDataWidth),
+        .AXI_USER_WIDTH (UserWidth)
+    ) axi_skid ();
 
-        logic ar_done;
-        logic r_done;
-    } state_t;
+    // instances ==============================================================
 
-    state_t state_d, state_q;
+    axi_skid #(
+        .IdWidth   (IdWidth),
+        .AddrWidth (AddrWidth),
+        .DataWidth (DataWidth),
+        .UserWidth (UserWidth),
+
+        .BSkid (0),
+        .RSkid (0)
+    ) adam_axil_skid (
+        .clk  (clk),
+        .rstn (rstn),
+
+        .slv (axil_pause),
+        .mst (axil_skid)
+    );
+
+    // assigns ================================================================
+
+    assign dcache_req = req;
+    assign rsp = dcache_rsp;
+
+    // logic ==================================================================
 
     always_comb begin
-        state_d = state_q;
+        ptr_send_d = ptr_send_q;
+        ptr_recv_d = ptr_recv_q;
+        por_raxi_d = ptr_raxi_q;
 
-        dcache_req_o = '0;
+        dir_d  = dir_q;
+        recv_d = recv_q;
 
-        axi_skid.b_id   = '0;
-        axi_skid.b_resp = '0;
-        axi_skid.b_user = '0;
+        tag_d       = '0;
+        tag_valid_d = '0;
 
-        // aw =================================================================
+        req.address_index = '0;
+        req.data_wdata    = '0;
+        req.data_wuser    = '0;
+        req.data_req      = '0;
+        req.data_we       = '0;
+        req.data_be       = '0;
+        req.data_size     = '0;
+        req.data_id       = '0;
+        req.kill_req      = '0;
 
-        axi_skid.aw_ready = (!state_d.ar_done && !state_d.aw_done);
+        req.address_tag = '0;
+        req.tag_valid   = '0;
 
-        if (axi_skid.aw_valid && axi_skid.aw_ready) begin
-            state_d.id      = axi_skid.aw_id;
-            state_d.addr    = axi_skid.aw_addr;
-            state_d.aw_done = '1;
+        axi_skid.aw_ready = '0;
+        axi_skid.w_ready  = '0;
+        axi_skid.ar_ready = '0;
+        axi_skid.b_id     = '0;
+        axi_skid.b_resp   = '0;
+        axi_skid.b_user   = '0;
+        axi_skid.b_valid  = '0;
+        axi_skid.r_id     = '0;
+        axi_skid.r_data   = '0;
+        axi_skid.r_resp   = '0;
+        axi_skid.r_last   = '0;
+        axi_skid.r_user   = '0;
+        axi_skid.r_valid  = '0;
+
+        if (tag_valid_q) begin
+            req.address_tag = tag(tag_q);
         end
 
-        // w ==================================================================
-
-        axi_skid.w_ready = (state_d.aw_done && !state_d.w_done);
-
-        if (axi_skid.w_valid && axi_skid.w_ready) begin
-            state_d.data   = axi_skid.w_data;
-            state_d.strb   = axi_skid.w_strb;
-            state_d.w_done = '1;
+        if (ptr_t'(ptr_send_d + 1) == ptr_raxi_d) begin
+            // full
         end
+        else if (
+            (axi_skid.aw_valid && axi_skid.w_valid) &&
+            (!tag_buf_valid_q)
+        ) begin
+            req.address_index = index(axi_skid.aw_addr);
+            req.data_wdata    = axi_skid.w_data;
+            req.data_wuser    = axi_skid.aw_user;
+            req.data_req      = '1;
+            req.data_we       = '1;
+            req.data_be       = axi_skid.w_strb;
+            req.data_size     = size(axi_skid.w_strb);
+            req.data_id       = axi_skid.aw_id;
+            req.kill_req      = '0;
 
-        // ar =================================================================
+            req.address_tag = tag(axi_skid.aw_addr);
 
-        axi_skid.ar_ready = (!state_d.ar_done && !state_d.aw_done);
+            axi_skid.aw_ready = rsp.gnt;
+            axi_skid.w_ready  = rsp.gnt;
 
-        if (axi_skid.ar_valid && axi_skid.ar_ready) begin
-            state_d.id   = axi_skid.ar_id;
-            state_d.addr = axi_skid.ar_addr;
-            state_d.ar_done = '1;
+            if (rsp.gnt) begin
+                send_d[ptr_send_q].dir  = '1;
+                recv_d[ptr_recv_q].id   = axi_skid.aw_id;
+                recv_d[ptr_recv_q].data = '0;
+                ptr_send_d = ptr_send_q + 1;
+                ptr_recv_d = ptr_recv_q + 1;
+            end
         end
+        else if (axi_skid.ar_valid) begin
+            req.address_index = index(axi_skid.ar_addr);
+            req.data_wdata    = '0;
+            req.data_wuser    = axi_skid.ar_user;
+            req.data_req      = '1;
+            req.data_we       = '0;
+            req.data_be       = '0;
+            req.data_size     = '0;
+            req.data_id       = axi_skid.ar_id;
+            req.kill_req      = '0;
 
-        // tag ================================================================
+            tag_d       = tag(axi_skid.ar_addr);
+            tag_valid_d = '1;
 
-        if (state_d.tag_valid) begin
-            dcache_req_o.address_tag = state_d.addr[AddrWidth-1:IndexWidth];
-            dcache_req_o.tag_valid   = '1;
-            state_d.tag_valid = '0;
-        end
-        else begin
-            dcache_req_o.address_tag = '0;
-            dcache_req_o.tag_valid   = '0;
-        end
+            axi_skid.ar_ready = rsp.gnt;
 
-        // req ================================================================
-
-        dcache_req_o.address_index = '0;
-        dcache_req_o.data_wdata    = '0;
-        dcache_req_o.data_wuser    = '0;
-        dcache_req_o.data_req      = '0;
-        dcache_req_o.data_we       = '0;
-        dcache_req_o.data_be       = '0;
-        dcache_req_o.data_size     = '0;
-        dcache_req_o.data_id       = '0;
-        dcache_req_o.kill_req      = '0;
-
-        if ((
-            (state_d.ar_done) ||
-            (state_d.aw_done && state_d.w_done && !state_q.tag_valid)
-        ) && (
-            (state_d.req_count < 4)
-        )) begin
-            dcache_req_o.address_index = state_d.addr[IndexWidth-1:0];
-            dcache_req_o.data_wdata    = state_d.data[TransWidth-1:0];
-            dcache_req_o.data_wuser    = '0;
-            dcache_req_o.data_req      = '1;
-            dcache_req_o.data_we       = state_d.aw_done;
-            dcache_req_o.data_be       = state_d.strb[TransWidth/8-1:0];
-            dcache_req_o.data_size     = dsize(state_d.strb[TransWidth/8-1:0]);
-            dcache_req_o.data_id       = state_d.id;
-            dcache_req_o.kill_req      = '0;
-
-            if(state_d.aw_done) begin
-                dcache_req_o.address_tag = state_d.addr[AddrWidth-1:IndexWidth];
+            if (rsp.gnt) begin
+                send_d[ptr_send_q].dir = '1;
+                ptr_send_q = ptr_send_q + 1;
             end
         end
 
-        if (dcache_req_o.data_req && dcache_rsp_i.data_gnt) begin
-            state_d.tag_valid = state_d.ar_done;
+        if (rsp.data_rvalid) begin
+            recv_d[ptr_recv_q].id   = rsp.data_rid;
+            recv_d[ptr_recv_q].data = rsp.data_rdata;
+            ptr_recv_d = ptr_recv_q + 1;
+        end
 
-            state_d.addr      += DataWidth/TransWidth;
-            state_d.req_count += 1;
+        if (ptr_raxi_d != ptr_recv_d) begin
+            if (send_d[ptr_raxi_d].dir) begin
+                axi_skid.b_id    = recv_d[ptr_raxi_d].id;
+                axi_skid.b_resp  = '0;
+                axi_skid.b_user  = recv_d[ptr_raxi_d].user;
+                axi_skid.b_valid = 1;
 
-            if(state_d.aw_done) begin
-                state_d.data >>= TransWidth;
-                state_d.strb >>= TransWidth/8;
-
-                state_d.rsp_count += 1;
+                if (axi_skid.b_ready) begin
+                    ptr_raxi_d = ptr_raxi_q + 1;
+                end
             end
-        end
+            else begin
+                axi_skid.r_id    = recv_d[ptr_raxi_d].id;
+                axi_skid.r_data  = recv_d[ptr_raxi_d].data;
+                axi_skid.r_resp  = '0;
+                axi_skid.r_last  = '1;
+                axi_skid.r_user  = recv_d[ptr_raxi_d].user;
+                axi_skid.r_valid = '1;
 
-        // rsp ================================================================
-
-        if (dcache_rsp_i.data_rvalid) begin
-            state_d.data >>= TransWidth;
-            state_d.data[DataWidth-1:DataWidth-TransWidth] =
-                dcache_rsp_i.data_rdata;
-
-            state_d.rsp_count += 1;
-        end
-
-        // b ==================================================================
-
-        axi_skid.b_id    = '0;
-        axi_skid.b_resp  = '0;
-        axi_skid.b_user  = '0;
-        axi_skid.b_valid = '0;
-
-        if(
-            !state_d.b_done &&
-            state_d.aw_done &&
-            state_d.rsp_count >= 4
-        ) begin
-            axi_skid.b_id    = state_d.id;
-            axi_skid.b_resp  = '0;
-            axi_skid.b_user  = '0;
-            axi_skid.b_valid = '1;
-        end
-
-        if (axi_skid.b_valid && axi_skid.b_ready) begin
-            state_d.b_done = '1;
-        end
-
-        // r ==================================================================
-
-        axi_skid.r_id    = '0;
-        axi_skid.r_data  = '0;
-        axi_skid.r_resp  = '0;
-        axi_skid.r_last  = '0;
-        axi_skid.r_user  = '0;
-        axi_skid.r_valid = '0;
-
-        if (
-            !state_d.r_done &&
-            state_d.ar_done &&
-            state_d.rsp_count >= 4
-        ) begin
-            axi_skid.r_id    = state_d.id;
-            axi_skid.r_data  = state_d.data;
-            axi_skid.r_resp  = '0;
-            axi_skid.r_last  = '1;
-            axi_skid.r_user  = '0;
-            axi_skid.r_valid = '1;
-        end
-
-        if (axi_skid.r_valid && axi_skid.r_ready) begin
-            state_d.r_done = '1;
-        end
-
-        // end ================================================================
-
-        if (state_d.r_done || state_d.b_done) begin
-            state_d = '0;
+                if (axi_skind.r_ready) begin
+                    ptr_raxi_d = ptr_raxi_q + 1;
+                end
+            end
         end
     end
 
-    always_ff @(posedge clk_i, negedge rst_ni) begin
-        if (~rst_ni) begin
-            state_q <= '0;
-        end else begin
-            state_q <= state_d;
+    always_ff @(posedge clk, negedge rstn) begin
+        if (!rstn) begin
+            ptr_send_q <= '0;
+            ptr_recv_q <= '0;
+            ptr_raxi_q <= '0;
+
+            send_q <= '0;
+            recv_q <= '0;
+
+            tag_q       <= '0;
+            tag_valid_q <= '0;
+        end
+        else begin
+            ptr_send_q <= ptr_send_d;
+            ptr_recv_q <= ptr_recv_d;
+            ptr_raxi_q <= ptr_raxi_d;
+
+            send_q <= send_d;
+            recv_q <= recv_d;
+
+            tag_q       <= tag_d;
+            tag_valid_q <= tag_valid_d;
         end
     end
 

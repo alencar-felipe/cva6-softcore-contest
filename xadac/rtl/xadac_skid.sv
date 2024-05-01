@@ -53,7 +53,6 @@ module xadac_skid #(
             end
         end
 `else
-
         spill_register #(
             .T       (DataT),
             .Bypass  (0)
@@ -67,7 +66,6 @@ module xadac_skid #(
             .ready_i ( mst_ready ),
             .data_o  ( mst_data     )
         );
-
 `endif
 
     end
