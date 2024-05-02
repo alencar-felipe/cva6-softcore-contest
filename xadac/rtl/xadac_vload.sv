@@ -136,17 +136,12 @@ module xadac_vload
                 !sb_d[id].exe_rsp_done
             ) begin
                 vd_data = '0;
-//[Synth 8-3380] loop condition does not converge after 2000 iterations ["/home/raffael/Downloads/Project/cva6-softcore-contest/xadac/rtl/xadac_vload.sv":130]
-//                for (i = 0; i < VecDataWidth/VecElemWidth; i++) begin
-//                    j = i % SizeT'(sb_d[id].vlen);
-//                    vd_data[VecElemWidth*i +: VecElemWidth] =
-//                        sb_d[id].data[VecElemWidth*j +: VecElemWidth];
-//                end
-                for (k = 0; k < VecDataWidth/VecElemWidth; k++) begin
-                    j = k % SizeT'(sb_d[id].vlen);
-                    vd_data[VecElemWidth*k +: VecElemWidth] =
-                        sb_d[id].data[VecElemWidth*j +: VecElemWidth];
-                end       
+                for (j = 0; j < VecDataWidth/VecElemWidth; j++) begin
+                    k = j % SizeT'(sb_d[id].vlen);
+                    vd_data[VecElemWidth*j +: VecElemWidth] =
+                        sb_d[id].data[VecElemWidth*k +: VecElemWidth];
+                end
+
                 exe_rsp_d          = '0;
                 exe_rsp_d.id       = id;
                 exe_rsp_d.vd_addr  = sb_d[id].vd_addr;
