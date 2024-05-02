@@ -61,8 +61,8 @@ module xadac_axi_wizard
         mst_strb_t mst_w_strb;
         logic      mst_w_valid;
 
-        logic slv_b_id;
-        logic slb_b_valid;
+        IdT   slv_b_id;
+        logic slv_b_valid;
     } write_t;
 
     write_t write_d, write_q;
@@ -97,29 +97,32 @@ module xadac_axi_wizard
 
         // slv aw =============================================================
 
-        slv.aw_ready = !write_d.aw_done;
+        slv.aw_ready = !write_d.slv_aw_done;
 
         if (slv.aw_valid && slv.aw_ready) begin
-            write_d.id   = axi_skid.aw_id;
-            write_d.addr = axi_skid.aw_addr;
+            write_d.id   = slv.aw_id;
+            write_d.addr = slv.aw_addr;
 
             write_d.slv_aw_done = '1;
         end
 
         // slv w ==============================================================
 
-        slv.w_ready = write_d.aw_done && !write_d.w_done;
+        slv.w_ready = write_d.slv_aw_done && !write_d.slv_w_done;
 
         if (slv.w_valid && slv.w_ready) begin
-            write_d.data = int_data_t'(axi_skid.w_data);
-            write_d.strb = int_strb_t'(axi_skid.w_strb);
+            write_d.data = int_data_t'(slv.w_data);
+            write_d.strb = int_strb_t'(slv.w_strb);
 
             write_d.slv_w_done = '1;
         end
 
         // advance ============================================================
 
-        while (write_d.strb[MstStrbWidth-1:0] != '0) begin
+        while (
+            (write_d.strb[MstStrbWidth-1:0] == '0) &&
+            (write_d.strb != '0)
+        ) begin
             write_d.addr +=  MstStrbWidth;
             write_d.data >>= MstStrbWidth * 8;
             write_d.strb >>= MstStrbWidth;
@@ -154,6 +157,7 @@ module xadac_axi_wizard
 
         if (mst.w_valid && mst.w_ready) begin
             write_d.mst_w_count = write_q.mst_w_count + 1;
+            write_d.strb[MstStrbWidth-1:0] = '0;
         end
 
         write_d.mst_w_data  = '0;
@@ -164,17 +168,14 @@ module xadac_axi_wizard
             (write_d.strb != '0) &&
             (write_d.mst_w_count < write_d.mst_aw_count)
         ) begin
-            write_d.mst_w_data  = write_d.data;
-            write_d.mst_w_strb  = write_d.strb;
+            write_d.mst_w_data  = write_d.data[MstDataWidth-1:0];
+            write_d.mst_w_strb  = write_d.strb[MstStrbWidth-1:0];
             write_d.mst_w_valid = '1;
         end
 
         // mst b ==============================================================
 
-        mst.b_ready = (
-            (write_d.strb != '0) &&
-            (write_d.mst_b_count < write_d.mst_w_count)
-        );
+        mst.b_ready = (write_q.mst_b_count < write_d.mst_w_count);
 
         if (mst.b_valid && mst.b_ready) begin
             write_d.mst_b_count = write_q.mst_b_count + 1;
@@ -192,7 +193,8 @@ module xadac_axi_wizard
         if (
             (write_d.slv_aw_done && write_d.slv_w_done) &&
             (!write_d.slv_b_done) &&
-            (write_d.strb == '0)
+            (write_d.strb == '0) &&
+            (write_d.mst_b_count == write_d.mst_w_count)
         ) begin
             write_d.slv_b_id    = write_d.id;
             write_d.slv_b_valid = '1;
@@ -201,9 +203,9 @@ module xadac_axi_wizard
         // end ================================================================
 
         if (
-            write_d.slv_aw_done &&
-            write_d.slv_w_done &&
-            write_d.slb_b_done
+            write_q.slv_aw_done &&
+            write_q.slv_w_done &&
+            write_q.slv_b_done
         ) begin
             write_d = '0;
         end
@@ -235,15 +237,15 @@ module xadac_axi_wizard
         AddrT mst_ar_addr;
         logic mst_ar_valid;
 
-        logic    slv_r_id;
+        IdT      slv_r_id;
         VecDataT slv_r_data;
         logic    slv_r_valid;
     } read_t;
 
     read_t read_d, read_q;
 
-    assign mst.ar_id     = write_q.mst_ar_id;
-    assign mst.ar_addr   = write_q.mst_ar_addr;
+    assign mst.ar_id     = read_q.mst_ar_id;
+    assign mst.ar_addr   = read_q.mst_ar_addr;
     assign mst.ar_len    = '0;
     assign mst.ar_size   = $unsigned($clog2(MstDataWidth/8));
     assign mst.ar_burst  = '0;
@@ -253,31 +255,31 @@ module xadac_axi_wizard
     assign mst.ar_qos    = '0;
     assign mst.ar_region = '0;
     assign mst.ar_user   = '0;
-    assign mst.ar_valid  = write_q.mst_ar_valid;
+    assign mst.ar_valid  = read_q.mst_ar_valid;
 
-    assign slv.r_id    = write_q.slv_b_id;
-    assign slv.r_data  = write_q.slv_r_data;
+    assign slv.r_id    = read_q.slv_r_id;
+    assign slv.r_data  = read_q.slv_r_data;
     assign slv.r_resp  = '0;
     assign slv.r_last  = '1;
     assign slv.r_user  = '0;
-    assign slv.r_valid = write_q.slv_b_valid;
+    assign slv.r_valid = read_q.slv_r_valid;
 
     always_comb begin
         read_d = read_q;
 
         // slv ar =============================================================
 
-        slv.ar_ready = !read_d.ar_done;
+        slv.ar_ready = !read_d.slv_ar_done;
 
         if (slv.ar_valid && slv.ar_ready) begin
-            read_d.id   = axi_skid.aw_id;
-            read_d.addr = axi_skid.ar_addr;
+            read_d.id   = slv.ar_id;
+            read_d.addr = slv.ar_addr;
 
             read_d.slv_ar_done  = '1;
             read_d.mst_ar_count = SlvDataWidth/MstDataWidth;
             read_d.mst_r_count  = SlvDataWidth/MstDataWidth;
 
-            if (unalgn(read_d.addr) != 0) begin
+            if (unaligned(read_d.addr) != 0) begin
                 read_d.mst_ar_count += 1;
                 read_d.mst_r_count  += 1;
             end
@@ -286,8 +288,8 @@ module xadac_axi_wizard
         // mst ar =============================================================
 
         if (mst.ar_valid && mst.ar_ready) begin
-            read_d.addr = write_q.addr + SlvDataWidth/MstDataWidth;
-            read_d.mst_ar_count = write_q.mst_ar_count - 1;
+            read_d.addr = read_q.addr + SlvDataWidth/MstDataWidth;
+            read_d.mst_ar_count = read_q.mst_ar_count - 1;
         end
 
         read_d.mst_ar_id    = '0;
@@ -307,9 +309,9 @@ module xadac_axi_wizard
         if (mst.r_valid && mst.r_ready) begin
             read_d.data = {
                 mst.r_data,
-                write_q.data[MstDataWidth +: SlvDataWidth]
+                read_q.data[MstDataWidth +: SlvDataWidth]
             };
-            read_d.mst_r_count = write_q.mst_r_count - 1;
+            read_d.mst_r_count = read_q.mst_r_count - 1;
         end
 
         // slv r ==============================================================
@@ -331,13 +333,13 @@ module xadac_axi_wizard
             read_d.slv_r_valid = '1;
 
             if (unaligned(read_d.addr) == 0) begin
-                read_d.slv_r_data = write_q.data[
+                read_d.slv_r_data = read_d.data[
                     MstDataWidth +: SlvDataWidth
                 ];
             end
             else begin
-                read_d.slv_r_data = write_q.data[
-                    unaligned(read_d.addr) +: SlvDataWidth
+                read_d.slv_r_data = read_d.data[
+                    unaligned(read_d.addr) * 8 +: SlvDataWidth
                 ];
             end
         end

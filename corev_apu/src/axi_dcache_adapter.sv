@@ -5,7 +5,7 @@ module axi_dcache_adapter
     input logic clk,
     input logic rstn,
 
-    AXI_BUS.Slave axi_skid,
+    AXI_BUS.Slave axi,
 
     output dcache_req_t dcache_req,
     input  dcache_rsp_t dcache_rsp
@@ -44,7 +44,7 @@ module axi_dcache_adapter
         logic dir;
     } send_t;
 
-    typedef struct {
+    typedef struct packed {
         id_t   id;
         data_t data;
         user_t user;
@@ -78,22 +78,22 @@ module axi_dcache_adapter
     ptr_t ptr_recv_d, ptr_recv_q;
     ptr_t ptr_raxi_d, ptr_raxi_q;
 
-    logic  [2**MaxTrans-1:0] send_d, send_q;
-    recv_t [2**MaxTrans-1:0] recv_d, recv_q;
+    send_t [MaxTrans-1:0] send_d, send_q;
+    recv_t [MaxTrans-1:0] recv_d, recv_q;
 
-    tag_t tag_d;
-    logic tag_valid_d;
+    tag_t tag_d, tag_q;
+    logic tag_valid_d, tag_valid_q;
 
     AXI_BUS #(
         .AXI_ID_WIDTH   (IdWidth),
         .AXI_ADDR_WIDTH (AddrWidth),
-        .AXI_DATA_WIDTH (VecDataWidth),
+        .AXI_DATA_WIDTH (DataWidth),
         .AXI_USER_WIDTH (UserWidth)
     ) axi_skid ();
 
     // instances ==============================================================
 
-    axi_skid #(
+    xadac_axi_skid #(
         .IdWidth   (IdWidth),
         .AddrWidth (AddrWidth),
         .DataWidth (DataWidth),
@@ -101,12 +101,12 @@ module axi_dcache_adapter
 
         .BSkid (0),
         .RSkid (0)
-    ) adam_axil_skid (
+    ) i_xadac_axi_skid (
         .clk  (clk),
         .rstn (rstn),
 
-        .slv (axil_pause),
-        .mst (axil_skid)
+        .slv (axi),
+        .mst (axi_skid)
     );
 
     // assigns ================================================================
@@ -119,9 +119,9 @@ module axi_dcache_adapter
     always_comb begin
         ptr_send_d = ptr_send_q;
         ptr_recv_d = ptr_recv_q;
-        por_raxi_d = ptr_raxi_q;
+        ptr_raxi_d = ptr_raxi_q;
 
-        dir_d  = dir_q;
+        send_d = send_q;
         recv_d = recv_q;
 
         tag_d       = '0;
@@ -155,7 +155,8 @@ module axi_dcache_adapter
         axi_skid.r_valid  = '0;
 
         if (tag_valid_q) begin
-            req.address_tag = tag(tag_q);
+            req.address_tag = tag_q;
+            req.tag_valid   = tag_valid_q;
         end
 
         if (ptr_t'(ptr_send_d + 1) == ptr_raxi_d) begin
@@ -163,7 +164,7 @@ module axi_dcache_adapter
         end
         else if (
             (axi_skid.aw_valid && axi_skid.w_valid) &&
-            (!tag_buf_valid_q)
+            (!tag_valid_q)
         ) begin
             req.address_index = index(axi_skid.aw_addr);
             req.data_wdata    = axi_skid.w_data;
@@ -177,10 +178,10 @@ module axi_dcache_adapter
 
             req.address_tag = tag(axi_skid.aw_addr);
 
-            axi_skid.aw_ready = rsp.gnt;
-            axi_skid.w_ready  = rsp.gnt;
+            axi_skid.aw_ready = rsp.data_gnt;
+            axi_skid.w_ready  = rsp.data_gnt;
 
-            if (rsp.gnt) begin
+            if (rsp.data_gnt) begin
                 send_d[ptr_send_q].dir  = '1;
                 recv_d[ptr_recv_q].id   = axi_skid.aw_id;
                 recv_d[ptr_recv_q].data = '0;
@@ -202,11 +203,11 @@ module axi_dcache_adapter
             tag_d       = tag(axi_skid.ar_addr);
             tag_valid_d = '1;
 
-            axi_skid.ar_ready = rsp.gnt;
+            axi_skid.ar_ready = rsp.data_gnt;
 
-            if (rsp.gnt) begin
-                send_d[ptr_send_q].dir = '1;
-                ptr_send_q = ptr_send_q + 1;
+            if (rsp.data_gnt) begin
+                send_d[ptr_send_q].dir = '0;
+                ptr_send_d = ptr_send_q + 1;
             end
         end
 
@@ -235,7 +236,7 @@ module axi_dcache_adapter
                 axi_skid.r_user  = recv_d[ptr_raxi_d].user;
                 axi_skid.r_valid = '1;
 
-                if (axi_skind.r_ready) begin
+                if (axi_skid.r_ready) begin
                     ptr_raxi_d = ptr_raxi_q + 1;
                 end
             end

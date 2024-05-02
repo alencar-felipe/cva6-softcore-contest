@@ -124,6 +124,9 @@ export HPDCACHE_TARGET_CFG
 # Sources
 # Package files -> compile first
 ariane_pkg := \
+	vendor/pulp-platform/axi/src/axi_pkg.sv \
+	core/include/config_pkg.sv \
+	core/include/${TARGET_CFG}_config_pkg.sv \
 	xadac/rtl/xadac_pkg.sv \
 	corev_apu/tb/ariane_axi_pkg.sv \
 	corev_apu/tb/axi_intf.sv \
@@ -227,6 +230,8 @@ src := \
 	corev_apu/tb/common/uart.sv \
 	corev_apu/tb/common/SimDTM.sv \
 	corev_apu/tb/common/SimJTAG.sv \
+	xadac/rtl/xadac_axi_skid.sv \
+	xadac/rtl/xadac_axi_wizard.sv \
 	xadac/rtl/xadac_if.sv \
 	xadac/rtl/xadac_skid.sv \
 	xadac/rtl/xadac_vrf_phy.sv \
@@ -647,7 +652,7 @@ src_flist = $(shell \
 	    TARGET_CFG=$(TARGET_CFG) \
 	    HPDCACHE_TARGET_CFG=$(HPDCACHE_TARGET_CFG) \
 	    HPDCACHE_DIR=$(HPDCACHE_DIR) \
-	    python3 util/flist_flattener.py core/Flist.cva6)
+	    python3 util/flatten_flist.py core/Flist.cva6)
 fpga_filter := $(addprefix $(root-dir), corev_apu/bootrom/bootrom.sv)
 fpga_filter += $(addprefix $(root-dir), core/include/instr_tracer_pkg.sv)
 fpga_filter += $(addprefix $(root-dir), src/util/ex_trace_item.sv)
