@@ -44,9 +44,9 @@ module cva6_ptw_sv32
 
     input  logic          lsu_is_store_i,  // this translation was triggered by a store
     // PTW memory interface
-    output dcache_req_t req_port_o,
-    input  dcache_rsp_t rsp_port_i,
-    
+    input  dcache_req_o_t req_port_i,
+    output dcache_req_i_t req_port_o,
+
     // to Shared TLB, update logic
     output tlb_update_sv32_t shared_tlb_update_o,
 
@@ -235,7 +235,7 @@ module cva6_ptw_sv32
         // send a request out
         req_port_o.data_req = 1'b1;
         // wait for the WAIT_GRANT
-        if (rsp_port_i.data_gnt) begin
+        if (req_port_i.data_gnt) begin
           // send the tag valid signal one cycle later
           tag_valid_n = 1'b1;
           state_d     = PTE_LOOKUP;
@@ -363,7 +363,7 @@ module cva6_ptw_sv32
       // 2. waiting for a grant, if so: wait for it
       // if not, go back to idle
       if (((state_q inside {PTE_LOOKUP, WAIT_RVALID}) && !data_rvalid_q) ||
-                ((state_q == WAIT_GRANT) && rsp_port_i.data_gnt))
+                ((state_q == WAIT_GRANT) && req_port_i.data_gnt))
         state_d = WAIT_RVALID;
       else state_d = LATENCY;
     end
@@ -391,8 +391,8 @@ module cva6_ptw_sv32
       tlb_update_asid_q <= tlb_update_asid_n;
       vaddr_q           <= vaddr_n;
       global_mapping_q  <= global_mapping_n;
-      data_rdata_q      <= rsp_port_i.data_rdata;
-      data_rvalid_q     <= rsp_port_i.data_rvalid;
+      data_rdata_q      <= req_port_i.data_rdata;
+      data_rvalid_q     <= req_port_i.data_rvalid;
     end
   end
 

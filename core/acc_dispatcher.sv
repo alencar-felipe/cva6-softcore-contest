@@ -50,15 +50,15 @@ module acc_dispatcher
     // Interface with the load/store unit
     output logic acc_stall_st_pending_o,
     input logic acc_no_st_pending_i,
-    input dcache_req_t [2:0] dcache_req_ports_i,
+    input dcache_req_i_t [2:0] dcache_req_ports_i,
     // Interface with the controller
     output logic ctrl_halt_o,
     input logic flush_unissued_instr_i,
     input logic flush_ex_i,
     output logic flush_pipeline_o,
     // Interface with cache subsystem
-    output dcache_req_t [1:0] acc_dcache_req_ports_o,
-    input  dcache_rsp_t [1:0] acc_dcache_rsp_ports_i,
+    output dcache_req_i_t [1:0] acc_dcache_req_ports_o,
+    input dcache_req_o_t [1:0] acc_dcache_req_ports_i,
     input logic inval_ready_i,
     output logic inval_valid_o,
     output logic [63:0] inval_addr_o,

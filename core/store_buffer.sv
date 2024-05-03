@@ -45,8 +45,8 @@ module store_buffer
     input logic [1:0] data_size_i,  // type of request we are making (e.g.: bytes to write)
 
     // D$ interface
-    output dcache_req_t req_port_o,
-    input  dcache_rsp_t rsp_port_i
+    input  dcache_req_o_t req_port_i,
+    output dcache_req_i_t req_port_o
 );
 
   // the store queue has two parts:
@@ -169,7 +169,7 @@ module store_buffer
     // if the entry in the commit queue is valid and not speculative anymore we can issue this instruction
     if (commit_queue_q[commit_read_pointer_q].valid && !stall_st_pending_i) begin
       req_port_o.data_req = 1'b1;
-      if (rsp_port_i.data_gnt) begin
+      if (req_port_i.data_gnt) begin
         // we can evict it from the commit buffer
         commit_queue_n[commit_read_pointer_q].valid = 1'b0;
         // advance the read_pointer

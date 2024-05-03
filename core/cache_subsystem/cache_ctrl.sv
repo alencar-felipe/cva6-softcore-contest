@@ -30,8 +30,8 @@ module cache_ctrl
     input logic bypass_i,  // enable cache
     output logic busy_o,
     // Core request ports
-    input  dcache_req_t req_port_i,
-    output dcache_rsp_t rsp_port_o,
+    input dcache_req_i_t req_port_i,
+    output dcache_req_o_t req_port_o,
     // SRAM interface
     output logic [DCACHE_SET_ASSOC-1:0] req_o,  // req is valid
     output logic [DCACHE_INDEX_WIDTH-1:0] addr_o,  // address into cache array
@@ -115,10 +115,10 @@ module cache_ctrl
     mem_req_d = mem_req_q;
     hit_way_d = hit_way_q;
     // output assignments
-    rsp_port_o.data_gnt = 1'b0;
-    rsp_port_o.data_rvalid = 1'b0;
-    rsp_port_o.data_rdata = '0;
-    rsp_port_o.data_rid = mem_req_q.id;
+    req_port_o.data_gnt = 1'b0;
+    req_port_o.data_rvalid = 1'b0;
+    req_port_o.data_rdata = '0;
+    req_port_o.data_rid = mem_req_q.id;
     miss_req_o = '0;
     mshr_addr_o = '0;
     // Memory array communication
@@ -151,7 +151,7 @@ module cache_ctrl
           if (bypass_i) begin
             state_d = WAIT_TAG_BYPASSED;
             // grant this access only if it was a load
-            rsp_port_o.data_gnt = (req_port_i.data_we) ? 1'b0 : 1'b1;
+            req_port_o.data_gnt = (req_port_i.data_we) ? 1'b0 : 1'b1;
             mem_req_d.bypass = 1'b1;
             // ------------------
             // Cache is enabled
@@ -162,7 +162,7 @@ module cache_ctrl
               state_d = WAIT_TAG;
               mem_req_d.bypass = 1'b0;
               // only for a read
-              if (!req_port_i.data_we) rsp_port_o.data_gnt = 1'b1;
+              if (!req_port_i.data_we) req_port_o.data_gnt = 1'b1;
             end
           end
         end
@@ -196,7 +196,7 @@ module cache_ctrl
               mem_req_d.killed    = req_port_i.kill_req;
               mem_req_d.bypass    = 1'b0;
 
-              rsp_port_o.data_gnt = gnt_i;
+              req_port_o.data_gnt = gnt_i;
 
               if (!gnt_i) begin
                 state_d = IDLE;
@@ -206,11 +206,11 @@ module cache_ctrl
             end
 
             // this is timing critical
-            rsp_port_o.data_rdata = cl_i[cl_offset+:64];
+            req_port_o.data_rdata = cl_i[cl_offset+:64];
 
             // report data for a read
             if (!mem_req_q.we) begin
-              rsp_port_o.data_rvalid = ~mem_req_q.killed;
+              req_port_o.data_rvalid = ~mem_req_q.killed;
               // else this was a store so we need an extra step to handle it
             end else begin
               state_d   = STORE_REQ;
@@ -243,7 +243,7 @@ module cache_ctrl
           //    the cache-line again and potentially loosing any
           //    content we've written so far. This as a consequence
           //    means we can't have hit on the CL which mean the
-          //    rsp_port_o.data_rvalid will be de-asserted.
+          //    req_port_o.data_rvalid will be de-asserted.
           if ((mshr_index_matches_i && mem_req_q.we) || mshr_addr_matches_i) begin
             state_d = WAIT_MSHR;
           end
@@ -313,7 +313,7 @@ module cache_ctrl
 
           // got a grant ~> this is finished now
           if (gnt_i) begin
-            rsp_port_o.data_gnt = 1'b1;
+            req_port_o.data_gnt = 1'b1;
             state_d = IDLE;
           end
         end else begin
@@ -364,7 +364,7 @@ module cache_ctrl
           // We can also avoid waiting for the response valid, this signal is
           // currently not used by the store unit
           if (mem_req_q.we) begin
-            rsp_port_o.data_gnt = 1'b1;
+            req_port_o.data_gnt = 1'b1;
             state_d = IDLE;
           end
         end
@@ -372,7 +372,7 @@ module cache_ctrl
         if (miss_gnt_i && !mem_req_q.we) state_d = WAIT_CRITICAL_WORD;
         else if (miss_gnt_i) begin
           state_d = IDLE;
-          rsp_port_o.data_gnt = 1'b1;
+          req_port_o.data_gnt = 1'b1;
         end
 
         // it can be the case that the miss unit is currently serving a
@@ -393,8 +393,8 @@ module cache_ctrl
         end
 
         if (critical_word_valid_i) begin
-          rsp_port_o.data_rvalid = ~mem_req_q.killed;
-          rsp_port_o.data_rdata  = critical_word_i;
+          req_port_o.data_rvalid = ~mem_req_q.killed;
+          req_port_o.data_rdata  = critical_word_i;
           // we can make another request
           if (req_port_i.data_req) begin
             // save index, be and we
@@ -412,7 +412,7 @@ module cache_ctrl
             if (gnt_i) begin
               state_d = WAIT_TAG;
               mem_req_d.bypass = 1'b0;
-              rsp_port_o.data_gnt = 1'b1;
+              req_port_o.data_gnt = 1'b1;
             end
           end else begin
             state_d = IDLE;
@@ -423,15 +423,15 @@ module cache_ctrl
       WAIT_REFILL_VALID: begin
         // got a valid answer
         if (bypass_valid_i) begin
-          rsp_port_o.data_rdata = bypass_data_i;
-          rsp_port_o.data_rvalid = ~mem_req_q.killed;
+          req_port_o.data_rdata = bypass_data_i;
+          req_port_o.data_rvalid = ~mem_req_q.killed;
           state_d = IDLE;
         end
       end
     endcase
 
     if (req_port_i.kill_req) begin
-      rsp_port_o.data_rvalid = 1'b1;
+      req_port_o.data_rvalid = 1'b1;
       if (!(state_q inside {WAIT_REFILL_GNT, WAIT_CRITICAL_WORD})) begin
         state_d = IDLE;
       end
@@ -468,7 +468,7 @@ module cache_ctrl
   else $fatal(1, "partial mshr index doesn't match");
   // there should never be a valid answer when the MSHR matches and we are not being served
   no_valid_on_mshr_match :
-  assert property(@(posedge  clk_i) disable iff (~rst_ni) (mshr_addr_matches_i && !active_serving_i)-> !rsp_port_o.data_rvalid || req_port_i.kill_req)
+  assert property(@(posedge  clk_i) disable iff (~rst_ni) (mshr_addr_matches_i && !active_serving_i)-> !req_port_o.data_rvalid || req_port_i.kill_req)
   else $fatal(1, "rvalid_o should not be set on MSHR match");
 `endif
   //pragma translate_on

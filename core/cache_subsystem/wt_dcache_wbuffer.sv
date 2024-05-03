@@ -62,8 +62,8 @@ module wt_dcache_wbuffer
     output logic empty_o,  // asserted if no data is present in write buffer
     output logic not_ni_o,  // asserted if no ni data is present in write buffer
     // core request ports
-    input  ariane_pkg::dcache_req_t req_port_i,
-    output ariane_pkg::dcache_rsp_t rsp_port_o,
+    input dcache_req_i_t req_port_i,
+    output dcache_req_o_t req_port_o,
     // interface to miss handler
     input logic miss_ack_i,
     output logic [riscv::PLEN-1:0] miss_paddr_o,
@@ -426,10 +426,10 @@ module wt_dcache_wbuffer
   // update logic
   ///////////////////////////////////////////////////////
 
-  assign rsp_port_o.data_rvalid = '0;
-  assign rsp_port_o.data_rdata  = '0;
-  assign rsp_port_o.data_ruser  = '0;
-  assign rsp_port_o.data_rid    = '0;
+  assign req_port_o.data_rvalid = '0;
+  assign req_port_o.data_rdata  = '0;
+  assign req_port_o.data_ruser  = '0;
+  assign req_port_o.data_rid    = '0;
 
   assign rd_hit_oh_d = rd_hit_oh_i;
 
@@ -444,7 +444,7 @@ module wt_dcache_wbuffer
     wbuffer_d           = wbuffer_q;
     ni_pending_d        = ni_pending_q;
     dirty_rd_en         = 1'b0;
-    rsp_port_o.data_gnt = 1'b0;
+    req_port_o.data_gnt = 1'b0;
     wbuffer_wren        = 1'b0;
 
     // TAG lookup returns, mark corresponding word
@@ -503,7 +503,7 @@ module wt_dcache_wbuffer
       if (!ni_conflict) begin  //empty of NI operations
         wbuffer_wren = 1'b1;
 
-        rsp_port_o.data_gnt = 1'b1;
+        req_port_o.data_gnt = 1'b1;
         ni_pending_d[wr_ptr] = is_ni;
 
         wbuffer_d[wr_ptr].checked = 1'b0;
@@ -591,7 +591,7 @@ module wt_dcache_wbuffer
 
   write_full :
   assert property (
-    @(posedge clk_i) disable iff (!rst_ni) req_port_i.data_req |-> rsp_port_o.data_gnt |-> ((!full) || (|wbuffer_hit_oh)))
+    @(posedge clk_i) disable iff (!rst_ni) req_port_i.data_req |-> req_port_o.data_gnt |-> ((!full) || (|wbuffer_hit_oh)))
   else $fatal(1, "[l1 dcache wbuffer] cannot write if full or no hit");
 
   unused0 :

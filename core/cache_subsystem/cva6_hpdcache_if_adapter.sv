@@ -31,10 +31,10 @@ module cva6_hpdcache_if_adapter
     input hpdcache_pkg::hpdcache_req_sid_t hpdcache_req_sid_i,
 
     //  Request/response ports from/to the CVA6 core
-    input  ariane_pkg::dcache_req_t cva6_req_i,
-    output ariane_pkg::dcache_rsp_t cva6_rsp_o,
-    input  ariane_pkg::amo_req_t    cva6_amo_req_i,
-    output ariane_pkg::amo_resp_t   cva6_amo_resp_o,
+    input  ariane_pkg::dcache_req_i_t cva6_req_i,
+    output ariane_pkg::dcache_req_o_t cva6_req_o,
+    input  ariane_pkg::amo_req_t      cva6_amo_req_i,
+    output ariane_pkg::amo_resp_t     cva6_amo_resp_o,
 
     //  Request port to the L1 Dcache
     output logic                        hpdcache_req_valid_o,
@@ -91,15 +91,15 @@ module cva6_hpdcache_if_adapter
           hpdcache_req_pma_o.io = 1'b0;
 
       //    Response forwarding
-      assign cva6_rsp_o.data_rvalid = hpdcache_rsp_valid_i,
-          cva6_rsp_o.data_rdata = hpdcache_rsp_i.rdata,
-          cva6_rsp_o.data_rid = hpdcache_rsp_i.tid,
-          cva6_rsp_o.data_gnt = hpdcache_req_ready_i;
+      assign cva6_req_o.data_rvalid = hpdcache_rsp_valid_i,
+          cva6_req_o.data_rdata = hpdcache_rsp_i.rdata,
+          cva6_req_o.data_rid = hpdcache_rsp_i.tid,
+          cva6_req_o.data_gnt = hpdcache_req_ready_i;
     end  //  }}}
 
          //  STORE/AMO request
          //  {{{
-    else begin : gen_store_amo
+    else begin : store_amo_gen
       hpdcache_req_addr_t   amo_addr;
       hpdcache_req_offset_t amo_addr_offset;
       hpdcache_tag_t        amo_tag;
@@ -175,10 +175,10 @@ module cva6_hpdcache_if_adapter
 
       //  Response forwarding
       //  {{{
-      assign cva6_rsp_o.data_rvalid = hpdcache_rsp_valid_i && (hpdcache_rsp_i.tid != '1),
-          cva6_rsp_o.data_rdata = hpdcache_rsp_i.rdata,
-          cva6_rsp_o.data_rid = hpdcache_rsp_i.tid,
-          cva6_rsp_o.data_gnt = hpdcache_req_ready_i;
+      assign cva6_req_o.data_rvalid = hpdcache_rsp_valid_i && (hpdcache_rsp_i.tid != '1),
+          cva6_req_o.data_rdata = hpdcache_rsp_i.rdata,
+          cva6_req_o.data_rid = hpdcache_rsp_i.tid,
+          cva6_req_o.data_gnt = hpdcache_req_ready_i;
 
       assign cva6_amo_resp_o.ack = hpdcache_rsp_valid_i && (hpdcache_rsp_i.tid == '1),
           cva6_amo_resp_o.result = amo_is_word ? {{32{amo_resp_word[31]}}, amo_resp_word}

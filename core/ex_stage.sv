@@ -18,9 +18,7 @@ module ex_stage
   import ariane_pkg::*;
 #(
     parameter config_pkg::cva6_cfg_t CVA6Cfg = config_pkg::cva6_cfg_empty,
-    parameter int unsigned AsidWidth = 1,
-    // Dependent parameters, DO NOT OVERRIDE!
-    parameter int unsigned NrDcachePorts = 1
+    parameter int unsigned ASID_WIDTH = 1
 ) (
     input logic clk_i,        // Clock
     input logic rst_ni,       // Asynchronous reset active low
@@ -92,48 +90,39 @@ module ex_stage
     output riscv::xlen_t x_result_o,
     output logic x_valid_o,
     output logic x_we_o,
-    xadac_if.mst xadac,
+    output cvxif_pkg::cvxif_req_t cvxif_req_o,
+    input cvxif_pkg::cvxif_resp_t cvxif_resp_i,
     input logic acc_valid_i,  // Output is valid
     // Memory Management
     input logic enable_translation_i,
     input logic en_ld_st_translation_i,
     input logic flush_tlb_i,
 
-    input riscv::priv_lvl_t                   priv_lvl_i,
-    input riscv::priv_lvl_t                   ld_st_priv_lvl_i,
-    input logic                               sum_i,
-    input logic                               mxr_i,
-    input logic             [riscv::PPNW-1:0] satp_ppn_i,
-    input logic             [  AsidWidth-1:0] asid_i,
+    input  riscv::priv_lvl_t                   priv_lvl_i,
+    input  riscv::priv_lvl_t                   ld_st_priv_lvl_i,
+    input  logic                               sum_i,
+    input  logic                               mxr_i,
+    input  logic             [riscv::PPNW-1:0] satp_ppn_i,
+    input  logic             [ ASID_WIDTH-1:0] asid_i,
+    // icache translation requests
+    input  icache_arsp_t                       icache_areq_i,
+    output icache_areq_t                       icache_areq_o,
 
-    // I$ Translation Requests ==================================================
-
-    output icache_areq_t icache_areq_o,
-    input  icache_arsp_t icache_arsp_i,
-
-    // D$ =======================================================================
-
-    output dcache_req_t [NrDcachePorts-1:0] dcache_req_o,
-    input  dcache_rsp_t [NrDcachePorts-1:0] dcache_rsp_i,
-
+    // interface to dcache
+    input dcache_req_o_t [2:0] dcache_req_ports_i,
+    output dcache_req_i_t [2:0] dcache_req_ports_o,
     input logic dcache_wbuffer_empty_i,
     input logic dcache_wbuffer_not_ni_i,
-
-    output amo_req_t  amo_req_o,
-    input  amo_resp_t amo_resp_i,
-
-    // For Performance Counters =================================================
-
+    output amo_req_t amo_req_o,  // request to cache subsytem
+    input amo_resp_t amo_resp_i,  // response from cache subsystem
+    // Performance counters
     output logic itlb_miss_o,
     output logic dtlb_miss_o,
-
-    // PMPs =====================================================================
-
+    // PMPs
     input riscv::pmpcfg_t [15:0] pmpcfg_i,
     input logic [15:0][riscv::PLEN-3:0] pmpaddr_i,
 
-    // RVFI =====================================================================
-
+    // RVFI
     output [              riscv::VLEN-1:0] lsu_addr_o,
     output [              riscv::PLEN-1:0] mem_paddr_o,
     output [          (riscv::XLEN/8)-1:0] lsu_rmask_o,
@@ -165,7 +154,7 @@ module ex_stage
   logic current_instruction_is_sfence_vma;
   // These two register store the rs1 and rs2 parameters in case of `SFENCE_VMA`
   // instruction to be used for TLB flush in the next clock cycle.
-  logic [  AsidWidth-1:0] asid_to_be_flushed;
+  logic [ASID_WIDTH-1:0] asid_to_be_flushed;
   logic [riscv::VLEN-1:0] vaddr_to_be_flushed;
 
   // from ALU to branch unit
@@ -204,7 +193,7 @@ module ex_stage
       .pc_i,
       .is_compressed_instr_i,
       // any functional unit is valid, check that there is no accidental mis-predict
-      .fu_valid_i (alu_valid_i || lsu_valid_i || csr_valid_i || mult_valid_i || fpu_valid_i || acc_valid_i),
+      .fu_valid_i ( alu_valid_i || lsu_valid_i || csr_valid_i || mult_valid_i || fpu_valid_i || acc_valid_i ) ,
       .branch_valid_i,
       .branch_comp_res_i(alu_branch_res),
       .branch_result_o(branch_result),
@@ -276,7 +265,7 @@ module ex_stage
   // FPU
   // ----------------
   generate
-    if (CVA6Cfg.FpPresent) begin : gen_fpu
+    if (CVA6Cfg.FpPresent) begin : fpu_gen
       fu_data_t fpu_data;
       assign fpu_data = fpu_valid_i ? fu_data_i : '0;
 
@@ -298,8 +287,7 @@ module ex_stage
           .fpu_valid_o,
           .fpu_exception_o
       );
-    end
-    else begin : gen_no_fpu
+    end else begin : no_fpu_gen
       assign fpu_ready_o     = '0;
       assign fpu_trans_id_o  = '0;
       assign fpu_result_o    = '0;
@@ -317,7 +305,7 @@ module ex_stage
 
   load_store_unit #(
       .CVA6Cfg   (CVA6Cfg),
-      .ASID_WIDTH(AsidWidth)
+      .ASID_WIDTH(ASID_WIDTH)
   ) lsu_i (
       .clk_i,
       .rst_ni,
@@ -340,8 +328,8 @@ module ex_stage
       .commit_tran_id_i,
       .enable_translation_i,
       .en_ld_st_translation_i,
+      .icache_areq_i,
       .icache_areq_o,
-      .icache_arsp_i,
       .priv_lvl_i,
       .ld_st_priv_lvl_i,
       .sum_i,
@@ -353,8 +341,8 @@ module ex_stage
       .flush_tlb_i,
       .itlb_miss_o,
       .dtlb_miss_o,
-      .dcache_req_o(dcache_req_o[0]),
-      .dcache_rsp_i(dcache_rsp_i[0]),
+      .dcache_req_ports_i,
+      .dcache_req_ports_o,
       .dcache_wbuffer_empty_i,
       .dcache_wbuffer_not_ni_i,
       .amo_valid_commit_i,
@@ -387,21 +375,15 @@ module ex_stage
         .x_result_o,
         .x_valid_o,
         .x_we_o,
-        .xadac (xadac)
+        .cvxif_req_o,
+        .cvxif_resp_i
     );
-  end
-  else begin : gen_no_cvxif
+  end else begin : gen_no_cvxif
+    assign cvxif_req_o   = '0;
     assign x_trans_id_o  = '0;
     assign x_exception_o = '0;
     assign x_result_o    = '0;
     assign x_valid_o     = '0;
-
-    assign xadac.dec_req_ready = '0;
-    assign xadac.dec_rsp       = '0;
-    assign xadac.dec_rsp_valid = '0;
-    assign xadac.exe_req_ready = '0;
-    assign xadac.exe_rsp       = '0;
-    assign xadac.exe_rsp_valid = '0;
   end
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -424,7 +406,7 @@ module ex_stage
       // if the current instruction in EX_STAGE is a sfence.vma, in the next cycle no writes will happen
     end else if ((~current_instruction_is_sfence_vma) && (~((fu_data_i.operation == SFENCE_VMA) && csr_valid_i))) begin
       vaddr_to_be_flushed <= rs1_forwarding_i;
-      asid_to_be_flushed  <= rs2_forwarding_i[AsidWidth-1:0];
+      asid_to_be_flushed  <= rs2_forwarding_i[ASID_WIDTH-1:0];
     end
   end
 

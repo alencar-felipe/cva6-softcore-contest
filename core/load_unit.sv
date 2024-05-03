@@ -48,9 +48,9 @@ module load_unit
     input logic store_buffer_empty_i,  // the entire store-buffer is empty
     input logic [TRANS_ID_BITS-1:0] commit_tran_id_i,
     // D$ interface
-    output dcache_req_t req_port_o,
-    input  dcache_rsp_t rsp_port_i,
-    input  logic dcache_wbuffer_not_ni_i
+    input dcache_req_o_t req_port_i,
+    output dcache_req_i_t req_port_o,
+    input logic dcache_wbuffer_not_ni_i
 );
   enum logic [3:0] {
     IDLE,
@@ -224,7 +224,7 @@ module load_unit
             // make a load request to memory
             req_port_o.data_req = 1'b1;
             // we got no data grant so wait for the grant before sending the tag
-            if (!rsp_port_i.data_gnt) begin
+            if (!req_port_i.data_gnt) begin
               state_d = WAIT_GNT;
             end else begin
               if (ariane_pkg::MMU_PRESENT && !dtlb_hit_i) begin
@@ -281,7 +281,7 @@ module load_unit
           // the next state will be the idle state
           state_d  = IDLE;
           // pop load - but only if we are not getting an rvalid in here - otherwise we will over-write an incoming transaction
-          pop_ld_o = ~rsp_port_i.data_rvalid;
+          pop_ld_o = ~req_port_i.data_rvalid;
         end
       end
 
@@ -291,7 +291,7 @@ module load_unit
         // keep the request up
         req_port_o.data_req = 1'b1;
         // we finally got a data grant
-        if (rsp_port_i.data_gnt) begin
+        if (req_port_i.data_gnt) begin
           // so we send the tag in the next cycle
           if (ariane_pkg::MMU_PRESENT && !dtlb_hit_i) begin
             state_d = ABORT_TRANSACTION;
@@ -323,7 +323,7 @@ module load_unit
             // make a load request to memory
             req_port_o.data_req = 1'b1;
             // we got no data grant so wait for the grant before sending the tag
-            if (!rsp_port_i.data_gnt) begin
+            if (!req_port_i.data_gnt) begin
               state_d = WAIT_GNT;
             end else begin
               // we got a grant so we can send the tag in the next cycle
@@ -373,24 +373,24 @@ module load_unit
   end
 
   // track the load data for later usage
-  assign ldbuf_w = req_port_o.data_req & rsp_port_i.data_gnt;
+  assign ldbuf_w = req_port_o.data_req & req_port_i.data_gnt;
 
   // ---------------
   // Retire Load
   // ---------------
-  assign ldbuf_rindex = (CVA6Cfg.NrLoadBufEntries > 1) ? ldbuf_id_t'(rsp_port_i.data_rid) : 1'b0,
+  assign ldbuf_rindex = (CVA6Cfg.NrLoadBufEntries > 1) ? ldbuf_id_t'(req_port_i.data_rid) : 1'b0,
       ldbuf_rdata = ldbuf_q[ldbuf_rindex];
 
   // decoupled rvalid process
   always_comb begin : rvalid_output
     //  read the pending load buffer
-    ldbuf_r    = rsp_port_i.data_rvalid;
+    ldbuf_r    = req_port_i.data_rvalid;
     trans_id_o = ldbuf_q[ldbuf_rindex].trans_id;
     valid_o    = 1'b0;
     ex_o.valid = 1'b0;
 
     // we got an rvalid and it's corresponding request was not flushed
-    if (rsp_port_i.data_rvalid && !ldbuf_flushed_q[ldbuf_rindex]) begin
+    if (req_port_i.data_rvalid && !ldbuf_flushed_q[ldbuf_rindex]) begin
       // if the response corresponds to the last request, check that we are not killing it
       if ((ldbuf_last_id_q != ldbuf_rindex) || !req_port_o.kill_req) valid_o = 1'b1;
       // the output is also valid if we got an exception. An exception arrives one cycle after
@@ -406,7 +406,7 @@ module load_unit
     // exceptions can retire out-of-order -> but we need to give priority to non-excepting load and stores
     // so we simply check if we got an rvalid if so we prioritize it by not retiring the exception - we simply go for another
     // round in the load FSM
-    if ((state_q == WAIT_TRANSLATION) && !rsp_port_i.data_rvalid && ex_i.valid && valid_i) begin
+    if ((state_q == WAIT_TRANSLATION) && !req_port_i.data_rvalid && ex_i.valid && valid_i) begin
       trans_id_o = lsu_ctrl_i.trans_id;
       valid_o = 1'b1;
       ex_o.valid = 1'b1;
@@ -429,7 +429,7 @@ module load_unit
   riscv::xlen_t shifted_data;
 
   // realign as needed
-  assign shifted_data = rsp_port_i.data_rdata >> {ldbuf_rdata.address_offset, 3'b000};
+  assign shifted_data = req_port_i.data_rdata >> {ldbuf_rdata.address_offset, 3'b000};
 
   /*  // result mux (leaner code, but more logic stages.
     // can be used instead of the code below (in between //result mux fast) if timing is not so critical)
@@ -459,7 +459,7 @@ module load_unit
                                                                                                                          ldbuf_rdata.address_offset;
 
   for (genvar i = 0; i < (riscv::XLEN / 8); i++) begin : gen_sign_bits
-    assign rdata_sign_bits[i] = rsp_port_i.data_rdata[(i+1)*8-1];
+    assign rdata_sign_bits[i] = req_port_i.data_rdata[(i+1)*8-1];
   end
 
 

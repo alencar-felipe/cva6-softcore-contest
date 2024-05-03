@@ -39,16 +39,16 @@ module wt_dcache
     output amo_resp_t amo_resp_o,
 
     // Request ports
-    input  ariane_pkg::dcache_req_t [NumPorts-1:0] req_ports_i,
-    output ariane_pkg::dcache_rsp_t [NumPorts-1:0] rsp_ports_o,
+    input  dcache_req_i_t [NumPorts-1:0] req_ports_i,
+    output dcache_req_o_t [NumPorts-1:0] req_ports_o,
 
     output logic [NumPorts-1:0][DCACHE_SET_ASSOC-1:0] miss_vld_bits_o,
 
-    input  logic                       mem_rtrn_vld_i,
-    input  wt_cache_pkg::dcache_rtrn_t mem_rtrn_i,
-    output logic                       mem_data_req_o,
-    input  logic                       mem_data_ack_i,
-    output wt_cache_pkg::dcache_req_t  mem_data_o
+    input  logic         mem_rtrn_vld_i,
+    input  dcache_rtrn_t mem_rtrn_i,
+    output logic         mem_data_req_o,
+    input  logic         mem_data_ack_i,
+    output dcache_req_t  mem_data_o
 );
 
   // miss unit <-> read controllers
@@ -182,7 +182,7 @@ module wt_dcache
         .cache_en_i     (cache_en),
         // reqs from core
         .req_port_i     (req_ports_i[k]),
-        .rsp_port_o     (rsp_ports_o[k]),
+        .req_port_o     (req_ports_o[k]),
         // miss interface
         .miss_req_o     (miss_req[k]),
         .miss_ack_i     (miss_ack[k]),
@@ -230,7 +230,7 @@ module wt_dcache
       // .cache_en_i      ( '0                  ),
       // request ports from core (store unit)
       .req_port_i     (req_ports_i[NumPorts-1]),
-      .rsp_port_o     (rsp_ports_o[NumPorts-1]),
+      .req_port_o     (req_ports_o[NumPorts-1]),
       // miss unit interface
       .miss_req_o     (miss_req[NumPorts-1]),
       .miss_ack_i     (miss_ack[NumPorts-1]),

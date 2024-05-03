@@ -61,8 +61,8 @@ module mmu
     output logic itlb_miss_o,
     output logic dtlb_miss_o,
     // PTW memory interface
-    input  dcache_rsp_t rsp_port_i,
-    output dcache_req_t req_port_o,
+    input dcache_req_o_t req_port_i,
+    output dcache_req_i_t req_port_o,
     // PMP
     input riscv::pmpcfg_t [15:0] pmpcfg_i,
     input logic [15:0][riscv::PLEN-3:0] pmpaddr_i
@@ -166,9 +166,9 @@ module mmu
 
       .dtlb_access_i(dtlb_lu_access),
       .dtlb_hit_i   (dtlb_lu_hit),
-      .dtlb_vaddr_i (lsu_vaddr _i),
+      .dtlb_vaddr_i (lsu_vaddr_i),
 
-       .rsp_port_i (rsp_port_i),
+      .req_port_i (req_port_i),
       .req_port_o (req_port_o),
       .pmpcfg_i,
       .pmpaddr_i,
@@ -180,9 +180,9 @@ module mmu
   //     .clk(clk_i), // input wire clk
   //     .probe0({req_port_o.address_tag, req_port_o.address_index}),
   //     .probe1(req_port_o.data_req), // input wire [63:0]  probe1
-  //      .probe2(rsp_port_i.data_gnt), // input wire [0:0]  probe2
-  //      .probe3(rsp_port_i.data_rdata), // input wire [0:0]  probe3
-  //      .probe4(rsp_port_i.data_rvalid), // input wire [0:0]  probe4
+  //     .probe2(req_port_i.data_gnt), // input wire [0:0]  probe2
+  //     .probe3(req_port_i.data_rdata), // input wire [0:0]  probe3
+  //     .probe4(req_port_i.data_rvalid), // input wire [0:0]  probe4
   //     .probe5(ptw_error), // input wire [1:0]  probe5
   //     .probe6(update_vaddr), // input wire [0:0]  probe6
   //     .probe7(update_ptw_itlb.valid), // input wire [0:0]  probe7

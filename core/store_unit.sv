@@ -47,10 +47,10 @@ module store_unit
     input logic [11:0] page_offset_i,
     output logic page_offset_matches_o,
     // D$ interface
-    output amo_req_t    amo_req_o,
-    input  amo_resp_t   amo_resp_i,
-    output dcache_req_t req_port_o,
-    input  dcache_rsp_t rsp_port_i
+    output amo_req_t amo_req_o,
+    input amo_resp_t amo_resp_i,
+    input dcache_req_o_t req_port_i,
+    output dcache_req_i_t req_port_o
 );
   // it doesn't matter what we are writing back as stores don't return anything
   assign result_o = lsu_ctrl_i.data;
@@ -249,7 +249,7 @@ module store_unit
       .data_i               (st_data_q),
       .be_i                 (st_be_q),
       .data_size_i          (st_data_size_q),
-      .rsp_port_i           (rsp_port_i),
+      .req_port_i           (req_port_i),
       .req_port_o           (req_port_o)
   );
 

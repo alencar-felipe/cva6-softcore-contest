@@ -7,8 +7,8 @@ module axi_dcache_adapter
 
     AXI_BUS.Slave axi,
 
-    output dcache_req_t dcache_req,
-    input  dcache_rsp_t dcache_rsp
+    output dcache_req_i_t dcache_req,
+    input  dcache_req_o_t dcache_rsp
 );
 
     // parameters =============================================================
@@ -71,8 +71,8 @@ module axi_dcache_adapter
 
     // signals ================================================================
 
-    dcache_req_t req;
-    dcache_rsp_t rsp;
+    dcache_req_i_t req;
+    dcache_req_o_t rsp;
 
     ptr_t ptr_send_d, ptr_send_q;
     ptr_t ptr_recv_d, ptr_recv_q;

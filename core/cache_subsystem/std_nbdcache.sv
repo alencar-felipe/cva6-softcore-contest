@@ -33,8 +33,8 @@ module std_nbdcache
     input amo_req_t amo_req_i,
     output amo_resp_t amo_resp_o,
     // Request ports
-    input  dcache_req_t [NumPorts-1:0] req_ports_i,  // request ports
-    output dcache_rsp_t [NumPorts-1:0] rsp_ports_o,  // response ports
+    input dcache_req_i_t [NumPorts-1:0] req_ports_i,  // request ports
+    output dcache_req_o_t [NumPorts-1:0] req_ports_o,  // request ports
     // Cache AXI refill port
     output axi_req_t axi_data_o,
     input axi_rsp_t axi_data_i,
@@ -93,7 +93,7 @@ module std_nbdcache
   // Cache Controller
   // ------------------
   generate
-    for (genvar i = 0; i < NumPorts; i++) begin : gen_master_ports
+    for (genvar i = 0; i < NumPorts; i++) begin : master_ports
       cache_ctrl #(
           .CVA6Cfg(CVA6Cfg)
       ) i_cache_ctrl (
@@ -101,7 +101,7 @@ module std_nbdcache
           .busy_o    (busy[i]),
           // from core
           .req_port_i(req_ports_i[i]),
-          .rsp_port_o(rsp_ports_o[i]),
+          .req_port_o(req_ports_o[i]),
           // to SRAM array
           .req_o     (req[i+1]),
           .addr_o    (addr[i+1]),

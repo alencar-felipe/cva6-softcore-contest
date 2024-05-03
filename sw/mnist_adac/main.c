@@ -9,8 +9,7 @@
 
 int main()
 {
-    printf("A\n");
-    // print_config();
+    print_config();
 
     uint8_t *input;
     int32_t expected;
