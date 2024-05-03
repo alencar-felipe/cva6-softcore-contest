@@ -211,4 +211,24 @@ module xadac
     assign axi_r_valid = axi.r_valid;
     assign axi.r_ready = axi_r_ready;
 
+    // always_ff @(posedge clk) begin
+    //     if (axi.ar_valid && axi.ar_ready) begin
+    //         $display("ar: %x", axi.ar_addr);
+
+    //         if (axi.ar_addr == '0) $finish();
+    //     end
+
+    //     if (axi.r_valid && axi.r_ready) begin
+    //         $display("r: %x", axi.r_data);
+    //     end
+
+    //     if (axi.aw_valid && axi.aw_ready) begin
+    //         $display("aw: %x", axi.aw_addr);
+    //     end
+
+    //     if (axi.w_valid && axi.w_ready) begin
+    //         $display("w: %x %x", axi.w_data, axi.w_strb);
+    //     end
+    // end
+
 endmodule
