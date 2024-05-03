@@ -18,7 +18,9 @@ module ex_stage
   import ariane_pkg::*;
 #(
     parameter config_pkg::cva6_cfg_t CVA6Cfg = config_pkg::cva6_cfg_empty,
-    parameter int unsigned ASID_WIDTH = 1
+    parameter int unsigned ASID_WIDTH = 1,
+    // Dependent parameters, DO NOT OVERRIDE!
+    parameter int unsigned NrDcachePorts = 1
 ) (
     input logic clk_i,        // Clock
     input logic rst_ni,       // Asynchronous reset active low
@@ -109,8 +111,8 @@ module ex_stage
     output icache_areq_t                       icache_areq_o,
 
     // interface to dcache
-    input dcache_req_o_t [2:0] dcache_req_ports_i,
-    output dcache_req_i_t [2:0] dcache_req_ports_o,
+    input dcache_req_o_t  [NrDcachePorts-1:0] dcache_req_ports_i,
+    output dcache_req_i_t [NrDcachePorts-1:0] dcache_req_ports_o,
     input logic dcache_wbuffer_empty_i,
     input logic dcache_wbuffer_not_ni_i,
     output amo_req_t amo_req_o,  // request to cache subsytem
@@ -341,8 +343,8 @@ module ex_stage
       .flush_tlb_i,
       .itlb_miss_o,
       .dtlb_miss_o,
-      .dcache_req_ports_i,
-      .dcache_req_ports_o,
+      .dcache_req_ports_i (dcache_req_ports_i[0]),
+      .dcache_req_ports_o (dcache_req_ports_o[0]),
       .dcache_wbuffer_empty_i,
       .dcache_wbuffer_not_ni_i,
       .amo_valid_commit_i,

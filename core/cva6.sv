@@ -159,9 +159,10 @@ module cva6
   localparam bit XF8Vec     = CVA6Cfg.XF8     & CVA6Cfg.XFVec & FLen>8;  // FP8 vectors available if vectors and larger fmt enabled
 
   localparam bit EnableAccelerator = CVA6Cfg.RVV;  // Currently only used by V extension (Ara)
-  localparam int unsigned NrWbPorts = (CVA6Cfg.CvxifEn || EnableAccelerator) ? 5 : 4;
 
-  localparam NrRgprPorts = 2;
+  localparam int unsigned NrWbPorts = (CVA6Cfg.CvxifEn || EnableAccelerator) ? 5 : 4;
+  localparam int unsigned NrRgprPorts = 2;
+  localparam int unsigned NrDcachePorts = 3;
 
   localparam config_pkg::cva6_cfg_t CVA6ExtendCfg = {
     CVA6Cfg.NrCommitPorts,
@@ -226,7 +227,6 @@ module cva6
   logic                                               eret;
   logic             [CVA6ExtendCfg.NrCommitPorts-1:0] commit_ack;
 
-  localparam NumPorts = 4;
   cvxif_pkg::cvxif_req_t cvxif_req;
   cvxif_pkg::cvxif_resp_t cvxif_resp;
 
@@ -391,7 +391,7 @@ module cva6
   logic                                                                dtlb_miss_ex_perf;
   logic                                                                dcache_miss_cache_perf;
   logic                                                                icache_miss_cache_perf;
-  logic          [                 NumPorts-1:0][DCACHE_SET_ASSOC-1:0] miss_vld_bits;
+  logic          [            NrDcachePorts-1:0][DCACHE_SET_ASSOC-1:0] miss_vld_bits;
   logic                                                                stall_issue;
   // --------------
   // CTRL <-> *
@@ -427,12 +427,11 @@ module cva6
   // ----------------
   // DCache <-> *
   // ----------------
-  dcache_req_i_t [                          2:0]                       dcache_req_ports_ex_cache;
-  dcache_req_o_t [                          2:0]                       dcache_req_ports_cache_ex;
-  dcache_req_i_t [                          1:0]                       dcache_req_ports_acc_cache;
-  dcache_req_o_t [                          1:0]                       dcache_req_ports_cache_acc;
-  logic                                                                dcache_commit_wbuffer_empty;
-  logic                                                                dcache_commit_wbuffer_not_ni;
+  dcache_req_i_t [NrDcachePorts-1:0] dcache_req;
+  dcache_req_o_t [NrDcachePorts-1:0] dcache_rsp;
+
+  logic dcache_commit_wbuffer_empty;
+  logic dcache_commit_wbuffer_not_ni;
 
   logic          [              riscv::VLEN-1:0]                       lsu_addr;
   logic          [              riscv::PLEN-1:0]                       mem_paddr;
@@ -741,8 +740,8 @@ module cva6
       .icache_areq_i          (icache_areq_cache_ex),
       .icache_areq_o          (icache_areq_ex_cache),
       // DCACHE interfaces
-      .dcache_req_ports_i     (dcache_req_ports_cache_ex),
-      .dcache_req_ports_o     (dcache_req_ports_ex_cache),
+      .dcache_req_ports_i     (dcache_rsp[0:0]),
+      .dcache_req_ports_o     (dcache_req[0:0]),
       .dcache_wbuffer_empty_i (dcache_commit_wbuffer_empty),
       .dcache_wbuffer_not_ni_i(dcache_commit_wbuffer_not_ni),
       // PMP
@@ -872,7 +871,7 @@ module cva6
   if (PERF_COUNTER_EN) begin : gen_perf_counter
     perf_counters #(
         .CVA6Cfg (CVA6ExtendCfg),
-        .NumPorts(NumPorts)
+        .NumPorts(NrDcachePorts)
     ) perf_counters_i (
         .clk_i         (clk_i),
         .rst_ni        (rst_ni),
@@ -895,7 +894,7 @@ module cva6
         .resolved_branch_i  (resolved_branch),
         .branch_exceptions_i(flu_exception_ex_id),
         .l1_icache_access_i (icache_dreq_if_cache),
-        .l1_dcache_access_i (dcache_req_ports_ex_cache),
+        .l1_dcache_access_i (dcache_req),
         .miss_vld_bits_i    (miss_vld_bits),
         .i_tlb_flush_i      (flush_tlb_ctrl_ex),
         .stall_issue_i      (stall_issue),
@@ -946,36 +945,14 @@ module cva6
   // Cache Subsystem
   // -------------------
 
-  // Acc dispatcher and store buffer share a dcache request port.
-  // Store buffer always has priority access over acc dipsatcher.
-  dcache_req_i_t [NumPorts-1:0] dcache_req_to_cache;
-  dcache_req_o_t [NumPorts-1:0] dcache_req_from_cache;
-
-  // D$ request
-  assign dcache_req_to_cache[0] = dcache_req_ports_ex_cache[0];
-  assign dcache_req_to_cache[1] = dcache_req_ports_ex_cache[1];
-  assign dcache_req_to_cache[2] = dcache_req_ports_acc_cache[0];
-  assign dcache_req_to_cache[3] = dcache_req_ports_ex_cache[2].data_req ? dcache_req_ports_ex_cache [2] :
-                                                                          dcache_req_ports_acc_cache[1];
-
-  // D$ response
-  assign dcache_req_ports_cache_ex[0] = dcache_req_from_cache[0];
-  assign dcache_req_ports_cache_ex[1] = dcache_req_from_cache[1];
-  assign dcache_req_ports_cache_acc[0] = dcache_req_from_cache[2];
-  always_comb begin : gen_dcache_req_store_data_gnt
-    dcache_req_ports_cache_ex[2]  = dcache_req_from_cache[3];
-    dcache_req_ports_cache_acc[1] = dcache_req_from_cache[3];
-
-    // Set gnt signal
-    dcache_req_ports_cache_ex[2].data_gnt &= dcache_req_ports_ex_cache[2].data_req;
-    dcache_req_ports_cache_acc[1].data_gnt &= !dcache_req_ports_ex_cache[2].data_req;
-  end
+  assign dcache_req[1] = '0;
+  assign dcache_req[2] = '0;
 
   if (DCACHE_TYPE == int'(config_pkg::WT)) begin : gen_cache_wt
     // this is a cache subsystem that is compatible with OpenPiton
     wt_cache_subsystem #(
         .CVA6Cfg   (CVA6ExtendCfg),
-        .NumPorts  (NumPorts),
+        .NumPorts  (NrDcachePorts),
         .noc_req_t (noc_req_t),
         .noc_resp_t(noc_resp_t)
     ) i_cache_subsystem (
@@ -1000,8 +977,8 @@ module cva6
         // from PTW, Load Unit  and Store Unit
         .dcache_miss_o     (dcache_miss_cache_perf),
         .miss_vld_bits_o   (miss_vld_bits),
-        .dcache_req_ports_i(dcache_req_to_cache),
-        .dcache_req_ports_o(dcache_req_from_cache),
+        .dcache_req_ports_i(dcache_req),
+        .dcache_req_ports_o(dcache_rsp),
         // write buffer status
         .wbuffer_empty_o   (dcache_commit_wbuffer_empty),
         .wbuffer_not_ni_o  (dcache_commit_wbuffer_not_ni),
@@ -1015,7 +992,7 @@ module cva6
   end else if (DCACHE_TYPE == int'(config_pkg::HPDCACHE)) begin : gen_cache_hpd
     cva6_hpdcache_subsystem #(
         .CVA6Cfg   (CVA6ExtendCfg),
-        .NumPorts  (NumPorts),
+        .NumPorts  (NrDcachePorts),
         .noc_req_t (noc_req_t),
         .noc_resp_t(noc_resp_t),
         .cmo_req_t (logic  /*FIXME*/),
@@ -1043,8 +1020,8 @@ module cva6
         .dcache_cmo_req_i ('0  /*FIXME*/),
         .dcache_cmo_resp_o(  /*FIXME*/),
 
-        .dcache_req_ports_i(dcache_req_to_cache),
-        .dcache_req_ports_o(dcache_req_from_cache),
+        .dcache_req_ports_i(dcache_req),
+        .dcache_rsp_ports_o(dcache_rsp),
 
         .wbuffer_empty_o (dcache_commit_wbuffer_empty),
         .wbuffer_not_ni_o(dcache_commit_wbuffer_not_ni),
@@ -1070,7 +1047,7 @@ module cva6
         // not as important since this cache subsystem is about to be
         // deprecated
         .CVA6Cfg      (CVA6ExtendCfg),
-        .NumPorts     (NumPorts),
+        .NumPorts     (NrDcachePorts),
         .axi_ar_chan_t(axi_ar_chan_t),
         .axi_aw_chan_t(axi_aw_chan_t),
         .axi_w_chan_t (axi_w_chan_t),
@@ -1086,7 +1063,7 @@ module cva6
         .icache_flush_i    (icache_flush_ctrl_cache),
         .icache_miss_o     (icache_miss_cache_perf),
         .icache_areq_i     (icache_areq_ex_cache),
-        .icache_areq_o     (icache_areq_cache_ex),
+        .icache_areq_o     (icache_arsp_cache_ex),
         .icache_dreq_i     (icache_dreq_if_cache),
         .icache_dreq_o     (icache_dreq_cache_if),
         // D$
@@ -1100,8 +1077,8 @@ module cva6
         // this is statically set to 1 as the std_cache does not have a wbuffer
         .wbuffer_empty_o   (dcache_commit_wbuffer_empty),
         // from PTW, Load Unit  and Store Unit
-        .dcache_req_ports_i(dcache_req_to_cache),
-        .dcache_req_ports_o(dcache_req_from_cache),
+        .dcache_req_ports_i(dcache_req),
+        .dcache_rsp_ports_o(dcache_rsp),
         // memory side
         .axi_req_o         (noc_req_o),
         .axi_resp_i        (noc_resp_i)
