@@ -130,11 +130,15 @@ module cva6
     // RISC-V formal interface port (`rvfi`):
     // Can be left open when formal tracing is not needed.
     output rvfi_instr_t [CVA6Cfg.NrCommitPorts-1:0] rvfi_o,
-    output cvxif_req_t cvxif_req_o,
-    input cvxif_resp_t cvxif_resp_i,
+    // output cvxif_req_t cvxif_req_o,
+    // input cvxif_resp_t cvxif_resp_i,
     // memory side
     output noc_req_t noc_req_o,
-    input noc_resp_t noc_resp_i
+    input noc_resp_t noc_resp_i,
+
+    xadac_if.mst          xadac,
+    input  dcache_req_i_t ext_dcache_req_i,
+    output dcache_req_o_t ext_dcache_rsp_o
 );
 
   // ------------------------------------------
@@ -720,8 +724,9 @@ module cva6
       .x_result_o             (x_result_ex_id),
       .x_valid_o              (x_valid_ex_id),
       .x_we_o                 (x_we_ex_id),
-      .cvxif_req_o            (cvxif_req),
-      .cvxif_resp_i           (cvxif_resp),
+      .xadac                  (xadac),
+      // .cvxif_req_o            (cvxif_req),
+      // .cvxif_resp_i           (cvxif_resp),
       // Accelerator
       .acc_valid_i            (acc_valid_acc_ex),
       // Performance counters
@@ -945,7 +950,8 @@ module cva6
   // Cache Subsystem
   // -------------------
 
-  assign dcache_req[1] = '0;
+  assign dcache_req[1] = ext_dcache_req_i;
+  assign ext_dcache_rsp_o = dcache_rsp[1];
   assign dcache_req[2] = '0;
 
   if (DCACHE_TYPE == int'(config_pkg::WT)) begin : gen_cache_wt
@@ -1129,9 +1135,9 @@ module cva6
         .acc_dcache_req_ports_i(dcache_req_ports_cache_acc),
         .inval_ready_i         (inval_ready),
         .inval_valid_o         (inval_valid),
-        .inval_addr_o          (inval_addr),
-        .acc_req_o             (cvxif_req_o),
-        .acc_resp_i            (cvxif_resp_i)
+        .inval_addr_o          (inval_addr)
+        // .acc_req_o             (cvxif_req_o),
+        // .acc_resp_i            (cvxif_resp_i)
     );
   end : gen_accelerator
   else begin : gen_no_accelerator
@@ -1156,8 +1162,8 @@ module cva6
     assign inval_addr                 = '0;
 
     // Feed through cvxif
-    assign cvxif_req_o                = cvxif_req;
-    assign cvxif_resp                 = cvxif_resp_i;
+    // assign cvxif_req_o                = cvxif_req;
+    // assign cvxif_resp                 = cvxif_resp_i;
   end : gen_no_accelerator
 
   // -------------------

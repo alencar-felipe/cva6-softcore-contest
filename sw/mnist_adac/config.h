@@ -4,8 +4,8 @@
 // #define LAYER_PERF
 // #define ADAC_HPM
 // #define DUMP
-#define VALIDATE
-// #define VECTOR
+// #define VALIDATE
+#define VECTOR
 // #define MODEL
 
 #ifndef IMAGE

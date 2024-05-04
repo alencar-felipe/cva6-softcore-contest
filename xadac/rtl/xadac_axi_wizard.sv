@@ -123,16 +123,16 @@ module xadac_axi_wizard
             (write_d.strb[MstStrbWidth-1:0] == '0) &&
             (write_d.strb != '0)
         ) begin
-            write_d.addr +=  MstStrbWidth;
             write_d.data >>= MstStrbWidth * 8;
             write_d.strb >>= MstStrbWidth;
+            write_d.addr +=  MstStrbWidth;
         end
 
         // align ==============================================================
 
-        write_d.addr -=  unaligned(write_d.addr);
         write_d.data <<= unaligned(write_d.addr) * 8;
         write_d.strb <<= unaligned(write_d.addr);
+        write_d.addr -=  unaligned(write_d.addr);
 
         // mst aw =============================================================
 
