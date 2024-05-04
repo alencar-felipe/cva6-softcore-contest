@@ -258,7 +258,7 @@ module cva6
   logic [riscv::VLEN-1:0] rs1_forwarding_id_ex;  // unregistered version of fu_data_o.operanda
   logic [riscv::VLEN-1:0] rs2_forwarding_id_ex;  // unregistered version of fu_data_o.operandb
 
-  fu_data_t fu_data_id_ex;
+  fu_data_t fu_data_id_ex,reg_fu_data_id_ex;
   logic [riscv::VLEN-1:0] pc_id_ex;
   logic is_compressed_instr_id_ex;
   // fixed latency units
@@ -645,6 +645,20 @@ module cva6
       .*
   );
 
+  always_ff @(posedge clk_i, negedge rst_ni) begin
+    if (!rst_ni) begin
+      reg_fu_data_id_ex.fu        <= NONE;
+      reg_fu_data_id_ex.operand_a <= '0;
+      reg_fu_data_id_ex.operand_b <= '0;      
+      reg_fu_data_id_ex.imm       <= '0;
+      reg_fu_data_id_ex.trans_id  <= '0;          
+    end
+    else begin
+      reg_fu_data_id_ex <= fu_data_id_ex;
+    end
+  end
+
+
   // ---------
   // EX
   // ---------
@@ -658,7 +672,7 @@ module cva6
       .flush_i              (flush_ctrl_ex),
       .rs1_forwarding_i     (rs1_forwarding_id_ex),
       .rs2_forwarding_i     (rs2_forwarding_id_ex),
-      .fu_data_i            (fu_data_id_ex),
+      .fu_data_i            (reg_fu_data_id_ex),
       .pc_i                 (pc_id_ex),
       .is_compressed_instr_i(is_compressed_instr_id_ex),
       // fixed latency units

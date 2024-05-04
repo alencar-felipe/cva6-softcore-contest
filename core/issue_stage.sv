@@ -121,6 +121,8 @@ module issue_stage
   riscv::xlen_t                             rs1_forwarding_xlen;
   riscv::xlen_t                             rs2_forwarding_xlen;
 
+  fu_data_t reg_issue_stage;
+
   assign rs1_forwarding_o = rs1_forwarding_xlen[riscv::VLEN-1:0];
   assign rs2_forwarding_o = rs2_forwarding_xlen[riscv::VLEN-1:0];
 
@@ -171,6 +173,19 @@ module issue_stage
       .*
   );
 
+   always_ff @(posedge clk_i, negedge rst_ni) begin
+       if (!rst_ni) begin
+        fu_data_o.fu        <= NONE;
+        fu_data_o.operand_a <= '0;
+        fu_data_o.operand_b <= '0;      
+        fu_data_o.imm       <= '0;
+        fu_data_o.trans_id  <= '0;          
+      end
+      else begin 
+        fu_data_o <= reg_issue_stage;
+      end
+    end
+
   // ---------------------------------------------------------
   // 3. Issue instruction and read operand, also commit
   // ---------------------------------------------------------
@@ -182,7 +197,7 @@ module issue_stage
       .issue_instr_i      (issue_instr_sb_iro),
       .issue_instr_valid_i(issue_instr_valid_sb_iro),
       .issue_ack_o        (issue_ack_iro_sb),
-      .fu_data_o          (fu_data_o),
+      .fu_data_o          (reg_issue_stage),
       .flu_ready_i        (flu_ready_i),
       .rs1_o              (rs1_iro_sb),
       .rs1_i              (rs1_sb_iro),

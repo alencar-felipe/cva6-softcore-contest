@@ -278,8 +278,6 @@ module ex_stage
   generate
     if (CVA6Cfg.FpPresent) begin : gen_fpu
       fu_data_t fpu_data;
-      assign fpu_data = fpu_valid_i ? fu_data_i : '0;
-
       fpu_wrap #(
           .CVA6Cfg(CVA6Cfg)
       ) fpu_i (
@@ -371,13 +369,28 @@ module ex_stage
 
   if (CVA6Cfg.CvxifEn) begin : gen_cvxif
     fu_data_t cvxif_data;
+    fu_data_t reg_issue_stage;
     assign cvxif_data = x_valid_i ? fu_data_i : '0;
+
+    always_ff @(posedge clk_i, negedge rst_ni) begin
+      if (!rst_ni) begin
+        reg_issue_stage.fu        <= NONE;
+        reg_issue_stage.operand_a <= '0;
+        reg_issue_stage.operand_b <= '0;      
+        reg_issue_stage.imm       <= '0;
+        reg_issue_stage.trans_id  <= '0;          
+      end
+      else begin
+        reg_issue_stage <= fu_data_i;
+      end
+    end
+
     cvxif_fu #(
         .CVA6Cfg(CVA6Cfg)
     ) cvxif_fu_i (
         .clk_i,
         .rst_ni,
-        .fu_data_i,
+        .fu_data_i(reg_issue_stage),
         .priv_lvl_i(ld_st_priv_lvl_i),
         .x_valid_i,
         .x_ready_o,

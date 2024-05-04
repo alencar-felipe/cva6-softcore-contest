@@ -117,15 +117,15 @@ module issue_read_operands
   assign rs1_forwarding_o    = operand_a_n[riscv::VLEN-1:0];  //forwarding or unregistered rs1 value
   assign rs2_forwarding_o    = operand_b_n[riscv::VLEN-1:0];  //forwarding or unregistered rs2 value
 
-  assign fu_data_o.operand_a = operand_a_q;
-  assign fu_data_o.operand_b = operand_b_q;
-  assign fu_data_o.fu        = fu_q;
-  assign fu_data_o.operation = operator_q;
-  assign fu_data_o.trans_id  = trans_id_q;
-  assign fu_data_o.imm       = imm_q;
+  //assign fu_data_o.operand_a = operand_a_q;
+  //assign fu_data_o.operand_b = operand_b_q;
+  //assign fu_data_o.fu        = fu_q;
+  //assign fu_data_o.operation = operator_q;
+  //assign fu_data_o.trans_id  = trans_id_q;
+  //assign fu_data_o.imm       = imm_q;
   assign alu_valid_o         = alu_valid_q;
   assign branch_valid_o      = branch_valid_q;
-  assign lsu_valid_o         = lsu_valid_q;
+  //assign lsu_valid_o         = lsu_valid_q;
   assign csr_valid_o         = csr_valid_q;
   assign mult_valid_o        = mult_valid_q;
   assign fpu_valid_o         = fpu_valid_q;
@@ -137,6 +137,25 @@ module issue_read_operands
   // ---------------
   // Issue Stage
   // ---------------
+
+  always_ff @(posedge clk_i, negedge rst_ni) begin
+       if (!rst_ni) begin
+        fu_data_o.fu        <= NONE;
+        fu_data_o.operand_a <= '0;
+        fu_data_o.operand_b <= '0;      
+        fu_data_o.imm       <= '0;
+        fu_data_o.trans_id  <= '0;          
+      end
+      else begin 
+        fu_data_o.operand_a <= operand_a_q;
+        fu_data_o.operand_b <= operand_b_q;
+        fu_data_o.fu        <= fu_q;
+        fu_data_o.operation <= operator_q;
+        fu_data_o.trans_id  <= trans_id_q;
+        fu_data_o.imm       <= imm_q;
+      end
+    end
+
 
   // select the right busy signal
   // this obviously depends on the functional unit we need
