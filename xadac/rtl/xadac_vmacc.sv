@@ -45,7 +45,12 @@ module xadac_vmacc
         slv.dec_rsp.vs_read[0] = '1;
         slv.dec_rsp.vs_read[1] = '1;
         slv.dec_rsp.vs_read[2] = '1;
-        slv.dec_rsp.accept = '1;
+
+        case (slv.dec_req.instr[25 +: JLenWidth])
+            'd1:     slv.dec_rsp.accept = '1;
+            'd4:     slv.dec_rsp.accept = '1;
+            default: slv.dec_rsp.accept = '0;
+        endcase
     end
 
     always_comb begin : comb_exe
@@ -60,13 +65,16 @@ module xadac_vmacc
         slv.exe_rsp.vd_addr  = slv.exe_req.instr[11:7];
         slv.exe_rsp.vd_data  = slv.exe_req.vs_data[2];
         slv.exe_rsp.vd_write = '1;
-        for (ilen_t i = 0; i < ilen; i++) begin
-            for (jlen_t j = 0; j < jlen; j++) begin
-                slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] = macc(
-                    slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth],
-                    slv.exe_req.vs_data[0][(jlen*i + j)*8 +: 8],
-                    slv.exe_req.vs_data[1][(jlen*i + j)*8 +: 8]
-                );
+
+        if (jlen == 'd1 || jlen == 'd4) begin
+            for (ilen_t i = 0; i < ilen; i++) begin
+                for (jlen_t j = 0; j < jlen; j++) begin
+                    slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] = macc(
+                        slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth],
+                        slv.exe_req.vs_data[0][(jlen*i + j)*8 +: 8],
+                        slv.exe_req.vs_data[1][(jlen*i + j)*8 +: 8]
+                    );
+                end
             end
         end
     end

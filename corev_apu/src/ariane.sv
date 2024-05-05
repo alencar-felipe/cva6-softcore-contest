@@ -84,6 +84,8 @@ module ariane
 
   if (CVA6Cfg.CvxifEn) begin : gen_xadac
 
+    xadac_if xadac_cut ();
+
     AXI_BUS #(
         .AXI_ID_WIDTH   (IdWidth),
         .AXI_ADDR_WIDTH (AddrWidth),
@@ -98,25 +100,51 @@ module ariane
         .AXI_USER_WIDTH (DCACHE_USER_WIDTH)
     ) axi_narrow ();
 
+    AXI_BUS #(
+        .AXI_ID_WIDTH   (IdWidth),
+        .AXI_ADDR_WIDTH (AddrWidth),
+        .AXI_DATA_WIDTH (XLEN),
+        .AXI_USER_WIDTH (DCACHE_USER_WIDTH)
+    ) axi_narrow_cut ();
+
+    // xadac_if_cut i_xadac_if_cut (
+    //     .clk  (clk_i),
+    //     .rstn (rst_ni),
+    //     .slv  (xadac),
+    //     .mst  (xadac_cut)
+    // );
+
     xadac i_xadac (
         .clk  (clk_i),
         .rstn (rst_ni),
-        .slv  (xadac),
+        .slv  (xadac), // _cut),
         .axi  (axi_wide)
     );
 
-    xadac_axi_wizard i_xdac_axi_wizard (
+    xadac_axi_wizard i_xadac_axi_wizard (
         .clk  (clk_i),
         .rstn (rst_ni),
         .slv  (axi_wide),
         .mst  (axi_narrow)
     );
 
+    xadac_axi_cut #(
+        .IdWidth   (IdWidth),
+        .AddrWidth (AddrWidth),
+        .DataWidth (XLEN),
+        .UserWidth (DCACHE_USER_WIDTH)
+    ) i_xadac_axi_cut (
+        .clk  (clk_i),
+        .rstn (rst_ni),
+        .slv  (axi_narrow),
+        .mst  (axi_narrow_cut)
+    );
+
     axi_dcache_adapter i_dcache_axi_adapter (
         .clk  (clk_i),
         .rstn (rst_ni),
 
-        .axi (axi_narrow),
+        .axi (axi_narrow_cut),
 
         .dcache_req (dcache_req),
         .dcache_rsp (dcache_rsp)

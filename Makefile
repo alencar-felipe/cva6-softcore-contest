@@ -230,6 +230,7 @@ src := \
 	corev_apu/tb/common/uart.sv \
 	corev_apu/tb/common/SimDTM.sv \
 	corev_apu/tb/common/SimJTAG.sv \
+	xadac/rtl/xadac_axi_cut.sv \
 	xadac/rtl/xadac_axi_skid.sv \
 	xadac/rtl/xadac_axi_wizard.sv \
 	xadac/rtl/xadac_if.sv \

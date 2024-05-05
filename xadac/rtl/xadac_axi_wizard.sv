@@ -121,12 +121,7 @@ module xadac_axi_wizard
 
         for (SizeT i = 0; i < IntStrbWidth/MstStrbWidth; i++) begin
 
-            if (
-                (write_d.strb[MstStrbWidth-1:0] == '0) &&
-                (write_d.strb != '0)
-            ) begin
-                break;
-            end
+            if (write_d.strb[MstStrbWidth-1:0] != '0) break;
 
             write_d.data >>= MstStrbWidth * 8;
             write_d.strb >>= MstStrbWidth;
