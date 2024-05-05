@@ -1,6 +1,6 @@
 module xadac_skid #(
-    parameter bit Passthrough = 0,
-    parameter type DataT = logic
+    parameter bit  Bypass = 0,
+    parameter type DataT  = logic
 ) (
     input logic clk,
     input logic rstn,
@@ -14,14 +14,12 @@ module xadac_skid #(
     input  logic mst_ready
 );
 
-    if (Passthrough) begin : gen_passthrough
+    if (Bypass) begin : gen_bypass
         assign mst_data  = slv_data;
         assign mst_valid = slv_valid;
         assign slv_ready = mst_ready;
     end
     else begin : gen_skid
-
-`ifdef VERILATOR
         logic stall;
         DataT buffer;
 
@@ -52,22 +50,6 @@ module xadac_skid #(
                 end
             end
         end
-`else
-        spill_register #(
-            .T       (DataT),
-            .Bypass  (0)
-        ) i_w_spill_reg (
-            .clk_i   ( clk             ),
-            .rst_ni  ( rstn             ),
-            .valid_i ( slv_valid   ),
-            .ready_o ( slv_ready    ),
-            .data_i  ( slv_data        ),
-            .valid_o ( mst_valid  ),
-            .ready_i ( mst_ready ),
-            .data_o  ( mst_data     )
-        );
-`endif
-
     end
 
 endmodule

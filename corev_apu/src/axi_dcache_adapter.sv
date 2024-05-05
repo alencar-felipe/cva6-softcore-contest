@@ -99,8 +99,8 @@ module axi_dcache_adapter
         .DataWidth (DataWidth),
         .UserWidth (UserWidth),
 
-        .BSkid (0),
-        .RSkid (0)
+        .BypassB (1),
+        .BypassR (1)
     ) i_xadac_axi_skid (
         .clk  (clk),
         .rstn (rstn),

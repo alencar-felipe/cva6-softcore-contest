@@ -1,10 +1,10 @@
 module xadac_if_skid
     import xadac_pkg::*;
 #(
-    parameter bit DecReqSkid = 0,
-    parameter bit DecRspSkid = 0,
-    parameter bit ExeReqSkid = 0,
-    parameter bit ExeRspSkid = 0
+    parameter bit BypassDecReq = 0,
+    parameter bit BypassDecRsp = 0,
+    parameter bit BypassExeReq = 0,
+    parameter bit BypassExeRsp = 0
 ) (
     input logic  clk,
     input logic  rstn,
@@ -13,8 +13,8 @@ module xadac_if_skid
 );
 
     xadac_skid #(
-        .Passthrough (!DecReqSkid),
-        .DataT (DecReqT)
+        .Bypass (BypassDecReq),
+        .DataT  (DecReqT)
     ) i_dec_req_skid (
         .clk  (clk),
         .rstn (rstn),
@@ -29,8 +29,8 @@ module xadac_if_skid
     );
 
     xadac_skid #(
-        .Passthrough (!DecRspSkid),
-        .DataT (DecRspT)
+        .Bypass (BypassDecRsp),
+        .DataT  (DecRspT)
     ) i_dec_rsp_skid (
         .clk  (clk),
         .rstn (rstn),
@@ -45,8 +45,8 @@ module xadac_if_skid
     );
 
     xadac_skid #(
-        .Passthrough (!ExeReqSkid),
-        .DataT (ExeReqT)
+        .Bypass (BypassExeReq),
+        .DataT  (ExeReqT)
     ) i_exe_req_skid (
         .clk  (clk),
         .rstn (rstn),
@@ -61,8 +61,8 @@ module xadac_if_skid
     );
 
     xadac_skid #(
-        .Passthrough (!ExeRspSkid),
-        .DataT (ExeRspT)
+        .Bypass (BypassExeRsp),
+        .DataT  (ExeRspT)
     ) i_exe_rsp_skid (
         .clk  (clk),
         .rstn (rstn),

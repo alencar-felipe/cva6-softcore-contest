@@ -7,11 +7,11 @@ module xadac_axi_skid #(
     parameter int unsigned DataWidth = 0,
     parameter int unsigned UserWidth = 0,
 
-    parameter bit AwSkid = 1,
-    parameter bit WSkid  = 1,
-    parameter bit BSkid  = 1,
-    parameter bit ArSkid = 1,
-    parameter bit RSkid  = 1
+    parameter bit BypassAw = 0,
+    parameter bit BypassW  = 0,
+    parameter bit BypassB  = 0,
+    parameter bit BypassAr = 0,
+    parameter bit BypassR  = 0
 ) (
     logic clk,
     logic rstn,
@@ -59,8 +59,8 @@ module xadac_axi_skid #(
     `AXI_ASSIGN_TO_R   (mst_r, mst);
 
     xadac_skid #(
-        .Passthrough (!AwSkid),
-        .DataT       (aw_t)
+        .Bypass (BypassAw),
+        .DataT  (aw_t)
     ) aw_skid (
         .clk  (clk),
         .rstn (rstn),
@@ -75,8 +75,8 @@ module xadac_axi_skid #(
     );
 
     xadac_skid #(
-        .Passthrough (!WSkid),
-        .DataT       (w_t)
+        .Bypass (BypassW),
+        .DataT  (w_t)
     ) w_skid (
         .clk  (clk),
         .rstn (rstn),
@@ -91,8 +91,8 @@ module xadac_axi_skid #(
     );
 
     xadac_skid #(
-        .Passthrough (!BSkid),
-        .DataT       (b_t)
+        .Bypass (BypassB),
+        .DataT  (b_t)
     ) b_skid (
         .clk  (clk),
         .rstn (rstn),
@@ -107,8 +107,8 @@ module xadac_axi_skid #(
     );
 
     xadac_skid #(
-        .Passthrough (!ArSkid),
-        .DataT       (ar_t)
+        .Bypass (BypassAr),
+        .DataT  (ar_t)
     ) ar_skid (
         .clk  (clk),
         .rstn (rstn),
@@ -123,8 +123,8 @@ module xadac_axi_skid #(
     );
 
     xadac_skid #(
-        .Passthrough (!RSkid),
-        .DataT       (r_t)
+        .Bypass (BypassR),
+        .DataT  (r_t)
     ) r_skid (
         .clk  (clk),
         .rstn (rstn),
