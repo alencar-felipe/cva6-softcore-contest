@@ -233,8 +233,10 @@ src := \
 	xadac/rtl/xadac_axi_skid.sv \
 	xadac/rtl/xadac_axi_wizard.sv \
 	xadac/rtl/xadac_if.sv \
+	xadac/rtl/xadac_cut.sv \
 	xadac/rtl/xadac_skid.sv \
 	xadac/rtl/xadac_vrf_phy.sv \
+	xadac/rtl/xadac_if_cut.sv \
 	xadac/rtl/xadac_if_skid.sv \
 	xadac/rtl/xadac_mux.sv \
 	xadac/rtl/xadac_sink.sv \

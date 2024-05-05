@@ -6,6 +6,12 @@ module xadac_vmacc
     xadac_if.slv slv
 );
 
+    localparam SizeT ILenWidth = $clog2(VecDataWidth/VecSumWidth+1);
+    localparam SizeT JLenWidth = $clog2(VecSumWidth/VecElemWidth+1);
+
+    typedef logic [ILenWidth-1:0] ilen_t;
+    typedef logic [JLenWidth-1:0] jlen_t;
+
     function automatic logic signed [31:0] macc(
         input logic signed [31:0] vrf_i32,
         input logic signed [7:0] vrf_i8,
@@ -43,16 +49,8 @@ module xadac_vmacc
     end
 
     always_comb begin : comb_exe
-        automatic SizeT ilen, jlen;
-
-        ilen = VecDataWidth/VecSumWidth;
-        jlen = min(
-            SizeT'(slv.exe_req.instr[25 +: VecLenWidth]),
-            VecSumWidth/VecElemWidth
-        );
-
-        // if (jlen != slv.exe_req.instr[25 +: VecLenWidth])
-        //     $display("%d %d\n", jlen, slv.exe_req.instr[25 +: VecLenWidth]);
+        automatic ilen_t ilen = VecDataWidth/VecSumWidth;
+        automatic jlen_t jlen = slv.exe_req.instr[25 +: JLenWidth];
 
         slv.exe_rsp_valid = slv.exe_req_valid;
         slv.exe_req_ready = (slv.exe_rsp_valid && slv.exe_rsp_ready);
@@ -62,8 +60,8 @@ module xadac_vmacc
         slv.exe_rsp.vd_addr  = slv.exe_req.instr[11:7];
         slv.exe_rsp.vd_data  = slv.exe_req.vs_data[2];
         slv.exe_rsp.vd_write = '1;
-        for (SizeT i = 0; i < ilen; i++) begin
-            for (SizeT j = 0; j < jlen; j++) begin
+        for (ilen_t i = 0; i < ilen; i++) begin
+            for (jlen_t j = 0; j < jlen; j++) begin
                 slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth] = macc(
                     slv.exe_rsp.vd_data[VecSumWidth*i +: VecSumWidth],
                     slv.exe_req.vs_data[0][(jlen*i + j)*8 +: 8],
@@ -72,15 +70,5 @@ module xadac_vmacc
             end
         end
     end
-
-    // always_ff @(posedge clk) begin
-    //     if (slv.exe_rsp_valid && slv.exe_rsp_ready) begin
-    //         $display("%x + %x * %x => %x\n",
-    //             slv.exe_req.vs_data[2],
-    //             slv.exe_req.vs_data[0],
-    //             slv.exe_req.vs_data[1],
-    //             slv.exe_rsp.vd_data);
-    //     end
-    // end
 
 endmodule

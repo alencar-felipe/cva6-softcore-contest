@@ -20,6 +20,10 @@ module xadac_vactv
     output logic axi_b_ready
 );
 
+    localparam SizeT ILenWidth = $clog2(VecDataWidth/VecSumWidth+1);
+
+    typedef logic [ILenWidth-1:0] ilen_t;
+
     typedef struct packed {
         AddrT    addr;
         VecDataT data;
@@ -45,7 +49,6 @@ module xadac_vactv
     logic    axi_w_valid_d;
 
     always_comb begin
-        automatic SizeT     i     = '0;
         automatic IdT       id    = '0;
         automatic VecLenT   vlen  = '0;
         automatic RegDataT  shift = '0;
@@ -91,10 +94,12 @@ module xadac_vactv
             vlen  = slv.exe_req.instr[25 +: VecLenWidth];
 
             data = '0;
-            for (VecLenT i = 0; i < vlen; i++) begin
-                sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
-                elem = VecElemT'((signed'(sum) > 0) ? (sum >> shift) : 0);
-                data[VecElemWidth*i +: VecElemWidth] = elem;
+            for (SizeT i = 0; i < VecDataWidth/VecSumWidth; i++) begin
+                if (i < vlen) begin
+                    sum = slv.exe_req.vs_data[2][VecSumWidth*i +: VecSumWidth];
+                    elem = VecElemT'((signed'(sum) > 0) ? (sum >> shift) : 0);
+                    data[VecElemWidth*i +: VecElemWidth] = elem;
+                end
             end
 
             sb_d[id].addr = AddrT'(slv.exe_req.rs_data[0]);
@@ -112,7 +117,7 @@ module xadac_vactv
             axi_aw_valid_d = '0;
         end
 
-        for(i = 0; i < SbLen; i++) begin
+        for(SizeT i = 0; i < SbLen; i++) begin
             id = IdT'(i);
             if(
                 !axi_aw_valid_d &&
@@ -134,7 +139,7 @@ module xadac_vactv
             axi_w_valid_d = '0;
         end
 
-        for(i = 0; i < SbLen; i++) begin
+        for(SizeT i = 0; i < SbLen; i++) begin
             id = IdT'(i);
             if(
                 !axi_w_valid_d &&
@@ -172,7 +177,7 @@ module xadac_vactv
             exe_rsp_valid_d = '0;
         end
 
-        for(i = 0; i < SbLen; i++) begin
+        for(SizeT i = 0; i < SbLen; i++) begin
             id = IdT'(i);
             if(
                 !exe_rsp_valid_d &&
@@ -188,7 +193,7 @@ module xadac_vactv
 
         // clean sb ===========================================================
 
-        for (i = 0; i < SbLen; i++) begin
+        for (SizeT i = 0; i < SbLen; i++) begin
             id = IdT'(i);
             if (
                 sb_d[id].exe_req_done &&
