@@ -119,10 +119,15 @@ module xadac_axi_wizard
 
         // advance ============================================================
 
-        while (
-            (write_d.strb[MstStrbWidth-1:0] == '0) &&
-            (write_d.strb != '0)
-        ) begin
+        for (SizeT i = 0; i < IntStrbWidth/MstStrbWidth; i++) begin
+
+            if (
+                (write_d.strb[MstStrbWidth-1:0] == '0) &&
+                (write_d.strb != '0)
+            ) begin
+                break;
+            end
+
             write_d.data >>= MstStrbWidth * 8;
             write_d.strb >>= MstStrbWidth;
             write_d.addr +=  MstStrbWidth;
