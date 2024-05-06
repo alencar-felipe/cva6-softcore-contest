@@ -80,7 +80,8 @@ module xadac_vactv
         slv.dec_rsp.rs_read[0] = '1;
         slv.dec_rsp.rs_read[1] = '0;
         slv.dec_rsp.vs_read[0] = '0;
-        slv.dec_rsp.vs_read[1] = '1;
+        slv.dec_rsp.vs_read[1] = '0;
+        slv.dec_rsp.vs_read[2] = '1;
         slv.dec_rsp.accept = '1;
 
         // exe req ============================================================

@@ -107,17 +107,17 @@ module ariane
         .AXI_USER_WIDTH (DCACHE_USER_WIDTH)
     ) axi_narrow_cut ();
 
-    // xadac_if_cut i_xadac_if_cut (
-    //     .clk  (clk_i),
-    //     .rstn (rst_ni),
-    //     .slv  (xadac),
-    //     .mst  (xadac_cut)
-    // );
+    xadac_if_cut i_xadac_if_cut (
+        .clk  (clk_i),
+        .rstn (rst_ni),
+        .slv  (xadac),
+        .mst  (xadac_cut)
+    );
 
     xadac i_xadac (
         .clk  (clk_i),
         .rstn (rst_ni),
-        .slv  (xadac), // _cut),
+        .slv  (xadac_cut),
         .axi  (axi_wide)
     );
 
