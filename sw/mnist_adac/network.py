@@ -84,42 +84,41 @@ class Xadac:
         self.vrf = np.random.randint(
             low=0,
             high=256,
-            size=(self.VNUM * self.V8LEN,),
+            size=(self.VNUM, self.V8LEN),
             dtype=np.uint8
         )
 
-    def vload(self, vrf, vd, rs1, imm):
+        self.vrf_i8 = self.vrf.view(np.int8)
+        self.vrf_u8 = self.vrf.view(np.uint8)
+        self.vrf_i32 = self.vrf.view(np.int32)
+
+    def vload(self, vd, rs1, imm):
         assert imm <= self.V8LEN
-        vrf_u8 = vrf.view(np.uint8)
-        ptr = np.frombuffer(rs1, dtype=np.uint8)
+        mem = np.frombuffer(rs1, dtype=np.uint8)
         for i in range(self.V8LEN):
-            vrf_u8[vd * self.V8LEN + i] = ptr[i % imm]
+            ptr = i % min(imm, len(mem))
+            self.vrf_u8[vd][i] = mem[ptr]
 
-    def vbias(self, vrf, vd, rs1, imm):
+    def vbias(self, vd, rs1, imm):
         assert imm <= self.V32LEN
-        vrf_i32 = vrf.view(np.int32)
+
         for i in range(self.V32LEN):
-            vrf_i32[vd * self.V32LEN + i] = rs1 if i < imm else 0
+            self.vrf_i32[vd][i] = rs1 if i < imm else 0
 
-    def vmacc(self, vrf, vd, vs1, vs2, imm):
+    def vmacc(self, vd, vs1, vs2, imm):
         assert imm <= 4
-        vrf_i32 = vrf.view(np.int32)
-        vrf_i8 = vrf.view(np.int8)
-        vrf_u8 = vrf.view(np.uint8)
-
         for i in range(self.V32LEN):
             for j in range(imm):
-                vrf_i32[vd * self.V32LEN + i] += (
-                    vrf_i8[vs1 * self.V8LEN + i * imm + j] *
-                    vrf_u8[vs2 * self.V8LEN + i * imm + j]
+                self.vrf_i32[vd][i] += (
+                    self.vrf_i8[vs1][i * imm + j] *
+                    self.vrf_u8[vs2][i * imm + j]
                 )
 
-    def vactv(self, vrf, vs3, rs1, rs2, imm):
+    def vactv(self, vs3, rs1, rs2, imm):
         assert imm <= self.V32LEN
-        vrf_i32 = vrf.view(np.int32)
         ptr = np.frombuffer(rs1, dtype=np.uint8)
         for i in range(imm):
-            sum = vrf_i32[vs3 * self.V32LEN + i]
+            sum = self.vrf_i32[vs3][i]
             sum = (sum >> rs2 if sum > 0 else 0) & 0xFF
             ptr[i] = np.uint8(sum)
 
@@ -137,6 +136,13 @@ def load_data(layer: dict) -> None:
         layer[name] = data[:np.prod(shape)].reshape(shape)
 
     layer["weight"] = layer["weight"].view(np.int8)
+
+
+def hexdump(data):
+    data_uint32 = data.reshape(-1).view(np.uint32)
+    for i in range(0, len(data_uint32), 4):
+        line = data_uint32[i:i+4]
+        print(" ".join(f"{x:08x}" for x in line))
 
 
 def gen_conv(
@@ -262,7 +268,7 @@ def reform_weight(layer):
     layer["reformed_weight"] = reformed
 
 
-def vec_conv(
+def xadac_conv(
     lon: int,
     loy: int,
     lox: int,
@@ -283,6 +289,8 @@ def vec_conv(
     **kwargs
 ) -> None:
 
+    xadac = Xadac()
+
     weight = reformed_weight
     output = np.zeros((loy, lox, lon), dtype=np.uint8)
 
@@ -295,6 +303,8 @@ def vec_conv(
                 for ob in range(lob):
                     sum[ob] = bias
 
+                xadac.vbias(1, bias, lob)
+
                 for wy in range(lwy):
                     for wx in range(lwx):
 
@@ -302,11 +312,17 @@ def vec_conv(
                         ix = sx*ox + wx
 
                         for ia in range(lia):
+
+                            xadac.vload(2, weight[oa][wy][wx][ia], lob*lib)
+                            xadac.vload(3, input[iy][ix][ia*lib:], lib)
+                            xadac.vmacc(1, 2, 3, lib)
+
                             for ob in range(lob):
                                 for ib in range(lib):
                                     in_ = ia*lib + ib
 
                                     if in_ >= lin:
+                                        # assert 0
                                         continue
 
                                     sum[ob] += (
@@ -322,6 +338,10 @@ def vec_conv(
                         (sum[ob] >> shift if sum[ob] > 0 else 0) & 0xFF
                     )
 
+                xadac.vactv(1, output[oy][ox][oa*lob:], shift, min(lob, lon - oa*lob) )
+
+    # hexdump(output)
+
     assert np.array_equal(output, expected)
 
 
@@ -330,4 +350,4 @@ if __name__ == "__main__":
         load_data(layer)
         base_conv(**layer)
         reform_weight(layer)
-        vec_conv(**layer)
+        xadac_conv(**layer)
