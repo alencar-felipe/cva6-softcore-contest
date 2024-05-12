@@ -167,6 +167,9 @@ class Asm:
         self.asm += "\n"
 
     def array(self, name, data):
+
+        data = np.frombuffer(data, dtype=np.uint8)
+
         if len(data) % 4 != 0:
             padding_length = 4 - (len(data) % 4)
             padding = np.zeros(padding_length, dtype=np.uint8)
@@ -381,7 +384,7 @@ def reform_weight(layer):
     layer["reformed_weight"] = reformed
 
 
-def reform_weight_l0(layer):
+def reform_weight_layer0(layer):
     lon = layer["lon"]
     lwx = layer["lwx"]
     lwy = layer["lwy"]
@@ -473,67 +476,6 @@ def xadac_conv(
     assert np.array_equal(output, expected)
 
 
-def xadac_conv_l0(
-    lon: int,
-    loy: int,
-    lox: int,
-    lin: int,
-    lwy: int,
-    lwx: int,
-    sy: int,
-    sx: int,
-    bias: int,
-    shift: int,
-    input: np.ndarray,
-    reformed_weight: np.ndarray,
-    expected: np.ndarray,
-    loa: int,
-    lob: int,
-    **kwargs
-) -> None:
-
-    weight = reformed_weight
-    output = np.zeros((loy, lox, lon), dtype=np.uint8)
-
-    print(weight.shape)
-
-    for oy in range(loy):
-        for ox in range(lox):
-            for oa in range(loa):
-
-                sum = np.zeros(lob, dtype=np.int32)
-
-                for ob in range(lob):
-                    sum[ob] = bias
-
-                for wy in range(lwy):
-                    for wx in range(lwx):
-
-                        iy = sy*oy + wy
-                        ix = sx*ox + wx
-
-                        for in_ in range(lin):
-                            for ob in range(lob):
-
-                                if in_ >= lin:
-                                    continue
-
-                                sum[ob] += (
-                                    input[iy][ix][in_] *
-                                    weight[oa][wy][ob][wx]
-                                )
-
-                for ob in range(lob):
-                    on = oa*lob + ob
-                    if on >= lon:
-                        continue
-                    output[oy][ox][on] = (
-                        (sum[ob] >> shift if sum[ob] > 0 else 0) & 0xFF
-                    )
-
-    assert np.array_equal(output, expected)
-
-
 def xadac_conv_asm(
     name: str,
     lon: int,
@@ -616,8 +558,135 @@ def xadac_conv_asm(
 
             asm.inc(i_reg, sy*lix*lin - lox*sx*lin)
 
-    weight = np.frombuffer(reformed_weight, dtype=np.uint8)
-    asm.array("weight", weight)
+    asm.array("weight", reformed_weight)
+
+    return asm
+
+
+def xadac_layer0(
+    lon: int,
+    loy: int,
+    lox: int,
+    lwy: int,
+    lwx: int,
+    sy: int,
+    sx: int,
+    bias: int,
+    shift: int,
+    input: np.ndarray,
+    reformed_weight: np.ndarray,
+    expected: np.ndarray,
+    loa: int,
+    lob: int,
+    **kwargs
+) -> None:
+
+    weight = reformed_weight
+    output = np.zeros((loy, lox, lon), dtype=np.uint8)
+
+    for oy in range(loy):
+        for ox in range(lox):
+            for oa in range(loa):
+
+                sum = np.zeros(lob, dtype=np.int32)
+
+                for ob in range(lob):
+                    sum[ob] = bias
+
+                for wy in range(lwy):
+                    for ob in range(lob):
+                        for wx in range(lwx):
+
+                            iy = sy*oy + wy
+                            ix = sx*ox + wx
+
+                            sum[ob] += (
+                                input[iy][ix][0] *
+                                weight[oa][wy][ob][wx]
+                            )
+
+                for ob in range(lob):
+                    on = oa*lob + ob
+                    if on >= lon:
+                        continue
+                    output[oy][ox][on] = (
+                        (sum[ob] >> shift if sum[ob] > 0 else 0) & 0xFF
+                    )
+
+    assert np.array_equal(output, expected)
+
+
+def xadac_layer0_asm(
+    name: str,
+    lon: int,
+    loy: int,
+    lox: int,
+    lix: int,
+    lwy: int,
+    lwx: int,
+    sy: int,
+    sx: int,
+    bias: int,
+    shift: int,
+    reformed_weight: np.ndarray,
+    loa: int,
+    lob: int,
+    **kwargs
+) -> str:
+
+    asm = Asm()
+
+    s_vec = "18"
+    w_vec = "19"
+    i_vec = "20"
+
+    o_reg = "a0"
+    w_reg = "t0"
+    i_reg = "a1"
+    oy_reg = "a2"
+    ox_reg = "a3"
+
+    bias_reg = "t1"
+    shift_reg = "t2"
+
+    @asm.func(name)
+    def layer_body():
+
+        asm.li(bias_reg, bias)
+        asm.li(shift_reg, shift)
+
+        @asm.loop("oy", loy, oy_reg)
+        def oy_body(oy):
+
+            @asm.loop("ox", lox, ox_reg)
+            def ox_body(ox):
+
+                asm.la(w_reg, "weight")
+
+                @asm.loop("oa", loa)
+                def oa_body(oa):
+                    asm.vbias(s_vec, bias_reg, lob)
+
+                    @asm.loop("wy", lwy)
+                    def wy_body(wy):
+
+                        asm.vload(w_vec, w_reg, lob*lwx)
+                        asm.vload(i_vec, i_reg, lwx)
+                        asm.vmacc(s_vec, w_vec, i_vec, lwx)
+                        asm.inc(w_reg, lob*lwx)
+                        asm.inc(i_reg, lix)
+
+                    asm.inc(i_reg, - lwx*lwy - lwy*(lix - lwx))
+
+                    imm = min(lob, lon - oa*lob)
+                    asm.vactv(s_vec, o_reg, shift_reg, imm)
+                    asm.inc(o_reg, imm)
+
+                asm.inc(i_reg, sx)
+
+            asm.inc(i_reg, sy*lix - lox*sx)
+
+    asm.array("weight", reformed_weight)
 
     return asm
 
@@ -627,14 +696,14 @@ if __name__ == "__main__":
         load_data(params)
         base_conv(**params)
 
-        if name == "layer0" and False:
-            reform_weight_l0(params)
-            xadac_conv_l0(**params)
-            asm = ""
+        if name == "layer0":
+            reform_weight_layer0(params)
+            xadac_layer0(**params)
+            asm = xadac_layer0_asm(name, **params)
         else:
             reform_weight(params)
             xadac_conv(**params)
-            asm = xadac_conv_asm(name=name, **params)
+            asm = xadac_conv_asm(name, **params)
 
         with open(f"{name}.S", "w") as f:
             f.write(asm.asm)
