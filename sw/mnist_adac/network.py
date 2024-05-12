@@ -273,6 +273,8 @@ def xadac_conv(
     loy: int,
     lox: int,
     lin: int,
+    lix: int,
+    liy: int,
     lwy: int,
     lwx: int,
     sy: int,
@@ -291,56 +293,38 @@ def xadac_conv(
 
     xadac = Xadac()
 
-    weight = reformed_weight
-    output = np.zeros((loy, lox, lon), dtype=np.uint8)
+    input = np.frombuffer(input, dtype=np.uint8)
+    weight = np.frombuffer(reformed_weight, dtype=np.uint8)
+    expected = np.frombuffer(expected, dtype=np.uint8)
+    output = np.zeros((loy*lox*lon), dtype=np.uint8)
 
+    i_ptr = 0
+    o_ptr = 0
     for oy in range(loy):
         for ox in range(lox):
+            w_ptr = 0
             for oa in range(loa):
-
-                sum = np.zeros(lob, dtype=np.int32)
-
-                for ob in range(lob):
-                    sum[ob] = bias
-
                 xadac.vbias(1, bias, lob)
 
                 for wy in range(lwy):
                     for wx in range(lwx):
-
-                        iy = sy*oy + wy
-                        ix = sx*ox + wx
-
                         for ia in range(lia):
-
-                            xadac.vload(2, weight[oa][wy][wx][ia], lob*lib)
-                            xadac.vload(3, input[iy][ix][ia*lib:], lib)
+                            xadac.vload(2, weight[w_ptr:], lob*lib)
+                            xadac.vload(3, input[i_ptr:], lib)
                             xadac.vmacc(1, 2, 3, lib)
+                            w_ptr += lob*lib
+                            i_ptr += lib
 
-                            for ob in range(lob):
-                                for ib in range(lib):
-                                    in_ = ia*lib + ib
+                    i_ptr += (lix - lwx)*lin
 
-                                    if in_ >= lin:
-                                        # assert 0
-                                        continue
+                i_ptr -= lib*lia*lwx*lwy + lwy*(lix - lwx)*lin
 
-                                    sum[ob] += (
-                                        input[iy][ix][in_] *
-                                        weight[oa][wy][wx][ia][ob][ib]
-                                    )
+                imm = min(lob, lon - oa*lob)
+                xadac.vactv(1, output[o_ptr:], shift, imm)
+                o_ptr += imm
 
-                for ob in range(lob):
-                    on = oa*lob + ob
-                    if on >= lon:
-                        continue
-                    output[oy][ox][on] = (
-                        (sum[ob] >> shift if sum[ob] > 0 else 0) & 0xFF
-                    )
-
-                xadac.vactv(1, output[oy][ox][oa*lob:], shift, min(lob, lon - oa*lob) )
-
-    # hexdump(output)
+            i_ptr += sx*lin
+        i_ptr += sy*lix*lin - lox*sx*lin
 
     assert np.array_equal(output, expected)
 
