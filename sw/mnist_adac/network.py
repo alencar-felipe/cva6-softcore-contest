@@ -2,7 +2,7 @@ from math import ceil
 import numpy as np
 
 LAYERS = {
-    "l0": {
+    "layer0": {
         "lon": 16,
         "loy": 11,
         "lox": 11,
@@ -19,7 +19,7 @@ LAYERS = {
         "weight_file": "resources/l0_weight.bin",
         "expected_file": "resources/l0_expected.bin"
     },
-    "l1": {
+    "layer1": {
         "lon": 24,
         "loy": 4,
         "lox": 4,
@@ -36,7 +36,7 @@ LAYERS = {
         "weight_file": "resources/l1_weight.bin",
         "expected_file": "resources/l1_expected.bin"
     },
-    "l2": {
+    "layer2": {
         "lon": 150,
         "loy": 1,
         "lox": 1,
@@ -53,7 +53,7 @@ LAYERS = {
         "weight_file": "resources/l2_weight.bin",
         "expected_file": "resources/l2_expected.bin"
     },
-    "l3": {
+    "layer3": {
         "lon": 10,
         "loy": 1,
         "lox": 1,
@@ -268,13 +268,30 @@ def reform_weight(layer):
     layer["reformed_weight"] = reformed
 
 
+def asm_array(arr, name):
+    if len(arr) % 4 != 0:
+        padding_length = 4 - (len(arr) % 4)
+        padding = np.zeros(padding_length, dtype=np.uint8)
+        arr = np.concatenate((arr, padding))
+
+    arr_32bit = arr.view(np.uint32)
+
+    asm = "    .data\n"
+    asm += f"{name}:\n"
+    for i in range(0, len(arr_32bit), 4):
+        words = arr_32bit[i:i+4]
+        words_hex = ", ".join(f"0x{word:08x}" for word in words)
+        asm += f"    .word {words_hex}\n"
+
+    return asm
+
+
 def xadac_conv(
     lon: int,
     loy: int,
     lox: int,
     lin: int,
     lix: int,
-    liy: int,
     lwy: int,
     lwx: int,
     sy: int,
@@ -289,7 +306,7 @@ def xadac_conv(
     lia: int,
     lib: int,
     **kwargs
-) -> None:
+) -> str:
 
     xadac = Xadac()
 
@@ -329,9 +346,125 @@ def xadac_conv(
     assert np.array_equal(output, expected)
 
 
+def xadac_conv_asm(
+    name: str,
+    lon: int,
+    loy: int,
+    lox: int,
+    lin: int,
+    lix: int,
+    lwy: int,
+    lwx: int,
+    sy: int,
+    sx: int,
+    bias: int,
+    shift: int,
+    reformed_weight: np.ndarray,
+    loa: int,
+    lob: int,
+    lia: int,
+    lib: int,
+    **kwargs
+) -> str:
+
+    asm = ""
+
+    def asm_vbias(vd, rs1, imm):
+        nonlocal asm
+        asm += f"    xadac.vbias {vd}, {rs1}, {imm}\n"
+
+    def asm_vload(vd, rs1, imm):
+        nonlocal asm
+        asm += f"    xadac.vload {vd}, {rs1}, {imm}\n"
+
+    def asm_vmacc(vd, vs1, vs2, imm):
+        nonlocal asm
+        asm += f"    xadac.vmacc {vd}, {vs1}, {vs2}, {imm}\n"
+
+    def asm_vactv(vs3, rs1, rs2, imm):
+        nonlocal asm
+        asm += f"    xadac.vactv {vs3}, {rs1}, {rs2}, {imm}\n"
+
+    def asm_la(reg, symbol):
+        nonlocal asm
+        asm += f"    la {reg}, {symbol}\n"
+
+    def asm_li(reg, value):
+        nonlocal asm
+        asm += f"    li {reg}, {value}\n"
+
+    def asm_ret():
+        nonlocal asm
+        asm += "    ret\n"
+
+    def asm_inc(reg, imm):
+        nonlocal asm
+        asm += f"    addi {reg}, {reg}, {imm}\n"
+
+    def asm_newline():
+        nonlocal asm
+        asm += "\n"
+
+    asm += "    .text\n"
+    asm += f"    .globl {name}\n"
+    asm += f"    .type {name}, @function\n"
+    asm += f"{name}:\n"
+
+    s_vec = "1"
+    w_vec = "2"
+    i_vec = "3"
+
+    o_reg = "a0"
+    w_reg = "t0"
+    i_reg = "a1"
+
+    bias_reg = "t1"
+    shift_reg = "t2"
+
+    asm_li(bias_reg, bias)
+    asm_li(shift_reg, shift)
+    for oy in range(loy):
+        for ox in range(lox):
+            asm_la(w_reg, "weight")
+            for oa in range(loa):
+                asm_vbias(s_vec, bias_reg, lob)
+                for wy in range(lwy):
+                    for wx in range(lwx):
+                        for ia in range(lia):
+                            asm_vload(w_vec, w_reg, lob*lib)
+                            asm_vload(i_vec, i_reg, lib)
+                            asm_vmacc(s_vec, w_vec, i_vec, lib)
+                            asm_inc(w_reg, lob*lib)
+                            asm_inc(i_reg, lib)
+
+                    asm_inc(i_reg, (lix - lwx)*lin)
+
+                asm_inc(i_reg, - lib*lia*lwx*lwy - lwy*(lix - lwx)*lin)
+
+                imm = min(lob, lon - oa*lob)
+                asm_vactv(s_vec, o_reg, shift_reg, imm)
+                asm_inc(o_reg, imm)
+
+            asm_inc(i_reg, sx*lin)
+
+        asm_inc(i_reg, sy*lix*lin - lox*sx*lin)
+
+    asm_ret()
+    asm_newline()
+
+    weight = np.frombuffer(reformed_weight, dtype=np.uint8)
+    asm += asm_array(weight, "weight")
+
+    return asm
+
+
 if __name__ == "__main__":
-    for layer in LAYERS.values():
-        load_data(layer)
-        base_conv(**layer)
-        reform_weight(layer)
-        xadac_conv(**layer)
+    for name, params in LAYERS.items():
+        load_data(params)
+        base_conv(**params)
+        reform_weight(params)
+        xadac_conv(**params)
+        asm = xadac_conv_asm(name=name, **params)
+        with open(f"{name}.S", "w") as f:
+            f.write(asm)
+        # break

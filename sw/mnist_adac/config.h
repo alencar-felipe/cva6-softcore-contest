@@ -6,7 +6,7 @@
 #define DUMP
 #define VALIDATE
 #define VECTOR
-#define MODEL
+// #define MODEL
 
 #ifndef IMAGE
     #define IMAGE img0003

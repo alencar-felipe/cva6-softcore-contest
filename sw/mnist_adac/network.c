@@ -187,6 +187,12 @@ static void argmax(
     }
 }
 
+void layer0(uint8_t *output, const uint8_t *input);
+void layer1(uint8_t *output, const uint8_t *input);
+void layer2(uint8_t *output, const uint8_t *input);
+void layer3(uint8_t *output, const uint8_t *input);
+
+
 void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 {
 
@@ -209,7 +215,8 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    CONV(L0, l0_out, input, l0_weight);
+    // CONV(L0, l0_out, input, l0_weight);
+    layer0(l0_out, input);
 
 #ifdef LAYER_PERF
     perf_toc();
@@ -231,7 +238,8 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    CONV(L1, l1_out, l0_out, l1_weight);
+    // CONV(L1, l1_out, l0_out, l1_weight);
+    layer1(l1_out, l0_out);
 
 #ifdef LAYER_PERF
     perf_toc();
@@ -253,7 +261,8 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    CONV(L2, l2_out, l1_out, l2_weight);
+    // CONV(L2, l2_out, l1_out, l2_weight);
+    layer2(l2_out, l1_out);
 
 #ifdef LAYER_PERF
     perf_toc();
@@ -275,7 +284,8 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    CONV(L3, l3_out, l2_out, l3_weight);
+    // CONV(L3, l3_out, l2_out, l3_weight);
+    layer3(l3_out, l2_out);
 
 #ifdef LAYER_PERF
     perf_toc();

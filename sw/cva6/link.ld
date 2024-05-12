@@ -14,7 +14,7 @@
 
    Description: linkerscript for the CV32A6 platform
 
-   =========================================================================== 
+   ===========================================================================
    Revisions  :
    Date        Version  Author       Description
    2020-10-06  0.1      S.Jacq       modification of the Test for CV32A6 softcore
@@ -32,7 +32,7 @@ MEMORY
 	   allowing initialized sections to be placed there). Infact we dump all
 	   sections to ram. */
 
-	ram (rwxai) : ORIGIN = 0x80000000, LENGTH = 0x2FF00
+	ram (rwxai) : ORIGIN = 0x80000000, LENGTH = 0xFFF00
 	dbg (rwxai) : ORIGIN = 0x1A110800, LENGTH = 0x1000
 }
 
