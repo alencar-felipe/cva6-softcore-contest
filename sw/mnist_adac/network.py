@@ -385,6 +385,18 @@ def xadac_conv_asm(
         nonlocal asm
         asm += f"    xadac.vactv {vs3}, {rs1}, {rs2}, {imm}\n"
 
+    def asm_beqz(rs1, symbol):
+        nonlocal asm
+        asm += f"    beqz {rs1}, {symbol}\n"
+
+    def asm_ret():
+        nonlocal asm
+        asm += "    ret\n"
+
+    def asm_j(symbol):
+        nonlocal asm
+        asm += f"    j {symbol}\n"
+
     def asm_la(reg, symbol):
         nonlocal asm
         asm += f"    la {reg}, {symbol}\n"
@@ -393,22 +405,34 @@ def xadac_conv_asm(
         nonlocal asm
         asm += f"    li {reg}, {value}\n"
 
-    def asm_ret():
-        nonlocal asm
-        asm += "    ret\n"
-
     def asm_inc(reg, imm):
         nonlocal asm
         asm += f"    addi {reg}, {reg}, {imm}\n"
+
+    def asm_label(label):
+        nonlocal asm
+        asm += f"{label}:\n"
 
     def asm_newline():
         nonlocal asm
         asm += "\n"
 
+    def asm_loop_begin(name, reg, size):
+        nonlocal asm
+        asm_li(reg, size)
+        asm_label(f"{name}_loop_begin")
+        asm_beqz(reg, f"{name}_loop_end")
+
+    def asm_loop_end(name, reg):
+        nonlocal asm
+        asm_inc(reg, -1)
+        asm_j(f"{name}_loop_begin")
+        asm_label(f"{name}_loop_end")
+
     asm += "    .text\n"
     asm += f"    .globl {name}\n"
     asm += f"    .type {name}, @function\n"
-    asm += f"{name}:\n"
+    asm_label(name)
 
     s_vec = "1"
     w_vec = "2"
@@ -417,14 +441,20 @@ def xadac_conv_asm(
     o_reg = "a0"
     w_reg = "t0"
     i_reg = "a1"
+    oy_reg = "a2"
+    ox_reg = "a3"
 
     bias_reg = "t1"
     shift_reg = "t2"
 
     asm_li(bias_reg, bias)
     asm_li(shift_reg, shift)
-    for oy in range(loy):
-        for ox in range(lox):
+
+    if True:  # oy loop
+        asm_loop_begin("oy", oy_reg, loy)
+        if True:  # ox loop
+            asm_loop_begin("ox", ox_reg, lox)
+
             asm_la(w_reg, "weight")
             for oa in range(loa):
                 asm_vbias(s_vec, bias_reg, lob)
@@ -446,8 +476,10 @@ def xadac_conv_asm(
                 asm_inc(o_reg, imm)
 
             asm_inc(i_reg, sx*lin)
+            asm_loop_end("ox", ox_reg)
 
         asm_inc(i_reg, sy*lix*lin - lox*sx*lin)
+        asm_loop_end("oy", oy_reg)
 
     asm_ret()
     asm_newline()
