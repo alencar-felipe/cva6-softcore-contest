@@ -269,6 +269,38 @@ def reform_weight(layer):
     layer["reformed_weight"] = reformed
 
 
+def reform_weight_l0(layer):
+    lon = layer["lon"]
+    lwx = layer["lwx"]
+    lwy = layer["lwy"]
+    weight = layer["weight"]
+
+    loa = layer["loa"] = ceil(lon / Xadac.V32LEN)
+    lob = layer["lob"] = Xadac.V32LEN
+
+    kshape = ("loa", "lwy", "lob", "lwx")
+    shape = tuple(layer[k] for k in kshape)
+
+    reformed = np.zeros(shape, dtype=np.int8)
+
+    print(layer["weight_file"])
+
+    for oa in range(loa):
+        for wy in range(lwy):
+            for wx in range(lwx):
+                for ob in range(lob):
+                    on = oa*lob + ob
+
+                    if on >= lon:
+                        continue
+
+                    reformed[oa][wy][ob][wx] = (
+                        weight[on][wy][wx][0]
+                    )
+
+    layer["reformed_weight"] = reformed
+
+
 def asm_array(arr, name):
     if len(arr) % 4 != 0:
         padding_length = 4 - (len(arr) % 4)
@@ -343,6 +375,67 @@ def xadac_conv(
 
             i_ptr += sx*lin
         i_ptr += sy*lix*lin - lox*sx*lin
+
+    assert np.array_equal(output, expected)
+
+
+def xadac_conv_l0(
+    lon: int,
+    loy: int,
+    lox: int,
+    lin: int,
+    lwy: int,
+    lwx: int,
+    sy: int,
+    sx: int,
+    bias: int,
+    shift: int,
+    input: np.ndarray,
+    reformed_weight: np.ndarray,
+    expected: np.ndarray,
+    loa: int,
+    lob: int,
+    **kwargs
+) -> None:
+
+    weight = reformed_weight
+    output = np.zeros((loy, lox, lon), dtype=np.uint8)
+
+    print(weight.shape)
+
+    for oy in range(loy):
+        for ox in range(lox):
+            for oa in range(loa):
+
+                sum = np.zeros(lob, dtype=np.int32)
+
+                for ob in range(lob):
+                    sum[ob] = bias
+
+                for wy in range(lwy):
+                    for wx in range(lwx):
+
+                        iy = sy*oy + wy
+                        ix = sx*ox + wx
+
+                        for in_ in range(lin):
+                            for ob in range(lob):
+
+                                if in_ >= lin:
+                                    continue
+
+                                sum[ob] += (
+                                    input[iy][ix][in_] *
+                                    weight[oa][wy][ob][wx]
+                                )
+
+                for ob in range(lob):
+                    on = oa*lob + ob
+                    if on >= lon:
+                        continue
+                    output[oy][ox][on] = (
+                        (sum[ob] >> shift if sum[ob] > 0 else 0) & 0xFF
+                    )
 
     assert np.array_equal(output, expected)
 
@@ -452,9 +545,9 @@ def xadac_conv_asm(
     asm += f"    .type {name}, @function\n"
     asm_label(name)
 
-    s_vec = "1"
-    w_vec = "2"
-    i_vec = "3"
+    s_vec = "18"
+    w_vec = "19"
+    i_vec = "20"
 
     o_reg = "a0"
     w_reg = "t0"
@@ -521,9 +614,16 @@ if __name__ == "__main__":
     for name, params in LAYERS.items():
         load_data(params)
         base_conv(**params)
-        reform_weight(params)
-        xadac_conv(**params)
-        asm = xadac_conv_asm(name=name, **params)
+
+        if name == "layer0":
+            reform_weight_l0(params)
+            xadac_conv_l0(**params)
+            asm = ""
+        else:
+            reform_weight(params)
+            xadac_conv(**params)
+            asm = xadac_conv_asm(name=name, **params)
+
         with open(f"{name}.S", "w") as f:
             f.write(asm)
         # break
