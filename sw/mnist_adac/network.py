@@ -182,10 +182,22 @@ class Asm:
             self.asm += f"    .word {words_hex}\n"
 
     def func(self, name):
-        self.asm += "    .text\n"
-        self.asm += f"    .globl {name}\n"
-        self.asm += f"    .type {name}, @function\n"
-        self.label(name)
+        def decorator(body):
+            self.asm += "    .text\n"
+            self.asm += f"    .globl {name}\n"
+            self.asm += f"    .type {name}, @function\n"
+            self.label(name)
+
+            self.stack += [name]
+            body()
+            self.stack.pop()
+
+            self.ret()
+            self.newline()
+
+            return None
+
+        return decorator
 
     def loop(self, name, size, reg=None, unroll=1):
         if reg is None:
@@ -545,8 +557,6 @@ def xadac_conv_asm(
 
     asm = Asm()
 
-    asm.func(name)
-
     s_vec = "18"
     w_vec = "19"
     i_vec = "20"
@@ -561,52 +571,50 @@ def xadac_conv_asm(
     bias_reg = "t1"
     shift_reg = "t2"
 
-    asm.li(bias_reg, bias)
-    asm.li(shift_reg, shift)
+    @asm.func(name)
+    def layer_body():
 
-    print("A")
+        asm.li(bias_reg, bias)
+        asm.li(shift_reg, shift)
 
-    @asm.loop("oy", loy, oy_reg)
-    def oy_body(oy):
+        @asm.loop("oy", loy, oy_reg)
+        def oy_body(oy):
 
-        @asm.loop("ox", lox, ox_reg)
-        def ox_body(ox):
+            @asm.loop("ox", lox, ox_reg)
+            def ox_body(ox):
 
-            asm.la(w_reg, "weight")
+                asm.la(w_reg, "weight")
 
-            @asm.loop("oa", loa)
-            def oa_body(oa):
-                asm.vbias(s_vec, bias_reg, lob)
+                @asm.loop("oa", loa)
+                def oa_body(oa):
+                    asm.vbias(s_vec, bias_reg, lob)
 
-                @asm.loop("wy", lwy)
-                def wy_body(wy):
+                    @asm.loop("wy", lwy)
+                    def wy_body(wy):
 
-                    @asm.loop("wx", lwx)
-                    def wx_body(wx):
+                        @asm.loop("wx", lwx)
+                        def wx_body(wx):
 
-                        @asm.loop("ia", lia, ia_reg, unroll=8)
-                        def ia_body(ia):
+                            @asm.loop("ia", lia, ia_reg, unroll=8)
+                            def ia_body(ia):
 
-                            asm.vload(w_vec, w_reg, lob*lib)
-                            asm.vload(i_vec, i_reg, lib)
-                            asm.vmacc(s_vec, w_vec, i_vec, lib)
-                            asm.inc(w_reg, lob*lib)
-                            asm.inc(i_reg, lib)
+                                asm.vload(w_vec, w_reg, lob*lib)
+                                asm.vload(i_vec, i_reg, lib)
+                                asm.vmacc(s_vec, w_vec, i_vec, lib)
+                                asm.inc(w_reg, lob*lib)
+                                asm.inc(i_reg, lib)
 
-                    asm.inc(i_reg, (lix - lwx)*lin)
+                        asm.inc(i_reg, (lix - lwx)*lin)
 
-                asm.inc(i_reg, - lib*lia*lwx*lwy - lwy*(lix - lwx)*lin)
+                    asm.inc(i_reg, - lib*lia*lwx*lwy - lwy*(lix - lwx)*lin)
 
-                imm = min(lob, lon - oa*lob)
-                asm.vactv(s_vec, o_reg, shift_reg, imm)
-                asm.inc(o_reg, imm)
+                    imm = min(lob, lon - oa*lob)
+                    asm.vactv(s_vec, o_reg, shift_reg, imm)
+                    asm.inc(o_reg, imm)
 
-            asm.inc(i_reg, sx*lin)
+                asm.inc(i_reg, sx*lin)
 
-        asm.inc(i_reg, sy*lix*lin - lox*sx*lin)
-
-    asm.ret()
-    asm.newline()
+            asm.inc(i_reg, sy*lix*lin - lox*sx*lin)
 
     weight = np.frombuffer(reformed_weight, dtype=np.uint8)
     asm.array("weight", weight)
