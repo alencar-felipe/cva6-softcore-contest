@@ -124,6 +124,106 @@ class Xadac:
             ptr[i] = np.uint8(sum)
 
 
+class Asm:
+
+    def __init__(self) -> None:
+        self.asm = ""
+        self.stack = []
+
+    def vbias(self, vd, rs1, imm):
+        self.asm += f"    xadac.vbias {vd}, {rs1}, {imm}\n"
+
+    def vload(self, vd, rs1, imm):
+        self.asm += f"    xadac.vload {vd}, {rs1}, {imm}\n"
+
+    def vmacc(self, vd, vs1, vs2, imm):
+        self.asm += f"    xadac.vmacc {vd}, {vs1}, {vs2}, {imm}\n"
+
+    def vactv(self, vs3, rs1, rs2, imm):
+        self.asm += f"    xadac.vactv {vs3}, {rs1}, {rs2}, {imm}\n"
+
+    def beqz(self, rs1, symbol):
+        self.asm += f"    beqz {rs1}, {symbol}\n"
+
+    def ret(self):
+        self.asm += "    ret\n"
+
+    def j(self, symbol):
+        self.asm += f"    j {symbol}\n"
+
+    def la(self, reg, symbol):
+        self.asm += f"    la {reg}, {symbol}\n"
+
+    def li(self, reg, value):
+        self.asm += f"    li {reg}, {value}\n"
+
+    def inc(self, reg, imm):
+        self.asm += f"    addi {reg}, {reg}, {imm}\n"
+
+    def label(self, label):
+        self.asm += f"{label}:\n"
+
+    def newline(self):
+        self.asm += "\n"
+
+    def array(self, name, data):
+        if len(data) % 4 != 0:
+            padding_length = 4 - (len(data) % 4)
+            padding = np.zeros(padding_length, dtype=np.uint8)
+            data = np.concatenate((data, padding))
+
+        data_u32 = data.view(np.uint32)
+
+        self.asm += "    .data\n"
+        self.asm += f"{name}:\n"
+        for i in range(0, len(data_u32), 4):
+            words = data_u32[i:i+4]
+            words_hex = ", ".join(f"0x{word:08x}" for word in words)
+            self.asm += f"    .word {words_hex}\n"
+
+    def func(self, name):
+        self.asm += "    .text\n"
+        self.asm += f"    .globl {name}\n"
+        self.asm += f"    .type {name}, @function\n"
+        self.label(name)
+
+    def loop(self, name, size, reg=None, unroll=1):
+        if reg is None:
+            unroll = size
+
+        div = size // unroll
+        rem = size % unroll
+
+        if div == 1:
+            div, rem = 0, div*unroll
+
+        prefix = "_".join(self.stack + [name])
+
+        def decorator(body):
+            if div > 0:
+                self.li(reg, div)
+                self.label(f"{prefix}_loop_begin")
+                self.beqz(reg, f"{prefix}_loop_end")
+
+                for i in range(unroll):
+                    self.stack += [f"{name}{i}"]
+                    body(i)
+                    self.stack.pop()
+
+                self.inc(reg, -1)
+                self.j(f"{prefix}_loop_begin")
+                self.label(f"{prefix}_loop_end")
+
+            for i in range(rem):
+                self.stack += [f"{name}{i + div*unroll}"]
+                body(i + div*unroll)
+                self.stack.pop()
+
+            return None
+
+        return decorator
+
+
 def load_data(layer: dict) -> None:
     load_data = {
         "input": ("liy", "lix", "lin"),
@@ -301,24 +401,6 @@ def reform_weight_l0(layer):
     layer["reformed_weight"] = reformed
 
 
-def asm_array(arr, name):
-    if len(arr) % 4 != 0:
-        padding_length = 4 - (len(arr) % 4)
-        padding = np.zeros(padding_length, dtype=np.uint8)
-        arr = np.concatenate((arr, padding))
-
-    arr_32bit = arr.view(np.uint32)
-
-    asm = "    .data\n"
-    asm += f"{name}:\n"
-    for i in range(0, len(arr_32bit), 4):
-        words = arr_32bit[i:i+4]
-        words_hex = ", ".join(f"0x{word:08x}" for word in words)
-        asm += f"    .word {words_hex}\n"
-
-    return asm
-
-
 def xadac_conv(
     lon: int,
     loy: int,
@@ -461,89 +543,9 @@ def xadac_conv_asm(
     **kwargs
 ) -> str:
 
-    asm = ""
+    asm = Asm()
 
-    def asm_vbias(vd, rs1, imm):
-        nonlocal asm
-        asm += f"    xadac.vbias {vd}, {rs1}, {imm}\n"
-
-    def asm_vload(vd, rs1, imm):
-        nonlocal asm
-        asm += f"    xadac.vload {vd}, {rs1}, {imm}\n"
-
-    def asm_vmacc(vd, vs1, vs2, imm):
-        nonlocal asm
-        asm += f"    xadac.vmacc {vd}, {vs1}, {vs2}, {imm}\n"
-
-    def asm_vactv(vs3, rs1, rs2, imm):
-        nonlocal asm
-        asm += f"    xadac.vactv {vs3}, {rs1}, {rs2}, {imm}\n"
-
-    def asm_beqz(rs1, symbol):
-        nonlocal asm
-        asm += f"    beqz {rs1}, {symbol}\n"
-
-    def asm_ret():
-        nonlocal asm
-        asm += "    ret\n"
-
-    def asm_j(symbol):
-        nonlocal asm
-        asm += f"    j {symbol}\n"
-
-    def asm_la(reg, symbol):
-        nonlocal asm
-        asm += f"    la {reg}, {symbol}\n"
-
-    def asm_li(reg, value):
-        nonlocal asm
-        asm += f"    li {reg}, {value}\n"
-
-    def asm_inc(reg, imm):
-        nonlocal asm
-        asm += f"    addi {reg}, {reg}, {imm}\n"
-
-    def asm_label(label):
-        nonlocal asm
-        asm += f"{label}:\n"
-
-    def asm_newline():
-        nonlocal asm
-        asm += "\n"
-
-    def asm_loop(pre, size, reg=None, unroll=1):
-        nonlocal asm
-
-        if reg is None:
-            unroll = size
-
-        div = size // unroll
-        rem = size % unroll
-
-        if div == 1:
-            div, rem = 0, div*unroll
-
-        def decorator(body):
-            if div > 0:
-                asm_li(reg, div)
-                asm_label(f"{pre}_loop_begin")
-                asm_beqz(reg, f"{pre}_loop_end")
-                for i in range(unroll):
-                    body(f"{pre}{i}", i)
-                asm_inc(reg, -1)
-                asm_j(f"{pre}_loop_begin")
-                asm_label(f"{pre}_loop_end")
-
-            for i in range(rem):
-                body(f"{pre}{i + div*unroll}", i + div*unroll)
-
-            return None
-        return decorator
-
-    asm += "    .text\n"
-    asm += f"    .globl {name}\n"
-    asm += f"    .type {name}, @function\n"
-    asm_label(name)
+    asm.func(name)
 
     s_vec = "18"
     w_vec = "19"
@@ -559,53 +561,55 @@ def xadac_conv_asm(
     bias_reg = "t1"
     shift_reg = "t2"
 
-    asm_li(bias_reg, bias)
-    asm_li(shift_reg, shift)
+    asm.li(bias_reg, bias)
+    asm.li(shift_reg, shift)
 
-    @asm_loop("oy", loy, oy_reg)
-    def oy_body(pre, oy):
+    print("A")
 
-        @asm_loop(f"{pre}_ox", lox, ox_reg)
-        def ox_body(pre, ox):
+    @asm.loop("oy", loy, oy_reg)
+    def oy_body(oy):
 
-            asm_la(w_reg, "weight")
+        @asm.loop("ox", lox, ox_reg)
+        def ox_body(ox):
 
-            @asm_loop(f"{pre}_oa", loa)
-            def oa_body(pre, oa):
-                asm_vbias(s_vec, bias_reg, lob)
+            asm.la(w_reg, "weight")
 
-                @asm_loop(f"{pre}_wy", lwy)
-                def wy_body(pre, wy):
+            @asm.loop("oa", loa)
+            def oa_body(oa):
+                asm.vbias(s_vec, bias_reg, lob)
 
-                    @asm_loop(f"{pre}_wx", lwx)
-                    def wx_body(pre, wx):
+                @asm.loop("wy", lwy)
+                def wy_body(wy):
 
-                        @asm_loop(f"{pre}_ia", lia, ia_reg, unroll=8)
-                        def ia_body(pre, ia):
+                    @asm.loop("wx", lwx)
+                    def wx_body(wx):
 
-                            asm_vload(w_vec, w_reg, lob*lib)
-                            asm_vload(i_vec, i_reg, lib)
-                            asm_vmacc(s_vec, w_vec, i_vec, lib)
-                            asm_inc(w_reg, lob*lib)
-                            asm_inc(i_reg, lib)
+                        @asm.loop("ia", lia, ia_reg, unroll=8)
+                        def ia_body(ia):
 
-                    asm_inc(i_reg, (lix - lwx)*lin)
+                            asm.vload(w_vec, w_reg, lob*lib)
+                            asm.vload(i_vec, i_reg, lib)
+                            asm.vmacc(s_vec, w_vec, i_vec, lib)
+                            asm.inc(w_reg, lob*lib)
+                            asm.inc(i_reg, lib)
 
-                asm_inc(i_reg, - lib*lia*lwx*lwy - lwy*(lix - lwx)*lin)
+                    asm.inc(i_reg, (lix - lwx)*lin)
+
+                asm.inc(i_reg, - lib*lia*lwx*lwy - lwy*(lix - lwx)*lin)
 
                 imm = min(lob, lon - oa*lob)
-                asm_vactv(s_vec, o_reg, shift_reg, imm)
-                asm_inc(o_reg, imm)
+                asm.vactv(s_vec, o_reg, shift_reg, imm)
+                asm.inc(o_reg, imm)
 
-            asm_inc(i_reg, sx*lin)
+            asm.inc(i_reg, sx*lin)
 
-        asm_inc(i_reg, sy*lix*lin - lox*sx*lin)
+        asm.inc(i_reg, sy*lix*lin - lox*sx*lin)
 
-    asm_ret()
-    asm_newline()
+    asm.ret()
+    asm.newline()
 
     weight = np.frombuffer(reformed_weight, dtype=np.uint8)
-    asm += asm_array(weight, "weight")
+    asm.array("weight", weight)
 
     return asm
 
@@ -615,7 +619,7 @@ if __name__ == "__main__":
         load_data(params)
         base_conv(**params)
 
-        if name == "layer0":
+        if name == "layer0" and False:
             reform_weight_l0(params)
             xadac_conv_l0(**params)
             asm = ""
@@ -625,5 +629,5 @@ if __name__ == "__main__":
             asm = xadac_conv_asm(name=name, **params)
 
         with open(f"{name}.S", "w") as f:
-            f.write(asm)
+            f.write(asm.asm)
         # break
