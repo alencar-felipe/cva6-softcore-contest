@@ -1,0 +1,24 @@
+import numpy as np
+
+# Data from your list
+data = [
+   0x00000030, 0x00006500, 0x00007600, 0x00470000,
+0x00000000, 0x00000000, 0x01268a00, 0x00000000,
+0x0000002c, 0x00000075, 0x00006500, 0x004b007d,
+0x31000000, 0xa3900000, 0x538d0000, 0x58260000,
+0x00005400, 0x00004800, 0x00000000, 0x00000021,
+0x00000021, 0x50000056, 0x76360000, 0x443e0002,
+0x001a0000, 0x00000039, 0x8f000000, 0x36000033,
+0x00000000, 0x004f9400, 0x00329300, 0x0000005e,
+0x00be0000, 0x00476673, 0x00002e00, 0x450b0031,
+0x00008f00, 0xffff670c,
+]
+
+# Create a NumPy array of uint32
+array_uint32 = np.array(data, dtype=np.uint32)
+
+# View the same data as uint8
+array_uint8 = array_uint32.view(np.uint8)
+
+# Save to a .bin file
+array_uint8.tofile('l2_output.bin')

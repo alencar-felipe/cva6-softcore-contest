@@ -199,6 +199,11 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     ASSERT(crc == 0x4dfde263);
 #endif
 
+#ifdef DUMP
+    printf("input:\n");
+    hexdump(input, L0_I_SIZE);
+#endif
+
 #ifdef LAYER_PERF
     printf("L0\n");
     perf_tic();
