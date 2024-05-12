@@ -1,3 +1,4 @@
+from functools import wraps
 from math import ceil
 import numpy as np
 
@@ -417,17 +418,34 @@ def xadac_conv_asm(
         nonlocal asm
         asm += "\n"
 
-    def asm_loop_begin(name, reg, size):
+    def asm_loop(pre, size, reg=None, unroll=1):
         nonlocal asm
-        asm_li(reg, size)
-        asm_label(f"{name}_loop_begin")
-        asm_beqz(reg, f"{name}_loop_end")
 
-    def asm_loop_end(name, reg):
-        nonlocal asm
-        asm_inc(reg, -1)
-        asm_j(f"{name}_loop_begin")
-        asm_label(f"{name}_loop_end")
+        if reg is None:
+            unroll = size
+
+        div = size // unroll
+        rem = size % unroll
+
+        if div == 1:
+            div, rem = 0, div*unroll
+
+        def decorator(body):
+            if div > 0:
+                asm_li(reg, div)
+                asm_label(f"{pre}_loop_begin")
+                asm_beqz(reg, f"{pre}_loop_end")
+                for i in range(unroll):
+                    body(f"{pre}{i}", i)
+                asm_inc(reg, -1)
+                asm_j(f"{pre}_loop_begin")
+                asm_label(f"{pre}_loop_end")
+
+            for i in range(rem):
+                body(f"{pre}{i + div*unroll}", i + div*unroll)
+
+            return None
+        return decorator
 
     asm += "    .text\n"
     asm += f"    .globl {name}\n"
@@ -443,6 +461,7 @@ def xadac_conv_asm(
     i_reg = "a1"
     oy_reg = "a2"
     ox_reg = "a3"
+    ia_reg = "a4"
 
     bias_reg = "t1"
     shift_reg = "t2"
@@ -450,17 +469,27 @@ def xadac_conv_asm(
     asm_li(bias_reg, bias)
     asm_li(shift_reg, shift)
 
-    if True:  # oy loop
-        asm_loop_begin("oy", oy_reg, loy)
-        if True:  # ox loop
-            asm_loop_begin("ox", ox_reg, lox)
+    @asm_loop("oy", loy, oy_reg)
+    def oy_body(pre, oy):
+
+        @asm_loop(f"{pre}_ox", lox, ox_reg)
+        def ox_body(pre, ox):
 
             asm_la(w_reg, "weight")
-            for oa in range(loa):
+
+            @asm_loop(f"{pre}_oa", loa)
+            def oa_body(pre, oa):
                 asm_vbias(s_vec, bias_reg, lob)
-                for wy in range(lwy):
-                    for wx in range(lwx):
-                        for ia in range(lia):
+
+                @asm_loop(f"{pre}_wy", lwy)
+                def wy_body(pre, wy):
+
+                    @asm_loop(f"{pre}_wx", lwx)
+                    def wx_body(pre, wx):
+
+                        @asm_loop(f"{pre}_ia", lia, ia_reg, unroll=8)
+                        def ia_body(pre, ia):
+
                             asm_vload(w_vec, w_reg, lob*lib)
                             asm_vload(i_vec, i_reg, lib)
                             asm_vmacc(s_vec, w_vec, i_vec, lib)
@@ -476,10 +505,8 @@ def xadac_conv_asm(
                 asm_inc(o_reg, imm)
 
             asm_inc(i_reg, sx*lin)
-            asm_loop_end("ox", ox_reg)
 
         asm_inc(i_reg, sy*lix*lin - lox*sx*lin)
-        asm_loop_end("oy", oy_reg)
 
     asm_ret()
     asm_newline()
