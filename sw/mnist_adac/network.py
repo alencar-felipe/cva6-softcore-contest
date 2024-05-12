@@ -1,4 +1,4 @@
-from functools import wraps
+from copy import copy
 from math import ceil
 import numpy as np
 
@@ -126,9 +126,15 @@ class Xadac:
 
 class Asm:
 
-    def __init__(self) -> None:
+    def __init__(self, regs, vecs) -> None:
         self.asm = ""
         self.stack = []
+
+        self.reg_idle = copy(regs)
+        self.reg_busy = []
+
+        self.vec_idle = copy(vecs)
+        self.vec_busy = []
 
     def vbias(self, vd, rs1, imm):
         self.asm += f"    xadac.vbias {vd}, {rs1}, {imm}\n"
@@ -237,6 +243,26 @@ class Asm:
             return None
 
         return decorator
+
+    def reg_alloc(self, reg=None):
+        assert reg not in self.reg_busy
+        reg = reg or self.reg_idle.pop()
+        self.reg_busy.insert(0, reg)
+        return reg
+
+    def reg_free(self, reg):
+        self.reg_busy.remove(reg)
+        self.reg_idle.issert(0, reg)
+
+    def vec_alloc(self, vec=None):
+        assert vec not in self.vec_busy
+        vec = vec or self.vec_idle.pop()
+        self.vec_busy.insert(0, vec)
+        return vec
+
+    def vec_free(self, vec):
+        self.vec_busy.remove(vec)
+        self.vec_idle.insert(0, vec)
 
 
 def load_data(layer: dict) -> None:
@@ -497,24 +523,28 @@ def xadac_conv_asm(
     **kwargs
 ) -> str:
 
-    asm = Asm()
-
-    s_vec = "18"
-    w_vec = "19"
-    i_vec = "20"
-
-    o_reg = "a0"
-    w_reg = "t0"
-    i_reg = "a1"
-    oy_reg = "a2"
-    ox_reg = "a3"
-    ia_reg = "a4"
-
-    bias_reg = "t1"
-    shift_reg = "t2"
+    asm = Asm(
+        regs=[
+            *[f"a{i}" for i in range(5)],
+            *[f"t{i}" for i in range(5)]
+        ],
+        vecs=[f"{i}" for i in range(18, 28)]
+    )
 
     @asm.func(name)
     def layer_body():
+
+        o_reg = asm.reg_alloc("a0")
+        i_reg = asm.reg_alloc("a1")
+
+        w_reg = asm.reg_alloc()
+
+        oy_reg = asm.reg_alloc()
+        ox_reg = asm.reg_alloc()
+        ia_reg = asm.reg_alloc()
+
+        bias_reg = asm.reg_alloc()
+        shift_reg = asm.reg_alloc()
 
         asm.li(bias_reg, bias)
         asm.li(shift_reg, shift)
@@ -529,6 +559,9 @@ def xadac_conv_asm(
 
                 @asm.loop("oa", loa)
                 def oa_body(oa):
+
+                    s_vec = asm.vec_alloc()
+
                     asm.vbias(s_vec, bias_reg, lob)
 
                     @asm.loop("wy", lwy)
@@ -540,11 +573,17 @@ def xadac_conv_asm(
                             @asm.loop("ia", lia, ia_reg, unroll=8)
                             def ia_body(ia):
 
+                                w_vec = asm.vec_alloc()
+                                i_vec = asm.vec_alloc()
+
                                 asm.vload(w_vec, w_reg, lob*lib)
                                 asm.vload(i_vec, i_reg, lib)
                                 asm.vmacc(s_vec, w_vec, i_vec, lib)
                                 asm.inc(w_reg, lob*lib)
                                 asm.inc(i_reg, lib)
+
+                                asm.vec_free(w_vec)
+                                asm.vec_free(i_vec)
 
                         asm.inc(i_reg, (lix - lwx)*lin)
 
@@ -553,6 +592,8 @@ def xadac_conv_asm(
                     imm = min(lob, lon - oa*lob)
                     asm.vactv(s_vec, o_reg, shift_reg, imm)
                     asm.inc(o_reg, imm)
+
+                    asm.vec_free(s_vec)
 
                 asm.inc(i_reg, sx*lin)
 
@@ -634,23 +675,27 @@ def xadac_layer0_asm(
     **kwargs
 ) -> str:
 
-    asm = Asm()
-
-    s_vec = "18"
-    w_vec = "19"
-    i_vec = "20"
-
-    o_reg = "a0"
-    w_reg = "t0"
-    i_reg = "a1"
-    oy_reg = "a2"
-    ox_reg = "a3"
-
-    bias_reg = "t1"
-    shift_reg = "t2"
+    asm = Asm(
+        regs=[
+            *[f"a{i}" for i in range(5)],
+            *[f"t{i}" for i in range(5)]
+        ],
+        vecs=[f"{i}" for i in range(18, 28)]
+    )
 
     @asm.func(name)
     def layer_body():
+
+        o_reg = asm.reg_alloc("a0")
+        i_reg = asm.reg_alloc("a1")
+
+        w_reg = asm.reg_alloc()
+
+        oy_reg = asm.reg_alloc()
+        ox_reg = asm.reg_alloc()
+
+        bias_reg = asm.reg_alloc()
+        shift_reg = asm.reg_alloc()
 
         asm.li(bias_reg, bias)
         asm.li(shift_reg, shift)
@@ -665,10 +710,16 @@ def xadac_layer0_asm(
 
                 @asm.loop("oa", loa)
                 def oa_body(oa):
+
+                    s_vec = asm.vec_alloc()
+
                     asm.vbias(s_vec, bias_reg, lob)
 
                     @asm.loop("wy", lwy)
                     def wy_body(wy):
+
+                        w_vec = asm.vec_alloc()
+                        i_vec = asm.vec_alloc()
 
                         asm.vload(w_vec, w_reg, lob*lwx)
                         asm.vload(i_vec, i_reg, lwx)
@@ -676,11 +727,16 @@ def xadac_layer0_asm(
                         asm.inc(w_reg, lob*lwx)
                         asm.inc(i_reg, lix)
 
+                        asm.vec_free(w_vec)
+                        asm.vec_free(i_vec)
+
                     asm.inc(i_reg, - lwx*lwy - lwy*(lix - lwx))
 
                     imm = min(lob, lon - oa*lob)
                     asm.vactv(s_vec, o_reg, shift_reg, imm)
                     asm.inc(o_reg, imm)
+
+                    asm.vec_free(s_vec)
 
                 asm.inc(i_reg, sx)
 
@@ -707,4 +763,3 @@ if __name__ == "__main__":
 
         with open(f"{name}.S", "w") as f:
             f.write(asm.asm)
-        # break

@@ -80,6 +80,15 @@
 #define L3_I_SIZE (L3_IN*L3_IY*L3_IX)
 #define L3_W_SIZE (L3_WX*L3_WY*L3_IA*L3_ON*L3_IB)
 
+#ifdef VECTOR_ASM
+
+extern void layer0(uint8_t *output, const uint8_t *input);
+extern void layer1(uint8_t *output, const uint8_t *input);
+extern void layer2(uint8_t *output, const uint8_t *input);
+extern void layer3(uint8_t *output, const uint8_t *input);
+
+#endif
+
 static uint8_t l0_out[L0_O_SIZE];
 static uint8_t l1_out[L1_O_SIZE];
 static uint8_t l2_out[L2_O_SIZE];
@@ -133,7 +142,7 @@ do { \
     } \
 } while(0)
 
-#else
+#elif !defined(VECTOR_ASM)
 
 #define CONV(L, O, I, W) \
 do { \
@@ -187,12 +196,6 @@ static void argmax(
     }
 }
 
-void layer0(uint8_t *output, const uint8_t *input);
-void layer1(uint8_t *output, const uint8_t *input);
-void layer2(uint8_t *output, const uint8_t *input);
-void layer3(uint8_t *output, const uint8_t *input);
-
-
 void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
 {
 
@@ -215,8 +218,11 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    // CONV(L0, l0_out, input, l0_weight);
+#ifdef VECTOR_ASM
     layer0(l0_out, input);
+#else
+    CONV(L0, l0_out, input, l0_weight);
+#endif
 
 #ifdef LAYER_PERF
     perf_toc();
@@ -238,8 +244,11 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    // CONV(L1, l1_out, l0_out, l1_weight);
+#ifdef VECTOR_ASM
     layer1(l1_out, l0_out);
+#else
+    CONV(L1, l1_out, l0_out, l1_weight);
+#endif
 
 #ifdef LAYER_PERF
     perf_toc();
@@ -261,8 +270,11 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    // CONV(L2, l2_out, l1_out, l2_weight);
+#ifdef VECTOR_ASM
     layer2(l2_out, l1_out);
+#else
+    CONV(L2, l2_out, l1_out, l2_weight);
+#endif
 
 #ifdef LAYER_PERF
     perf_toc();
@@ -284,8 +296,11 @@ void inference(const uint8_t* input, int32_t* output, uint8_t* credence)
     perf_tic();
 #endif
 
-    // CONV(L3, l3_out, l2_out, l3_weight);
+#ifdef VECTOR_ASM
     layer3(l3_out, l2_out);
+#else
+    CONV(L3, l3_out, l2_out, l3_weight);
+#endif
 
 #ifdef LAYER_PERF
     perf_toc();
