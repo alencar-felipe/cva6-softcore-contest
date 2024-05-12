@@ -103,26 +103,27 @@ static uint8_t l3_out[L3_O_SIZE];
 #define CONV_LOOP_ON(L, O, I, W, ON_STEP) \
 while(on + ON_STEP <= L##_ON) { \
     VBIAS(S_VI32, L##_BIAS, ON_STEP); \
-    size_t o = (oy*L##_OX + ox)*L##_ON + on; \
+    size_t i = IDX_I(L, L##_SY*oy, L##_SX*ox, 0, 0); \
     for (size_t wy = 0; wy < L##_WY; wy++) { \
-        size_t iy = L##_SY*oy + wy; \
         for (size_t wx = 0; wx < L##_WX; wx++) { \
-            size_t ix = L##_SX*ox + wx; \
             for (size_t ia = 0; ia < L##_IA; ia++) { \
-                size_t i = IDX_I(L, iy, ix, ia, 0); \
                 size_t w = IDX_W(L, wy, wx, ia, on, 0); \
                 VLOAD(W_VI8, (void *) &W[w], ON_STEP*L##_IB); \
                 VLOAD(I_VU8, (void *) &I[i], L##_IB); \
                 VMACC(S_VI32, W_VI8, I_VU8, L##_IB); \
+                i += L##_IB; \
             } \
         } \
+        i += (L##_IX - L##_WX)*L##_IN; \
     } \
     VACTV(S_VI32, &O[o], L##_SHIFT, ON_STEP); \
+    o += ON_STEP; \
     on += ON_STEP; \
 }
 
 #define CONV(L, O, I, W) \
 do { \
+    size_t o = 0; \
     for (size_t oy = 0; oy < L##_OY; oy++) { \
         for (size_t ox = 0; ox < L##_OX; ox++) { \
             size_t on = 0; \
